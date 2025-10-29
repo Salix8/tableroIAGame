@@ -3,3 +3,6 @@
 [ext_resource type="PackedScene" uid="uid://eskpbch2tbnq" path="res://Sprites/kenney_hexagon-kit/Models/FBX format/grass.fbx" id="1_ltxf8"]
 
 [node name="HexTile" instance=ExtResource("1_ltxf8")]
+
+[node name="grass" parent="." index="0"]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 0, 0, 0)

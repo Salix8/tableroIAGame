@@ -2,37 +2,59 @@ using Godot;
 
 public partial class MapGenerator : Node3D
 {
-    [Export]
-    int MapRadius { get; set; } = 10;
+    [Export] int MapRadius { get; set; } = 10;
 
-    [Export]
-    public PackedScene HexTileScene { get; set; }
+    [Export] PackedScene hexTileScene { get; set; }
 
     // El tamaño (radio) de tu malla hexagonal 3D.
     // Ajústalo para que coincida con el tamaño de tu modelo.
-    private float hexSize = 1.0f;
+    private float hexSize;
     private FastNoiseLite noise;
 
     public override void _Ready()
     {
-        // Inicializamos el objeto de ruido
         noise = new FastNoiseLite();
         noise.NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth;
-        noise.Frequency = 0.05f; // Puedes experimentar con estos valores
+        noise.Frequency = 0.05f;
+
+        CalculateHexSize();
 
         GenerateMap();
     }
 
-    public void GenerateMap()
+    private void CalculateHexSize()
     {
-        // Primero, comprobamos si la escena de la tesela ha sido asignada en el editor
-        if (HexTileScene == null)
+        if (hexTileScene == null)
         {
-            GD.PrintErr("La escena 'HexTileScene' no está asignada en el MapGenerator.");
+            GD.PrintErr("La escena 'HexTileScene' no está asignada. No se puede calcular el tamaño.");
             return;
         }
 
-        // Doble bucle para recorrer la rejilla hexagonal en un área cuadrada
+        Node3D tempHex = hexTileScene.Instantiate<Node3D>();
+        MeshInstance3D meshInstance = tempHex.GetNode<MeshInstance3D>("grass");
+
+        if (meshInstance == null)
+        {
+            GD.PrintErr("No se encontró un nodo llamado 'grass' en la escena HexTile.");
+            tempHex.QueueFree();
+            return;
+        }
+
+        Aabb aabb = meshInstance.GetAabb();
+        hexSize = aabb.Size.X / 2.0f;
+
+        // Liberamos la memoria de la instancia temporal
+        tempHex.QueueFree();
+    }
+
+    public void GenerateMap()
+    {
+        if (hexTileScene == null)
+        {
+            GD.PrintErr("La escena 'hexTileScene' no está asignada en el MapGenerator.");
+            return;
+        }
+
         for (int q = -MapRadius; q <= MapRadius; q++)
         {
             for (int r = -MapRadius; r <= MapRadius; r++)
@@ -40,23 +62,21 @@ public partial class MapGenerator : Node3D
                 // Calculamos la tercera coordenada cúbica 's'
                 int s = -q - r;
 
-                // Esta condición asegura que estamos generando dentro de un radio hexagonal,
-                // no en un cuadrado, lo que evita que se generen teselas en las esquinas.
+                // Esta condición asegura que estamos generando dentro de un radio hexagonal, no en un cuadrado, lo que evita que se generen teselas en las esquinas.
                 if (Mathf.Abs(q) + Mathf.Abs(r) + Mathf.Abs(s) <= MapRadius * 2)
                 {
-                    // 1. Obtener la altura del ruido
-                    // Multiplicamos por un valor (ej. 5.0f) para amplificar el efecto.
-                    float height = noise.GetNoise2D(q, r) * 5.0f;
+                    Node3D newHex = hexTileScene.Instantiate<Node3D>();
+                    MeshInstance3D meshInstance = newHex.GetNode<MeshInstance3D>("grass");
+                    Aabb aabb = meshInstance.GetAabb();
+                    hexSize = aabb.Size.X / 2.0f;
 
-                    // 2. Convertir coordenadas del hexágono a posición 3D en el mundo
-                    // Esta es la fórmula estándar para convertir coordenadas axiales (q, r) a cartesianas (x, z)
+                    float height = noise.GetNoise2D(q, r);
+                    // Convertir coordenadas del hexágono a posición 3D en el mundo fórmula estándar para convertir coordenadas axiales (q, r) a cartesianas (x, z)
                     float xPos = hexSize * 3.0f / 2.0f * q;
                     float zPos = hexSize * Mathf.Sqrt(3.0f) * (r + q / 2.0f);
 
                     Vector3 hexPos = new Vector3(xPos, height, zPos);
 
-                    // 3. Instanciar y posicionar la tesela
-                    Node3D newHex = HexTileScene.Instantiate<Node3D>();
                     newHex.Position = hexPos;
                     AddChild(newHex);
                 }
