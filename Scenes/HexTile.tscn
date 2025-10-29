@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://r2h24eifhmyj"]
+
+[ext_resource type="PackedScene" uid="uid://eskpbch2tbnq" path="res://Sprites/kenney_hexagon-kit/Models/FBX format/grass.fbx" id="1_ltxf8"]
+
+[node name="HexTile" instance=ExtResource("1_ltxf8")]

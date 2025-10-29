@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://8x2fk85s4wiv"
+path="res://.godot/imported/path-intersectionA.obj-0dd2f8c170378fce2020819d239ec587.mesh"
+
+[deps]
+
+files=["res://.godot/imported/path-intersectionA.obj-0dd2f8c170378fce2020819d239ec587.mesh"]
+
+source_file="res://Sprites/kenney_hexagon-kit/Models/OBJ format/path-intersectionA.obj"
+dest_files=["res://.godot/imported/path-intersectionA.obj-0dd2f8c170378fce2020819d239ec587.mesh", "res://.godot/imported/path-intersectionA.obj-0dd2f8c170378fce2020819d239ec587.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
