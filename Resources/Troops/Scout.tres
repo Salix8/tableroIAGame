@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TroopData" load_steps=2 format=3 uid="uid://cluvypf4r7vcj"]
+
+[ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="1_cku41"]
+
+[resource]
+script = ExtResource("1_cku41")
+Cost = 2
+Damage = 1
+Movement = 7
+metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

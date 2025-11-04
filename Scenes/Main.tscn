@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=7 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="PackedScene" uid="uid://r2h24eifhmyj" path="res://Scenes/HexTile.tscn" id="2_idj7w"]
+[ext_resource type="Script" uid="uid://c7mepqwd3dhsh" path="res://Scripts/Troops.cs" id="3_rgh2o"]
+[ext_resource type="Resource" uid="uid://cluvypf4r7vcj" path="res://Resources/Troops/Scout.tres" id="4_v1gob"]
+[ext_resource type="Resource" uid="uid://c8tw1oe0vy5hg" path="res://Resources/Troops/Warrior.tres" id="5_jw32o"]
+[ext_resource type="Resource" uid="uid://dwryn3llrislp" path="res://Resources/Troops/Archer.tres" id="6_50glp"]
 
 [node name="Main" type="Node3D"]
 
@@ -16,3 +20,9 @@ transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 5, 12
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.14287074, 0.9897413, 0, -0.9897413, 0.14287074, 0, 0, 0)
+
+[node name="Troops" type="Node" parent="."]
+script = ExtResource("3_rgh2o")
+scoutData = ExtResource("4_v1gob")
+warriorData = ExtResource("5_jw32o")
+archerData = ExtResource("6_50glp")
