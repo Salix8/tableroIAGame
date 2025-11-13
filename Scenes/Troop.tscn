@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://ds2a8ikbdunbv"]
+
+[ext_resource type="PackedScene" uid="uid://biqovydrmlker" path="res://Assets/character-a.fbx" id="1_hdrs0"]
+
+[node name="Troop" instance=ExtResource("1_hdrs0")]
