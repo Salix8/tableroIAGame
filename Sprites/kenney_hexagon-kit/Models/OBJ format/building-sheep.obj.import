@@ -16,10 +16,7 @@ dest_files=["res://.godot/imported/building-sheep.obj-3f9f40d4da4f72ead6faec4708
 [params]
 
 generate_tangents=true
-generate_lods=true
-generate_shadow_mesh=true
-generate_lightmap_uv2=false
-generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
 force_disable_mesh_compression=false
