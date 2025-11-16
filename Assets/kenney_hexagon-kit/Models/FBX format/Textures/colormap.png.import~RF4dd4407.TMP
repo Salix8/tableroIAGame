@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfxglafbtkjo2"
-path="res://.godot/imported/unit-mansion.png-0de50866f42f38831c06024e1f27f078.ctex"
+uid="uid://m14dgm2bowpl"
+path="res://.godot/imported/colormap.png-120f6a4664a723c3dd72f5feb8791655.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/kenney_hexagon-kit/Previews/unit-mansion.png"
-dest_files=["res://.godot/imported/unit-mansion.png-0de50866f42f38831c06024e1f27f078.ctex"]
+source_file="res://Assets/kenney_hexagon-kit/Models/FBX format/Textures/colormap.png"
+dest_files=["res://.godot/imported/colormap.png-120f6a4664a723c3dd72f5feb8791655.ctex"]
 
 [params]
 
