@@ -28,9 +28,6 @@ public partial class TroopSpawner : Node
 
         Troop troop = new Troop(data, coords, HexGrid.Entities.Player); // TODO User.id
 
-        Vector3 worldPos = new Vector3(0,0,0); // TODO
-        troop.GlobalPosition = worldPos;
-
         AddChild(troop);
 
         cell.IsOccupied = true;

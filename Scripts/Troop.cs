@@ -34,6 +34,10 @@ public partial class Troop (TroopData data, Vector2I pos, HexGrid.Entities owner
     {
 
     }
+    void dealDamage(int num)
+    {
+
+    }
     void die()
     {
 
