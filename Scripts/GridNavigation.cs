@@ -7,75 +7,75 @@ public partial class GridNavigation : Node
 {
 	[Export] public HexGrid hexGrid;
 
-	public HashSet<HexCell> ComputeReachableArea(Vector2I startCoords, int maxMovementCost)
+	// public HashSet<HexCell> ComputeReachableArea(Vector2I startCoords, int maxMovementCost)
+	// {
+	// 	var reachable = new HashSet<Vector2I>();
+	// 	var openSet = new PriorityQueue<Vector2I, int>();
+	// 	var gCost = new Dictionary<Vector2I, int>();
+	//
+	// 	HexCell startCell = startCoords;
+	// 	if (startCell == null) return reachable;
+	//
+	// 	openSet.Enqueue(startCell, 0);
+	// 	gCost[startCell] = 0;
+	// 	reachable.Add(startCell);
+	//
+	// 	while (openSet.TryDequeue(out HexCell current, out int currentCost))
+	// 	{
+	// 		if (currentCost > maxMovementCost) continue;
+	//
+	// 		foreach (var neighbor in hexGrid.GetNeighbors(current.HexCoords))
+	// 		{
+	// 			if (neighbor.IsOccupied) continue;
+	//
+	// 			int moveCost = GetMovementCost(neighbor);
+	// 			if (moveCost >= 9999) continue;
+	//
+	// 			int newCost = currentCost + moveCost;
+	// 			if (newCost <= maxMovementCost)
+	// 			{
+	// 				if (!gCost.ContainsKey(neighbor) || newCost < gCost[neighbor])
+	// 				{
+	// 					gCost[neighbor] = newCost;
+	// 					reachable.Add(neighbor);
+	// 					openSet.Enqueue(neighbor, newCost);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return reachable;
+	// }
+
+
+	public IList<Vector2I> ComputePath(Vector2I startCoords, Vector2I targetCoords)
 	{
-		var reachable = new HashSet<HexCell>();
-		var openSet = new PriorityQueue<HexCell, int>();
-		var gCost = new Dictionary<HexCell, int>();
+		// HexCell startCell = hexGrid.GetCell(startCoords);
+		// HexCell targetCell = hexGrid.GetCell(targetCoords);
+		//
+		// if (startCell == null || targetCell == null) return [];
 
-		HexCell startCell = hexGrid.GetCell(startCoords);
-		if (startCell == null) return reachable;
+		var openSet = new PriorityQueue<Vector2I, int>();
+		var closedSet = new HashSet<Vector2I>();
+		var gCost = new Dictionary<Vector2I, int>();
+		var parent = new Dictionary<Vector2I, Vector2I>();
 
-		openSet.Enqueue(startCell, 0);
-		gCost[startCell] = 0;
-		reachable.Add(startCell);
-
-		while (openSet.TryDequeue(out HexCell current, out int currentCost))
-		{
-			if (currentCost > maxMovementCost) continue;
-
-			foreach (var neighbor in hexGrid.GetNeighbors(current.Coords))
-			{
-				if (neighbor.IsOccupied) continue;
-
-				int moveCost = GetMovementCost(neighbor);
-				if (moveCost >= 9999) continue;
-
-				int newCost = currentCost + moveCost;
-				if (newCost <= maxMovementCost)
-				{
-					if (!gCost.ContainsKey(neighbor) || newCost < gCost[neighbor])
-					{
-						gCost[neighbor] = newCost;
-						reachable.Add(neighbor);
-						openSet.Enqueue(neighbor, newCost);
-					}
-				}
-			}
-		}
-		return reachable;
-	}
-
-
-	public HexCell[] ComputePath(Vector2I startCoords, Vector2I targetCoords)
-	{
-		HexCell startCell = hexGrid.GetCell(startCoords);
-		HexCell targetCell = hexGrid.GetCell(targetCoords);
-
-		if (startCell == null || targetCell == null) return [];
-
-		var openSet = new PriorityQueue<HexCell, int>();
-		var closedSet = new HashSet<HexCell>();
-		var gCost = new Dictionary<HexCell, int>();
-		var parent = new Dictionary<HexCell, HexCell>();
-
-		gCost[startCell] = 0;
+		gCost[startCoords] = 0;
 		int h = hexGrid.GetHexDistance(startCoords, targetCoords);
-		openSet.Enqueue(startCell, 0 + h);
+		openSet.Enqueue(startCoords, 0 + h);
 
-		while (openSet.TryDequeue(out HexCell current, out _))
+		while (openSet.TryDequeue(out Vector2I current, out _))
 		{
-			if (current == targetCell)
-				return ReconstructPath(startCell, targetCell, parent);
+			if (current == targetCoords)
+				return ReconstructPath(startCoords, targetCoords, parent);
 
 			closedSet.Add(current);
 
-			foreach (var neighbor in hexGrid.GetNeighbors(current.Coords))
+			foreach (var neighbor in hexGrid.GetNeighborCoords(current))
 			{
-				if (closedSet.Contains(neighbor) || neighbor.IsOccupied)
+				if (closedSet.Contains(neighbor) || WorldState.Instance.GridState.IsOccupied(neighbor))
 					continue;
 
-				int moveCost = GetMovementCost(neighbor);
+				int moveCost = WorldState.Instance.GridState.GetMovementCost(neighbor);
 				if (moveCost >= 9999) continue;
 
 				int tentativeG = gCost[current] + moveCost;
@@ -85,7 +85,7 @@ public partial class GridNavigation : Node
 					parent[neighbor] = current;
 					gCost[neighbor] = tentativeG;
 
-					h = hexGrid.GetHexDistance(neighbor.Coords, targetCoords);
+					h = hexGrid.GetHexDistance(neighbor, targetCoords);
 					openSet.Enqueue(neighbor, tentativeG + h);
 				}
 			}
@@ -106,17 +106,17 @@ public partial class GridNavigation : Node
 		}
 	}
 
-	private HexCell[] ReconstructPath(HexCell start, HexCell end, Dictionary<HexCell, HexCell> parent)
+	private IList<Vector2I> ReconstructPath(Vector2I start, Vector2I end, Dictionary<Vector2I, Vector2I> parentLookup)
 	{
-		var path = new List<HexCell>();
-		HexCell current = end;
+		var path = new List<Vector2I>();
+		Vector2I current = end;
 		while (current != start)
 		{
 			path.Add(current);
-			current = parent[current];
+			current = parentLookup[current];
 		}
 		path.Add(start);
 		path.Reverse();
-		return path.ToArray();
+		return path;
 	}
 }

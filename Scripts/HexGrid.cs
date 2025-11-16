@@ -1,55 +1,61 @@
 using Godot;
 using Game;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Game;
 
 public partial class HexGrid : Node2D
 {
-	public enum Entities {
-		Player,
-		Opponent
-	};
+	// public enum Entities {
+	// 	Player,
+	// 	Opponent
+	// };
 
 	[Export] float cellOuterRadius = 1;
 
 
 	public float CellOuterRadius => cellOuterRadius;
 
-	public Dictionary<Vector2I, HexCell> AllCells { get; private set; } = new();
+	// public Dictionary<Vector2I, HexCell> AllCells { get; private set; } = new();
 
-	private static readonly Vector2I[] directions =
+	static readonly Vector2I[] Directions =
 	[
 		new(1, 0), new(1, -1), new(0, -1),
 		new(-1, 0), new(-1, 1), new(0, 1)
 	];
 
-	public void RegisterCell(HexCell cell)
+	public IList<Vector2I> GetNeighborCoords(Vector2I center)
 	{
-		AllCells[cell.Coords] = cell;
+		return Directions.Select(dir => center + dir).ToList();
 	}
 
-	public HexCell GetCell(Vector2I coords)
-	{
-		AllCells.TryGetValue(coords, out HexCell cell);
-		return cell;
-	}
+	// public void RegisterCell(HexCell cell)
+	// {
+	// 	AllCells[cell.HexCoords] = cell;
+	// }
+	//
+	// public HexCell GetCell(Vector2I coords)
+	// {
+	// 	AllCells.TryGetValue(coords, out HexCell cell);
+	// 	return cell;
+	// }
 
-	public List<HexCell> GetNeighbors(Vector2I coords)
-	{
-		var neighbors = new List<HexCell>();
-
-		foreach (var dir in directions)
-		{
-			Vector2I neighborCoords = coords + dir;
-			if (AllCells.TryGetValue(neighborCoords, out HexCell neighbor))
-			{
-				neighbors.Add(neighbor);
-			}
-		}
-
-		return neighbors;
-	}
+	// public List<HexCell> GetNeighbors(Vector2I coords)
+	// {
+	// 	var neighbors = new List<HexCell>();
+	//
+	// 	foreach (var dir in Directions)
+	// 	{
+	// 		Vector2I neighborCoords = coords + dir;
+	// 		if (AllCells.TryGetValue(neighborCoords, out HexCell neighbor))
+	// 		{
+	// 			neighbors.Add(neighbor);
+	// 		}
+	// 	}
+	//
+	// 	return neighbors;
+	// }
 	public int GetHexDistance(Vector2I a, Vector2I b)
 	{
 		// Convertimos axial -> cube

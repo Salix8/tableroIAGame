@@ -2,7 +2,7 @@ using Godot;
 
 namespace Game;
 
-public class HexCell
+public class HexCell(Vector2I hexCoords, HexCell.TerrainType terrain)
 {
     public enum TerrainType {
         Plains,
@@ -11,13 +11,10 @@ public class HexCell
         Water
     }
     
-    public Vector2I Coords { get; }
-    public TerrainType Terrain { get; set; }
-    public bool IsOccupied { get; set; } = false;
+    public Vector2I HexCoords { get; } = hexCoords;
 
-    public HexCell(Vector2I coords, TerrainType terrain)
-    {
-        Coords = coords;
-        Terrain = terrain;
-    }
+    public TerrainType Terrain { get; set; } = terrain;
+
+    //Todo: move this to a world state
+    public bool IsOccupied { get; set; } = false;
 }
