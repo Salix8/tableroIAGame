@@ -6,7 +6,7 @@ public partial class MapGenerator : Node3D
 	[Export] int MapRadius { get; set; } = 10;
 
 	[Export] PackedScene hexTileScene { get; set; }
-	
+
 	[Export] HexGrid hexGrid { get; set; }
 
 	// El tamaño (radio) de tu malla hexagonal 3D.
@@ -84,20 +84,20 @@ public partial class MapGenerator : Node3D
 					AddChild(newHex);
 
 					Vector2I coords = new Vector2I(q, r);
-					TerrainType terrain = DetermineTerrainFromHeight(height); // Función auxiliar
-					
+					HexCell.TerrainType terrain = DetermineTerrainFromHeight(height); // Función auxiliar
+
 					HexCell newCell = new HexCell(coords, terrain);
 					hexGrid.RegisterCell(newCell);
 				}
 			}
 		}
 	}
-	
-	private TerrainType DetermineTerrainFromHeight(float height)
+
+	private HexCell.TerrainType DetermineTerrainFromHeight(float height)
 	{
-		if (height < -0.5f) return TerrainType.Water;
-		if (height < 0.0f) return TerrainType.Plains;
-		if (height < 0.5f) return TerrainType.Forest;
-		return TerrainType.Mountain;
+		if (height < -0.5f) return HexCell.TerrainType.Water;
+		if (height < 0.0f) return HexCell.TerrainType.Plains;
+		if (height < 0.5f) return HexCell.TerrainType.Forest;
+		return HexCell.TerrainType.Mountain;
 	}
 }

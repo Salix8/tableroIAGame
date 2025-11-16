@@ -26,10 +26,10 @@ public partial class GridNavigation : Node
 
 			foreach (var neighbor in hexGrid.GetNeighbors(current.Coords))
 			{
-				if (neighbor.IsOccupied) continue; 
+				if (neighbor.IsOccupied) continue;
 
 				int moveCost = GetMovementCost(neighbor);
-				if (moveCost >= 9999) continue; 
+				if (moveCost >= 9999) continue;
 
 				int newCost = currentCost + moveCost;
 				if (newCost <= maxMovementCost)
@@ -43,7 +43,7 @@ public partial class GridNavigation : Node
 				}
 			}
 		}
-		return reachable; 
+		return reachable;
 	}
 
 
@@ -98,10 +98,10 @@ public partial class GridNavigation : Node
 	{
 		switch (cell.Terrain)
 		{
-			case TerrainType.Plains: return 1;
-			case TerrainType.Forest: return 2;
-			case TerrainType.Mountain: return 3;
-			case TerrainType.Water: return 99999;
+			case HexCell.TerrainType.Plains: return 1;
+			case HexCell.TerrainType.Forest: return 2;
+			case HexCell.TerrainType.Mountain: return 3;
+			case HexCell.TerrainType.Water: return 99999;
 			default: return 1;
 		}
 	}

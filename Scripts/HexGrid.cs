@@ -1,8 +1,6 @@
 using Godot;
 using Game;
-using Godot.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Game;
 
@@ -14,13 +12,13 @@ public partial class HexGrid : Node2D
 	public float CellOuterRadius => cellOuterRadius;
 
 	public Dictionary<Vector2I, HexCell> AllCells { get; private set; } = new();
-	
-	private static readonly Vector2I[] directions = 
+
+	private static readonly Vector2I[] directions =
 	[
 		new(1, 0), new(1, -1), new(0, -1),
 		new(-1, 0), new(-1, 1), new(0, 1)
 	];
-	
+
 	public void RegisterCell(HexCell cell)
 	{
 		AllCells[cell.Coords] = cell;
@@ -31,23 +29,31 @@ public partial class HexGrid : Node2D
 		AllCells.TryGetValue(coords, out HexCell cell);
 		return cell;
 	}
-	
+
 	public List<HexCell> GetNeighbors(Vector2I coords)
-	public int GetHexDistance(Vector2I a, Vector2I b)
-
-	public enum TerrainType { Plains, Forest, Mountain, Water }
-	
-	public class HexCell
 	{
-		public Vector2I Coords { get; }
-		public TerrainType Terrain { get; set; }
-		public bool IsOccupied { get; set; } = false;
+		var neighbors = new List<HexCell>();
 
-		public HexCell(Vector2I coords, TerrainType terrain)
+		foreach (var dir in directions)
 		{
-			Coords = coords;
-			Terrain = terrain;
+			Vector2I neighborCoords = coords + dir;
+			if (AllCells.TryGetValue(neighborCoords, out HexCell neighbor))
+			{
+				neighbors.Add(neighbor);
+			}
 		}
+
+		return neighbors;
+	}
+	public int GetHexDistance(Vector2I a, Vector2I b)
+	{
+		// Convertimos axial -> cube
+		var ac = AxialToCube(a);
+		var bc = AxialToCube(b);
+
+		return (Mathf.Abs(ac.X - bc.X) +
+				Mathf.Abs(ac.Y - bc.Y) +
+				Mathf.Abs(ac.Z - bc.Z)) / 2;
 	}
 
 	public Vector2I WorldToHex(Vector2 worldCoords)
