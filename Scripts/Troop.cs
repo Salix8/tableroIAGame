@@ -34,6 +34,10 @@ public partial class Troop (TroopData data, Vector2I coords, int ownerIndex)
     {
 
     }
+    void dealDamage(int num)
+    {
+
+    }
     void die()
     {
 
