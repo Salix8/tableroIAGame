@@ -1,3 +1,8 @@
-[gd_scene format=3 uid="uid://dy8rpqscktbt8"]
+[gd_scene load_steps=2 format=3 uid="uid://dy8rpqscktbt8"]
+
+[ext_resource type="Script" uid="uid://by1ryxg5mphoo" path="res://Scripts/Troop.cs" id="1_8vntb"]
 
 [node name="Troop" type="Node3D"]
+script = ExtResource("1_8vntb")
+
+[node name="ModelRoot" type="Node3D" parent="."]

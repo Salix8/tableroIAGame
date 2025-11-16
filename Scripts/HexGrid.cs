@@ -6,6 +6,11 @@ namespace Game;
 
 public partial class HexGrid : Node2D
 {
+	public enum Entities {
+		Player,
+		Opponent
+	};
+
 	[Export] float cellOuterRadius = 1;
 
 
