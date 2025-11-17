@@ -1,10 +1,10 @@
 ﻿using Godot;
 
-namespace Game;
+namespace Game.State;
 
-public struct CreateTroopAction : IGameAction
+public struct MoveTroopAction : IGameAction
 {
-	public CreateTroopAction(TroopData data, Vector2I position)
+	public MoveTroopAction(Vector2I troopCoord, Vector2I targetCoord)
 	{
 		throw new System.NotImplementedException();
 	}

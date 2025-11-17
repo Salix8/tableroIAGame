@@ -2,6 +2,7 @@ using Godot;
 using Game;
 using System.Collections.Generic;
 using System.Linq;
+using Game.State;
 
 public partial class GridNavigation : Node
 {

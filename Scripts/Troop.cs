@@ -2,19 +2,18 @@ using Godot;
 
 namespace Game;
 
-public partial class Troop (TroopData data, Vector2I coords, int ownerIndex)
+public struct Troop (TroopData data, Vector2I coords, int ownerIndex)
 {
-    public TroopData Data { get; set; } = data;
-    public int OwnerIndex { get; set; } = ownerIndex;
+    public TroopData Data { get; } = data;
     public Vector2I Coords { get; set; } = coords;
 	public int Cost { get; private set; } = data.Cost;
-    public int MaxHealth => data.Health;
+    public int MaxHealth => Data.Health;
     public int CurrentHealth { get; private set; } = data.Health;
-    public int NumAttacks => data.NumAttacks;
-	public int Damage => data.Damage;
-	public int Range => data.Range;
-	public int Movement => data.Movement;
-	public int Vision => data.Vision;
+    public int AttackCount => Data.AttackCount;
+	public int Damage => Data.Damage;
+	public int AttackRange => Data.AttackRange;
+	public int MovementRange => Data.MovementRange;
+	public int VisionRange => Data.VisionRange;
 
     // public override void _Ready()
     // {

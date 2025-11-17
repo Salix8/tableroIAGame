@@ -1,7 +1,6 @@
-﻿using System;
-using Godot;
+﻿using Godot;
 
-namespace Game;
+namespace Game.State;
 
 public class WorldState
 {

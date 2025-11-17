@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Game.AsyncEvents;
 using Godot;
 
-namespace Game;
+namespace Game.State;
 
 public class TerrainState()
 {
@@ -27,19 +28,20 @@ public class TerrainState()
 		};
 	}
 
-	public void AddCellAt(Vector2I position, TerrainType type)
+	public Task AddCellAt(Vector2I position, TerrainType type)
 	{
 		terrainMap[position] = type;
-		CellAdded?.Invoke(position);
+		return cellAdded.DispatchParallel();
 	}
 
-	public event Action<Vector2I> CellAdded;
+	readonly AsyncEvent cellAdded = new();
+	public IAsyncHandlerCollection CellAdded => cellAdded;
+
 
 	public IEnumerable<Vector2I> GetFilledPositions()
 	{
 		return terrainMap.Keys;
 	}
-	// public HexGrid Grid => grid;
 	public int GetMovementCostToEnter(Vector2I coords)
 	{
 		throw new System.NotImplementedException();

@@ -1,4 +1,6 @@
-﻿namespace Game;
+﻿using Game.State;
+
+namespace Game;
 
 public class HumanGameStrategy : IGameStrategy
 {
