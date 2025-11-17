@@ -1,0 +1,11 @@
+﻿namespace Game;
+
+public class AiGameStrategy : IGameStrategy
+{
+	//todo implement AI player specific logic
+
+	public IGameAction GetNextAction(WorldState state, int playerIndex)
+	{
+		throw new System.NotImplementedException();
+	}
+}

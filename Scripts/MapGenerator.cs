@@ -87,7 +87,7 @@ public partial class MapGenerator : Node3D
 					HexCell.TerrainType terrain = DetermineTerrainFromHeight(height); // Función auxiliar
 
 					HexCell newCell = new HexCell(coords, terrain);
-					hexGrid.RegisterCell(newCell);
+					// hexGrid.RegisterCell(newCell);
 				}
 			}
 		}

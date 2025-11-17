@@ -5,71 +5,58 @@ using System.Linq;
 
 namespace Game;
 
-public partial class HexGrid : Node2D
+public class HexGrid(float cellOuterRadius)
 {
-	// public enum Entities {
-	// 	Player,
-	// 	Opponent
-	// };
-
-	[Export] float cellOuterRadius = 1;
-
-
 	public float CellOuterRadius => cellOuterRadius;
+	public static readonly Vector2I UpRight = new Vector2I(1, 1);
+	public static readonly Vector2I DownRight = new Vector2I(1, -1);
+	public static readonly Vector2I Down = Vector2I.Down;
+	public static readonly Vector2I UpLeft = new Vector2I(-1, 1);
+	public static readonly Vector2I DownLeft = new Vector2I(-1, -1);
+	public static readonly Vector2I Up = Vector2I.Up;
 
-	// public Dictionary<Vector2I, HexCell> AllCells { get; private set; } = new();
-
-	static readonly Vector2I[] Directions =
-	[
-		new(1, 0), new(1, -1), new(0, -1),
-		new(-1, 0), new(-1, 1), new(0, 1)
+	public static readonly IReadOnlyList<Vector2I> Directions =[
+		DownLeft, Down, DownRight, UpRight, Up, UpLeft,
 	];
 
-	public IList<Vector2I> GetNeighborCoords(Vector2I center)
+	public static IList<Vector2I> GetNeighborCoords(Vector2I center)
 	{
 		return Directions.Select(dir => center + dir).ToList();
 	}
 
-	// public void RegisterCell(HexCell cell)
-	// {
-	// 	AllCells[cell.HexCoords] = cell;
-	// }
-	//
-	// public HexCell GetCell(Vector2I coords)
-	// {
-	// 	AllCells.TryGetValue(coords, out HexCell cell);
-	// 	return cell;
-	// }
-
-	// public List<HexCell> GetNeighbors(Vector2I coords)
-	// {
-	// 	var neighbors = new List<HexCell>();
-	//
-	// 	foreach (var dir in Directions)
-	// 	{
-	// 		Vector2I neighborCoords = coords + dir;
-	// 		if (AllCells.TryGetValue(neighborCoords, out HexCell neighbor))
-	// 		{
-	// 			neighbors.Add(neighbor);
-	// 		}
-	// 	}
-	//
-	// 	return neighbors;
-	// }
-	public int GetHexDistance(Vector2I a, Vector2I b)
+	public static int GetHexDistance(Vector2I a, Vector2I b)
 	{
 		// Convertimos axial -> cube
 		var ac = AxialToCube(a);
 		var bc = AxialToCube(b);
 
 		return (Mathf.Abs(ac.X - bc.X) +
-				Mathf.Abs(ac.Y - bc.Y) +
-				Mathf.Abs(ac.Z - bc.Z)) / 2;
+		        Mathf.Abs(ac.Y - bc.Y) +
+		        Mathf.Abs(ac.Z - bc.Z)) / 2;
 	}
+
+
+	public static IEnumerable<Vector2I> GetNeighborSpiralCoords(Vector2I center, int radius)
+	{
+		Vector2I cur = center;
+		for (int rad = 1; rad <= radius; rad++){
+			cur += Down;
+			for (int edge = 0; edge < 6; edge++){
+				for (int step = 0; step < rad; step++){
+					yield return cur;
+					cur += RingDirections[edge];
+				}
+			}
+		}
+	}
+
+	static readonly IReadOnlyList<Vector2I> RingDirections =[
+		DownRight, UpRight, Up, UpLeft, DownLeft, Down
+	];
 
 	public Vector2I WorldToHex(Vector2 worldCoords)
 	{
-		Vector2 localCoords = worldCoords * GlobalTransform / cellOuterRadius;
+		Vector2 localCoords = worldCoords / cellOuterRadius;
 		Vector2 hexCoords = localCoords * hexTransform;
 		return CubeToAxial(CubeRound(AxialToCubeF(hexCoords)));
 	}
@@ -80,9 +67,10 @@ public partial class HexGrid : Node2D
 	public Vector2 HexToWorld(Vector2I hexCoords)
 	{
 		Vector2 localCoords = hexTransform * hexCoords;
-		Vector2 worldCoords = GlobalTransform * localCoords * cellOuterRadius;
+		Vector2 worldCoords = localCoords * cellOuterRadius;
 		return worldCoords;
 	}
+
 
 	static Vector2I CubeToAxial(Vector3I cubeCoords) => new(cubeCoords.X, cubeCoords.Y);
 	static Vector2 CubeToAxialF(Vector3 cubeCoords) => new(cubeCoords.X, cubeCoords.Y);

@@ -5,7 +5,6 @@ namespace Game;
 public partial class TroopSpawner : Node
 {
     [Export] public PackedScene TroopScene { get; set; }
-    [Export] public HexGrid HexGrid { get; set; }
 
     public int Mana { get; private set; } = 0;
 

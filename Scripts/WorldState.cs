@@ -1,28 +1,25 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 
 namespace Game;
 
-public partial class WorldState : Node
+public class WorldState
 {
-	[Export] GridState gridState;
-
-	public static WorldState Instance { get; private set; }
-	public override void _Ready()
+	public WorldState()
 	{
-		if (Instance == null)
-		{
-			Instance = this;
-		}
-		else
-		{
-			QueueFree();
-		}
+		terrainState = new TerrainState();
+		players = [];
 	}
-	public GridState GridState => gridState;
-	[Export] Player[] players;
-	public Player GetPlayer(int index) => players[index];
-	public int PlayerCount => players.Length;
+	readonly TerrainState terrainState;
+	public TerrainState TerrainState => terrainState;
+	(IGameStrategy strategy, PlayerState state)[] players;
+
 	public Vector2I[] GetVisibleCoords(int playerIndex)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public bool IsOccupied(Vector2I coords)
 	{
 		throw new System.NotImplementedException();
 	}

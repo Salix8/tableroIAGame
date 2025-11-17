@@ -5,7 +5,6 @@ using System.Linq;
 
 public partial class GridNavigation : Node
 {
-	[Export] public HexGrid hexGrid;
 
 	// public HashSet<HexCell> ComputeReachableArea(Vector2I startCoords, int maxMovementCost)
 	// {
@@ -60,7 +59,7 @@ public partial class GridNavigation : Node
 		var parent = new Dictionary<Vector2I, Vector2I>();
 
 		gCost[startCoords] = 0;
-		int h = hexGrid.GetHexDistance(startCoords, targetCoords);
+		int h = HexGrid.GetHexDistance(startCoords, targetCoords);
 		openSet.Enqueue(startCoords, 0 + h);
 
 		while (openSet.TryDequeue(out Vector2I current, out _))
@@ -70,12 +69,12 @@ public partial class GridNavigation : Node
 
 			closedSet.Add(current);
 
-			foreach (var neighbor in hexGrid.GetNeighborCoords(current))
+			foreach (var neighbor in HexGrid.GetNeighborCoords(current))
 			{
-				if (closedSet.Contains(neighbor) || WorldState.Instance.GridState.IsOccupied(neighbor))
+				if (closedSet.Contains(neighbor) || WorldState.Instance.TerrainState.IsOccupied(neighbor))
 					continue;
 
-				int moveCost = WorldState.Instance.GridState.GetMovementCost(neighbor);
+				int moveCost = WorldState.Instance.TerrainState.GetMovementCost(neighbor);
 				if (moveCost >= 9999) continue;
 
 				int tentativeG = gCost[current] + moveCost;
@@ -85,7 +84,7 @@ public partial class GridNavigation : Node
 					parent[neighbor] = current;
 					gCost[neighbor] = tentativeG;
 
-					h = hexGrid.GetHexDistance(neighbor, targetCoords);
+					h = HexGrid.GetHexDistance(neighbor, targetCoords);
 					openSet.Enqueue(neighbor, tentativeG + h);
 				}
 			}
