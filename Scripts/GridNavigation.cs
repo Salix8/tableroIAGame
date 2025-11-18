@@ -72,10 +72,11 @@ public partial class GridNavigation : Node
 
 			foreach (var neighbor in HexGrid.GetNeighborCoords(current))
 			{
-				if (closedSet.Contains(neighbor) || WorldState.Instance.TerrainState.IsOccupied(neighbor))
+				if (closedSet.Contains(neighbor) || false)//TODO replace false with an IsOccupiedCall
 					continue;
 
-				int moveCost = WorldState.Instance.TerrainState.GetMovementCost(neighbor);
+				// int moveCost = WorldState.Instance.TerrainState.GetMovementCost(neighbor);
+				int moveCost = 1;
 				if (moveCost >= 9999) continue;
 
 				int tentativeG = gCost[current] + moveCost;

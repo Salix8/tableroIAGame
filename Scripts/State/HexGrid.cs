@@ -1,19 +1,18 @@
-using Godot;
-using Game;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
-namespace Game;
+namespace Game.State;
 
 public class HexGrid(float cellOuterRadius)
 {
 	public float CellOuterRadius => cellOuterRadius;
-	public static readonly Vector2I UpRight = new Vector2I(1, 1);
-	public static readonly Vector2I DownRight = new Vector2I(1, -1);
-	public static readonly Vector2I Down = Vector2I.Down;
-	public static readonly Vector2I UpLeft = new Vector2I(-1, 1);
-	public static readonly Vector2I DownLeft = new Vector2I(-1, -1);
-	public static readonly Vector2I Up = Vector2I.Up;
+	public static readonly Vector2I Up = new Vector2I(0,-1);
+	public static readonly Vector2I UpRight = new Vector2I(1, -1);
+	public static readonly Vector2I DownRight = new Vector2I(1, 0);
+	public static readonly Vector2I Down = -Up;
+	public static readonly Vector2I DownLeft = -UpRight;
+	public static readonly Vector2I UpLeft = -DownRight;
 
 	public static readonly IReadOnlyList<Vector2I> Directions =[
 		DownLeft, Down, DownRight, UpRight, Up, UpLeft,
@@ -26,7 +25,6 @@ public class HexGrid(float cellOuterRadius)
 
 	public static int GetHexDistance(Vector2I a, Vector2I b)
 	{
-		// Convertimos axial -> cube
 		var ac = AxialToCube(a);
 		var bc = AxialToCube(b);
 
@@ -38,15 +36,15 @@ public class HexGrid(float cellOuterRadius)
 
 	public static IEnumerable<Vector2I> GetNeighborSpiralCoords(Vector2I center, int radius)
 	{
-		Vector2I cur = center;
+		Vector2I cur = center + DownLeft;
 		for (int rad = 1; rad <= radius; rad++){
-			cur += Down;
 			for (int edge = 0; edge < 6; edge++){
 				for (int step = 0; step < rad; step++){
 					yield return cur;
 					cur += RingDirections[edge];
 				}
 			}
+			cur += DownLeft;
 		}
 	}
 
