@@ -4,6 +4,8 @@ namespace Game;
 
 public struct Troop (TroopData data, Vector2I coords, int ownerIndex)
 {
+	//todo refactor this
+	// the troop might not need to actually hold the coordinate
     public TroopData Data { get; } = data;
     public Vector2I Coords { get; set; } = coords;
 	public int Cost { get; private set; } = data.Cost;
@@ -26,24 +28,4 @@ public struct Troop (TroopData data, Vector2I coords, int ownerIndex)
     //
     //     CurrentHealth = Data.Health;
     // }
-
-    /*
-     todo
-    void takeDamage(int num)
-    {
-
-    }
-    void dealDamage(int num)
-    {
-
-    }
-    void die()
-    {
-
-    }
-    void select()
-    {
-
-    }
-    */
 }

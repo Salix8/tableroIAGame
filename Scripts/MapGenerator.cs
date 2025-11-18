@@ -9,8 +9,7 @@ public partial class MapGenerator : Node3D
 
 	public override void _Ready()
 	{
+		//todo: tap into the terrain state on created event to create terrain in game
 	}
-	public void GenerateMap()
-	{
-	}
+
 }
