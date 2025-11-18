@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=11 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://qeojaldhnmx0" path="res://Scripts/HexGrid.cs" id="1_jw32o"]
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
@@ -10,8 +10,6 @@
 [ext_resource type="Script" uid="uid://vhdq4vv602yp" path="res://Scripts/GridNavigation.cs" id="8_50glp"]
 [ext_resource type="Script" uid="uid://bfnuy8u42wosp" path="res://Scripts/PlayableWorldState.cs" id="9_bmxlf"]
 [ext_resource type="Script" uid="uid://dv71us8ote7gl" path="res://Scripts/HexGrid3D.cs" id="10_4kpch"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_bmxlf"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_jw32o")
@@ -46,16 +44,3 @@ metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 script = ExtResource("10_4kpch")
 cellRadius = 1.0
 metadata/_custom_type_script = "uid://dv71us8ote7gl"
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_bmxlf")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7108239, -0.5762286)
-mesh = SubResource("SphereMesh_bmxlf")
-skeleton = NodePath("../MeshInstance3D")
-
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.968505, 1.9043806)
-mesh = SubResource("SphereMesh_bmxlf")
-skeleton = NodePath("../MeshInstance3D")
