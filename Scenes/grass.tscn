@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://djo3gw5hit78w"]
+
+[ext_resource type="PackedScene" uid="uid://eskpbch2tbnq" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass.fbx" id="1_ewrq5"]
+
+[node name="grass" instance=ExtResource("1_ewrq5")]

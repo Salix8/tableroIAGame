@@ -1,6 +1,5 @@
-[gd_scene load_steps=11 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=10 format=3 uid="uid://cj4rxubggvnkc"]
 
-[ext_resource type="Script" uid="uid://qeojaldhnmx0" path="res://Scripts/HexGrid.cs" id="1_jw32o"]
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="PackedScene" uid="uid://r2h24eifhmyj" path="res://Scenes/HexTile.tscn" id="2_idj7w"]
 [ext_resource type="Script" uid="uid://c7mepqwd3dhsh" path="res://Scripts/Troops.cs" id="3_rgh2o"]
@@ -12,14 +11,13 @@
 [ext_resource type="Script" uid="uid://dv71us8ote7gl" path="res://Scripts/HexGrid3D.cs" id="10_4kpch"]
 
 [node name="Main" type="Node3D"]
-script = ExtResource("1_jw32o")
-cellOuterRadius = null
 
 [node name="Enviroment" type="Node" parent="."]
 
-[node name="MapGenerator" type="Node3D" parent="Enviroment"]
+[node name="MapGenerator" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("grid")]
 script = ExtResource("1_r150o")
 hexTileScene = ExtResource("2_idj7w")
+grid = NodePath("../../PlayableWorldState/HexGrid3D")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 5, 12)

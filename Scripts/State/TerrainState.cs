@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Game.AsyncEvents;
+using Game.AsyncEvents.Generic;
 using Godot;
 
 namespace Game.State;
@@ -31,11 +31,11 @@ public class TerrainState()
 	public Task AddCellAt(Vector2I position, TerrainType type)
 	{
 		terrainMap[position] = type;
-		return cellAdded.DispatchParallel();
+		return cellAdded.DispatchParallel((position, type));
 	}
 
-	readonly AsyncEvent cellAdded = new();
-	public IAsyncHandlerCollection CellAdded => cellAdded;
+	readonly AsyncEvent<(Vector2I, TerrainType)> cellAdded = new();
+	public IAsyncHandlerCollection<(Vector2I, TerrainType)> CellAdded => cellAdded;
 
 
 	public IEnumerable<Vector2I> GetFilledPositions()
@@ -44,11 +44,15 @@ public class TerrainState()
 	}
 	public int GetMovementCostToEnter(Vector2I coords)
 	{
-		throw new System.NotImplementedException();
+		return GetTerrainCost(GetTerrainType(coords));
 	}
 	public TerrainType GetTerrainType(Vector2I coords)
 	{
-		throw new System.NotImplementedException();
+		if (terrainMap.TryGetValue(coords, out TerrainType value))
+		{
+			return value;
+		}
+		return TerrainType.Plains;
 	}
 
 
