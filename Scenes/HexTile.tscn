@@ -1,8 +1,29 @@
-[gd_scene load_steps=2 format=3 uid="uid://r2h24eifhmyj"]
+[gd_scene load_steps=6 format=3 uid="uid://r2h24eifhmyj"]
 
-[ext_resource type="PackedScene" uid="uid://eskpbch2tbnq" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass.fbx" id="1_ltxf8"]
+[ext_resource type="Script" uid="uid://cwyg8kd126077" path="res://Scripts/HexTile.cs" id="1_tile_script"]
+[ext_resource type="PackedScene" uid="uid://eskpbch2tbnq" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass.fbx" id="2_plains"]
+[ext_resource type="PackedScene" uid="uid://bf5m730wyidvh" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass-forest.fbx" id="3_forest"]
+[ext_resource type="PackedScene" uid="uid://657bwi1y7n0l" path="res://Assets/kenney_hexagon-kit/Models/FBX format/stone-mountain.fbx" id="4_mountain"]
+[ext_resource type="PackedScene" uid="uid://ccml8g0yrs7rg" path="res://Assets/kenney_hexagon-kit/Models/FBX format/water.fbx" id="5_water"]
 
-[node name="HexTile" instance=ExtResource("1_ltxf8")]
+[node name="HexTile" type="Node3D" node_paths=PackedStringArray("Plains", "Forest", "Mountain", "Water")]
+script = ExtResource("1_tile_script")
+Plains = NodePath("Plains")
+Forest = NodePath("Forest")
+Mountain = NodePath("Mountain")
+Water = NodePath("Water")
 
-[node name="grass" parent="." index="0"]
-transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 0, 0, 0)
+[node name="Plains" parent="." instance=ExtResource("2_plains")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
+
+[node name="Forest" parent="." instance=ExtResource("3_forest")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
+visible = false
+
+[node name="Mountain" parent="." instance=ExtResource("4_mountain")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
+visible = false
+
+[node name="Water" parent="." instance=ExtResource("5_water")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
+visible = false

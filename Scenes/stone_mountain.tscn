@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://bodtfb0fprvh7"]
+
+[ext_resource type="PackedScene" uid="uid://657bwi1y7n0l" path="res://Assets/kenney_hexagon-kit/Models/FBX format/stone-mountain.fbx" id="1_q6brl"]
+
+[node name="stone-mountain" instance=ExtResource("1_q6brl")]

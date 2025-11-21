@@ -43,7 +43,7 @@ public partial class HexGrid3D : Node3D
 		// DrawCell(Vector2I.Zero + HexGrid.Up, Colors.Red);
 		// DrawCell(Vector2I.Zero + HexGrid.DownRight, Colors.Blue);
 		foreach (Vector2I neighborSpiralCoord in HexGrid.GetNeighborSpiralCoords(Vector2I.Zero, 3)){
-			// DebugDraw2D.SetText($"Coord {neighborSpiralCoord}");
+			//DebugDraw2D.SetText($"Coord {neighborSpiralCoord}");
 			DrawCell(neighborSpiralCoord,Colors.Red);
 		}
 	}

@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://bea5epcaqpgxh"]
+
+[ext_resource type="PackedScene" uid="uid://ccml8g0yrs7rg" path="res://Assets/kenney_hexagon-kit/Models/FBX format/water.fbx" id="1_slmpt"]
+
+[node name="water" instance=ExtResource("1_slmpt")]
