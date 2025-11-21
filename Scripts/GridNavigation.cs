@@ -46,6 +46,37 @@ public partial class GridNavigation : Node
 	// 	return reachable;
 	// }
 
+	public bool IsCellAttackable(Vector2I originCoords, Vector2I targetCoords, int attackRange)
+	{
+		if (originCoords == targetCoords) return true;
+
+		var queue = new Queue<(Vector2I, int)>();
+		var visited = new HashSet<Vector2I>();
+
+		queue.Enqueue((targetCoords, 0));
+		visited.Add(targetCoords);
+
+		while (queue.Count > 0)
+		{
+			var (current, dist) = queue.Dequeue();
+
+			if (current == originCoords) return true;
+
+			if (dist >= attackRange) continue;
+
+			foreach (var neighbor in HexGrid.GetNeighborCoords(current))
+			{
+				if (visited.Contains(neighbor)) continue;
+
+				//TODO add check for Line of Sight blockers (like Mountains) here if needed
+
+				visited.Add(neighbor);
+				queue.Enqueue((neighbor, dist + 1));
+			}
+		}
+
+		return false;
+	}
 
 	public IList<Vector2I> ComputePath(Vector2I startCoords, Vector2I targetCoords)
 	{
