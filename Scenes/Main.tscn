@@ -40,5 +40,5 @@ metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="HexGrid3D" type="Node3D" parent="PlayableWorldState"]
 script = ExtResource("10_4kpch")
-cellRadius = 1.0
+CellRadius = 0.5
 metadata/_custom_type_script = "uid://dv71us8ote7gl"
