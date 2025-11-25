@@ -1,4 +1,4 @@
-﻿using Game.State;
+using Game.State;
 
 namespace Game;
 
