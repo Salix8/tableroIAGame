@@ -1,6 +1,8 @@
 using Game;
 using Game.State;
 using Godot;
+using System.Collections.Generic;
+using System.Linq;
 
 public partial class MapGenerator : Node3D
 {
@@ -9,6 +11,14 @@ public partial class MapGenerator : Node3D
 	[Export] HexGrid3D grid;
 
 	[Export] public int MapRadius { get; private set; } = 5;
+	[Export(PropertyHint.Range, "0,5,1")] public int SmoothingIterations { get; private set; } = 1;
+
+	[ExportSubgroup("Terrain Weights")]
+	[Export(PropertyHint.Range, "0,1,0.01")] public float MountainDensity { get; private set; } = 0.12f;
+	[Export(PropertyHint.Range, "0,100,1")] public int PlainsWeight { get; private set; } = 49;
+    [Export(PropertyHint.Range, "0,100,1")] public int ForestWeight { get; private set; } = 28;
+    [Export(PropertyHint.Range, "0,100,1")] public int WaterWeight { get; private set; } = 23;
+
 
 	private PlayableWorldState worldState;
 
@@ -21,8 +31,14 @@ public partial class MapGenerator : Node3D
 		{
 			grid.DebugDrawRadius = MapRadius;
 		}
-		
-		// Generate a hexagonal map
+
+		// Calculate terrain probability thresholds from weights
+		float totalWeight = PlainsWeight + ForestWeight + WaterWeight;
+		float plainsThreshold = (totalWeight > 0) ? PlainsWeight / totalWeight : 1.0f;
+		float forestThreshold = (totalWeight > 0) ? plainsThreshold + (ForestWeight / totalWeight) : 1.0f;
+
+		// Phase 1: Generate Base Map (Plains, Forest, Water)
+		var initialMap = new Dictionary<Vector2I, TerrainState.TerrainType>();
 		for (int q = -MapRadius; q <= MapRadius; q++)
 		{
 			var r1 = Mathf.Max(-MapRadius, -q - MapRadius);
@@ -30,29 +46,71 @@ public partial class MapGenerator : Node3D
 			for (int r = r1; r <= r2; r++)
 			{
 				var cell = new Vector2I(q, r);
-				// Weighted random terrain selection
-				TerrainState.TerrainType terrainType;
-				float rand = GD.Randf(); // Random float between 0.0 and 1.0
+				float rand = GD.Randf();
 
-				if (rand < 0.6f) // 60% chance for Plains
-				{
-					terrainType = TerrainState.TerrainType.Plains;
-				}
-				else if (rand < 0.8f) // 20% chance for Forest (0.6 to 0.8)
-				{
-					terrainType = TerrainState.TerrainType.Forest;
-				}
-				else if (rand < 0.9f) // 10% chance for Mountain (0.8 to 0.9)
-				{
-					terrainType = TerrainState.TerrainType.Mountain;
-				}
-				else // 10% chance for Water (0.9 to 1.0)
-				{
-					terrainType = TerrainState.TerrainType.Water;
-				}
-				worldState.State.TerrainState.AddCellAt(cell, terrainType);
+				if (rand < plainsThreshold) initialMap[cell] = TerrainState.TerrainType.Plains;
+				else if (rand < forestThreshold) initialMap[cell] = TerrainState.TerrainType.Forest;
+				else initialMap[cell] = TerrainState.TerrainType.Water;
 			}
-		}	}
+		}
+
+		// Phase 2: Smoothing
+		var smoothedMap = initialMap;
+		for (int i = 0; i < SmoothingIterations; i++)
+		{
+			smoothedMap = SmoothMap(smoothedMap);
+		}
+		
+		// Phase 3: Sprinkle Mountains
+		var finalMap = new Dictionary<Vector2I, TerrainState.TerrainType>();
+		foreach (var entry in smoothedMap)
+		{
+			if (GD.Randf() < MountainDensity)
+			{
+				finalMap[entry.Key] = TerrainState.TerrainType.Mountain;
+			}
+			else
+			{
+				finalMap[entry.Key] = entry.Value;
+			}
+		}
+
+		// Final Population
+		foreach (var entry in finalMap)
+		{
+			worldState.State.TerrainState.AddCellAt(entry.Key, entry.Value);
+		}
+	}
+
+	private Dictionary<Vector2I, TerrainState.TerrainType> SmoothMap(Dictionary<Vector2I, TerrainState.TerrainType> originalMap)
+	{
+		var newMap = new Dictionary<Vector2I, TerrainState.TerrainType>();
+		var terrainTypes = System.Enum.GetValues(typeof(TerrainState.TerrainType)).Cast<TerrainState.TerrainType>();
+
+		foreach (var cellCoords in originalMap.Keys)
+		{
+			var voteCounts = new Dictionary<TerrainState.TerrainType, int>();
+			foreach(var type in terrainTypes) voteCounts[type] = 0;
+
+			// Central cell gets more votes (weight = 2)
+			voteCounts[originalMap[cellCoords]] += 2;
+
+			// Neighbors get 1 vote each
+			foreach (var neighborCoords in HexGrid.GetNeighborCoords(cellCoords))
+			{
+				if (originalMap.TryGetValue(neighborCoords, out var neighborType))
+				{
+					voteCounts[neighborType] += 1;
+				}
+			}
+
+			// The terrain type with the most votes wins
+			newMap[cellCoords] = voteCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+		}
+
+		return newMap;
+	}
+
 
 	private async System.Threading.Tasks.Task OnCellAdded((Vector2I, TerrainState.TerrainType) cellData)
 	{
