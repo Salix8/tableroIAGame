@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://dwb5apilgmwjr"]
+
+[ext_resource type="Script" uid="uid://be6o0joaa7ocx" path="res://Scripts/UI/PlayerStatsUI.cs" id="1_v11vh"]
+
+[node name="PlayerStatsUI" type="Control" node_paths=PackedStringArray("_manaLabel")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_v11vh")
+_manaLabel = NodePath("ManaLabel")
+
+[node name="ManaLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Mana: 0"

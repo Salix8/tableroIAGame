@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=3 uid="uid://dca1xe2caefkk"]
+
+[ext_resource type="Script" uid="uid://bwt76703q0k8y" path="res://Scripts/UI/GameUI.cs" id="1_71wt1"]
+[ext_resource type="PackedScene" uid="uid://dwb5apilgmwjr" path="res://Scenes/UI/PlayerStatsUI.tscn" id="2_xkiwj"]
+
+[node name="GameUI" type="CanvasLayer" node_paths=PackedStringArray("_playerStatsUI", "_nextTurnButton", "_turnInfoLabel")]
+script = ExtResource("1_71wt1")
+_playerStatsUI = NodePath("MarginContainer/PlayerStatsUI")
+_nextTurnButton = NodePath("MarginContainer2/NextTurnButton")
+_turnInfoLabel = NodePath("MarginContainer3/TurnInfoLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 15
+
+[node name="PlayerStatsUI" parent="MarginContainer" instance=ExtResource("2_xkiwj")]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -122.0
+offset_top = -51.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 20
+
+[node name="NextTurnButton" type="Button" parent="MarginContainer2"]
+layout_mode = 2
+text = "Pasar Turno"
+
+[node name="MarginContainer3" type="MarginContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="TurnInfoLabel" type="Label" parent="MarginContainer3"]
+layout_mode = 2

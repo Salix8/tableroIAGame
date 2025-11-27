@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=13 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="PackedScene" uid="uid://r2h24eifhmyj" path="res://Scenes/HexTile.tscn" id="2_idj7w"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://bfnuy8u42wosp" path="res://Scripts/PlayableWorldState.cs" id="9_grg3l"]
 [ext_resource type="Script" uid="uid://dv71us8ote7gl" path="res://Scripts/HexGrid3D.cs" id="10_4kpch"]
 [ext_resource type="PackedScene" uid="uid://b6g8e2v1x0w8y" path="res://Scenes/UI/GameOverScreen.tscn" id="10_frkhe"]
+[ext_resource type="PackedScene" uid="uid://dca1xe2caefkk" path="res://Scenes/UI/GameUI.tscn" id="12_grg3l"]
 
 [node name="Main" type="Node3D"]
 
@@ -23,7 +24,7 @@ grid = NodePath("../../PlayableWorldState/HexGrid3D")
 worldState = NodePath("../../PlayableWorldState")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 5, 12)
+transform = Transform3D(0.8660254, -0.3213938, 0.38302222, 0, 0.76604444, 0.6427876, -0.5, -0.55667037, 0.66341394, 3, 5, 4.5)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.86602557, 0, -0.86602557, 0.5, 0, 0, 0)
@@ -54,3 +55,6 @@ metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 script = ExtResource("10_4kpch")
 CellRadius = 0.5
 metadata/_custom_type_script = "uid://dv71us8ote7gl"
+
+[node name="GameUI" parent="." node_paths=PackedStringArray("_worldState") instance=ExtResource("12_grg3l")]
+_worldState = NodePath("../PlayableWorldState")
