@@ -11,7 +11,8 @@ public class TerrainState()
 		Plains,
 		Forest,
 		Mountain,
-		Water
+		Water,
+		WizardTower
 	}
 
 	readonly Dictionary<Vector2I, TerrainType> terrainMap = new();
@@ -24,6 +25,7 @@ public class TerrainState()
 			TerrainType.Forest => 1,
 			TerrainType.Mountain => int.MaxValue,
 			TerrainType.Water => 2,
+			TerrainType.WizardTower => 1,
 			_ => 1
 		};
 	}
@@ -42,6 +44,17 @@ public class TerrainState()
 	{
 		return terrainMap.Keys;
 	}
+
+	public IEnumerable<Vector2I> GetTerrainCoordinates(TerrainType type)
+	{
+		foreach (var entry in terrainMap)
+		{
+			if (entry.Value == type)
+			{
+				yield return entry.Key;
+			}
+		}
+	}
 	public int GetMovementCostToEnter(Vector2I coords)
 	{
 		return GetTerrainCost(GetTerrainType(coords));
@@ -51,7 +64,7 @@ public class TerrainState()
 		if (terrainMap.TryGetValue(coords, out TerrainType value))
 		{
 			return value;
-		}
+			}
 		return TerrainType.Plains;
 	}
 

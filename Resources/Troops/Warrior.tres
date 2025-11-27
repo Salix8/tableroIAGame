@@ -4,7 +4,6 @@
 
 [resource]
 script = ExtResource("1_jrcrt")
+Name = "Guerrero"
 Health = 6
-NumAttacks = 3
-Vision = 3
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

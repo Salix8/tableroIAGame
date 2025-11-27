@@ -5,8 +5,19 @@ namespace Game;
 
 public class PlayerState
 {
-	int mana = 0;
-	Dictionary<Vector2I, Troop> troops = new();
+	public PlayerState(int playerIndex)
+	{
+		PlayerIndex = playerIndex;
+	}
+
+	public int PlayerIndex { get; private set; }
+	public int Mana { get; set; } = 0;
+	public Dictionary<Vector2I, Troop> Troops { get; set; } = new();
+
+	public void AddMana(int amount)
+	{
+		Mana = Mathf.Max(0, Mana + amount);
+	}
 
 	// todo add more props
 }
