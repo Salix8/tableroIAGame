@@ -1,38 +1,47 @@
 using Godot;
 using Game;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Game.State;
 
+public interface IReadonlyWorldState
+{
+	//todo implement this to hide write stuff for gameactions
+}
 public class WorldState
 {
-	public WorldState()
+	public WorldState(int playerAmount )
 	{
 		terrainState = new TerrainState();
-		players = new (IGameStrategy strategy, PlayerState state)[] {
-			(null, new PlayerState(0)),
-			(null, new PlayerState(1))
-		};
+		playerStates = new PlayerState[playerAmount];
+		for (int i = 0; i < playerAmount; i++){
+			int playerIndex = i;
+			playerStates[playerIndex] = new PlayerState(playerIndex);
+			playerStates[playerIndex].ClaimedCoord += (coord => {
+				OnCoordClaimed(coord,playerIndex);
+			});
+		}
+	}
+
+	void OnCoordClaimed(Vector2I coord, int playerIndex)
+	{
+		for (int i = 0; i < playerStates.Length; i++){
+			if (i == playerIndex){
+				continue;
+			}
+			PlayerState state = playerStates[i];
+			state.RemoveClaim(coord);
+		}
 	}
 	readonly TerrainState terrainState;
 	public TerrainState TerrainState => terrainState;
-	public Dictionary<Vector2I, ManaWellState> ManaWells { get; } = new();
-	public Dictionary<Vector2I, int> ConqueringClaims { get; } = new();
-	public (IGameStrategy strategy, PlayerState state)[] players;
+	readonly PlayerState[] playerStates;
+	public IReadOnlyList<PlayerState> PlayerStates => playerStates;
 
 	public PlayerState GetPlayerState(int playerIndex)
 	{
-		return players[playerIndex].state;
-	}
-
-	public void AddTroop(int playerIndex, Vector2I coords, Troop troop)
-	{
-		players[playerIndex].state.Troops[coords] = troop;
-	}
-
-	public void RemoveTroop(int playerIndex, Vector2I coords)
-	{
-		players[playerIndex].state.Troops.Remove(coords);
+		return playerStates[playerIndex];
 	}
 
 	public Vector2I[] GetVisibleCoords(int playerIndex)
@@ -42,21 +51,14 @@ public class WorldState
 
 	public bool IsOccupied(Vector2I coords)
 	{
-		foreach (var playerEntry in players)
-		{
-			if (playerEntry.state.Troops.ContainsKey(coords))
-			{
-				return true;
-			}
-		}
-		return false;
+		return playerStates.Any(playerEntry => playerEntry.TryGetTroop(coords,out _));
 	}
 
 	public int? GetPlayerIndexOccupying(Vector2I coords)
 	{
-		for (int i = 0; i < players.Length; i++)
+		for (int i = 0; i < playerStates.Length; i++)
 		{
-			if (players[i].state.Troops.ContainsKey(coords))
+			if (playerStates[i].TryGetTroop(coords, out _))
 			{
 				return i;
 			}

@@ -1,35 +1,25 @@
 [gd_scene load_steps=7 format=3 uid="uid://r2h24eifhmyj"]
 
-[ext_resource type="Script" uid="uid://cwyg8kd126077" path="res://Scripts/HexTile.cs" id="1_tile_script"]
-[ext_resource type="PackedScene" uid="uid://eskpbch2tbnq" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass.fbx" id="2_plains"]
-[ext_resource type="PackedScene" uid="uid://bf5m730wyidvh" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass-forest.fbx" id="3_forest"]
-[ext_resource type="PackedScene" uid="uid://657bwi1y7n0l" path="res://Assets/kenney_hexagon-kit/Models/FBX format/stone-mountain.fbx" id="4_mountain"]
-[ext_resource type="PackedScene" uid="uid://ccml8g0yrs7rg" path="res://Assets/kenney_hexagon-kit/Models/FBX format/water.fbx" id="5_water"]
+[ext_resource type="Script" uid="uid://cwyg8kd126077" path="res://Scripts/Visualizers/HexTileVisualizer.cs" id="1_5idql"]
+[ext_resource type="PackedScene" uid="uid://djo3gw5hit78w" path="res://Scenes/grass.tscn" id="2_wkulw"]
+[ext_resource type="PackedScene" uid="uid://crenp18o3wjcl" path="res://Scenes/grass_forest.tscn" id="3_mlnnr"]
+[ext_resource type="PackedScene" uid="uid://bodtfb0fprvh7" path="res://Scenes/stone_mountain.tscn" id="4_wldho"]
+[ext_resource type="PackedScene" uid="uid://bea5epcaqpgxh" path="res://Scenes/water.tscn" id="5_ctmco"]
 [ext_resource type="PackedScene" uid="uid://dplv6acw31v3a" path="res://Scenes/wizard_tower.tscn" id="6_wizard_tower"]
 
-[node name="HexTile" type="Node3D" node_paths=PackedStringArray("Plains", "Forest", "Mountain", "Water", "WizardTower")]
-script = ExtResource("1_tile_script")
-Plains = NodePath("Plains")
-Forest = NodePath("Forest")
-Mountain = NodePath("Mountain")
-Water = NodePath("Water")
-WizardTower = NodePath("WizardTower")
+[node name="HexTile" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
+script = ExtResource("1_5idql")
+terrainScenes = Dictionary[int, PackedScene]({
+0: ExtResource("2_wkulw"),
+1: ExtResource("3_mlnnr"),
+2: ExtResource("4_wldho"),
+3: ExtResource("5_ctmco"),
+4: ExtResource("6_wizard_tower"),
+5: ExtResource("6_wizard_tower")
+})
+totalAnimationDuration = 0.4
+skippedDuration = 0.37
+spawnPoint = NodePath("spawn")
 
-[node name="Plains" parent="." instance=ExtResource("2_plains")]
-transform = Transform3D(0.86602527, 0, 0.50000024, 0, 1, 0, -0.50000024, 0, 0.86602527, 0, 0, 0)
-
-[node name="Forest" parent="." instance=ExtResource("3_forest")]
-transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
-visible = false
-
-[node name="Mountain" parent="." instance=ExtResource("4_mountain")]
-transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
-visible = false
-
-[node name="Water" parent="." instance=ExtResource("5_water")]
-transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
-visible = false
-
-[node name="WizardTower" parent="." instance=ExtResource("6_wizard_tower")]
-transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0, 0)
-visible = false
+[node name="spawn" type="Node3D" parent="."]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 0, 0, 0)

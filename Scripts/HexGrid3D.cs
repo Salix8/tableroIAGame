@@ -14,6 +14,8 @@ public partial class HexGrid3D : Node3D
 		grid = new HexGrid(CellRadius);
 	}
 
+	public float InnerRadius => 0.86602540378f * CellRadius;
+
 	public Vector2I WorldToHex(Vector3 worldPosition)
 	{
 		Vector3 local = worldPosition * GlobalTransform;

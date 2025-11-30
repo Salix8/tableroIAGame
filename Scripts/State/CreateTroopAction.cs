@@ -1,15 +1,26 @@
-﻿using Godot;
+﻿using System.Threading.Tasks;
+using Godot;
 
 namespace Game.State;
 
-public struct CreateTroopAction : IGameAction
+public readonly struct CreateTroopAction(TroopData troopData, Vector2I position) : IGameAction
 {
-	public CreateTroopAction(TroopData data, Vector2I position)
+
+	public async Task<bool> TryApply(PlayerState playerState,WorldState worldState)
 	{
-		throw new System.NotImplementedException();
-	}
-	public bool TryApply(PlayerState state)
-	{
-		throw new System.NotImplementedException();
+		if (!playerState.IsSpawnableCoord(position)){
+			return false;
+		}
+
+		if (worldState.IsOccupied(position)){
+			return false;
+		}
+
+		if (worldState.TerrainState.GetTerrainType(position) is TerrainState.TerrainType.Mountain or null){
+			return false;
+		}
+
+		return await playerState.TrySpawnTroop(troopData, position);
+
 	}
 }

@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="TroopData" load_steps=2 format=3 uid="uid://cluvypf4r7vcj"]
+[gd_resource type="Resource" script_class="TroopData" load_steps=3 format=3 uid="uid://cluvypf4r7vcj"]
 
+[ext_resource type="PackedScene" uid="uid://ciqso5iou4pnx" path="res://Scenes/scout.tscn" id="1_a6awx"]
 [ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="1_cku41"]
 
 [resource]
 script = ExtResource("1_cku41")
+ModelScene = ExtResource("1_a6awx")
 Name = "Explorador"
 Cost = 2
 Damage = 1

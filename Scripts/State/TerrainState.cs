@@ -12,7 +12,8 @@ public class TerrainState()
 		Forest,
 		Mountain,
 		Water,
-		WizardTower
+		WizardTower,
+		ManaPool,
 	}
 
 	readonly Dictionary<Vector2I, TerrainType> terrainMap = new();
@@ -21,11 +22,8 @@ public class TerrainState()
 	{
 		return terrain switch
 		{
-			TerrainType.Plains => 1,
-			TerrainType.Forest => 1,
 			TerrainType.Mountain => int.MaxValue,
 			TerrainType.Water => 2,
-			TerrainType.WizardTower => 1,
 			_ => 1
 		};
 	}
@@ -33,7 +31,7 @@ public class TerrainState()
 	public Task AddCellAt(Vector2I position, TerrainType type)
 	{
 		terrainMap[position] = type;
-		return cellAdded.DispatchParallel((position, type));
+		return cellAdded.DispatchSequential((position, type));
 	}
 
 	readonly AsyncEvent<(Vector2I, TerrainType)> cellAdded = new();
@@ -55,17 +53,21 @@ public class TerrainState()
 			}
 		}
 	}
-	public int GetMovementCostToEnter(Vector2I coords)
+	public int? GetMovementCostToEnter(Vector2I coords)
 	{
-		return GetTerrainCost(GetTerrainType(coords));
+		TerrainType? type = GetTerrainType(coords);
+		if (type == null){
+			return null;
+		}
+		return GetTerrainCost(type.Value);
 	}
-	public TerrainType GetTerrainType(Vector2I coords)
+	public TerrainType? GetTerrainType(Vector2I coord)
 	{
-		if (terrainMap.TryGetValue(coords, out TerrainType value))
-		{
-			return value;
-			}
-		return TerrainType.Plains;
+		if (terrainMap.TryGetValue(coord, out TerrainType type)){
+			return type;
+		}
+
+		return null;
 	}
 
 

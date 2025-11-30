@@ -1,7 +1,9 @@
-﻿namespace Game.State;
+﻿using System.Threading.Tasks;
+
+namespace Game.State;
 
 public interface IGameAction
 {
-	bool TryApply(PlayerState state);
+	Task<bool> TryApply(PlayerState playerState, WorldState worldState);
 
 }

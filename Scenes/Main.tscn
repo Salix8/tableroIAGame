@@ -1,27 +1,40 @@
-[gd_scene load_steps=13 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=15 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
+[ext_resource type="Script" uid="uid://ho0am3pm8f0w" path="res://Scripts/Visualizers/MapVisualizer.cs" id="2_grg3l"]
 [ext_resource type="PackedScene" uid="uid://r2h24eifhmyj" path="res://Scenes/HexTile.tscn" id="2_idj7w"]
 [ext_resource type="Script" uid="uid://c7mepqwd3dhsh" path="res://Scripts/Troops.cs" id="3_rgh2o"]
+[ext_resource type="Script" uid="uid://ce75cpal3e01q" path="res://Scripts/Visualizers/TroopVisualizerSpawner.cs" id="4_1p5hy"]
 [ext_resource type="Resource" uid="uid://cluvypf4r7vcj" path="res://Resources/Troops/Scout.tres" id="4_v1gob"]
+[ext_resource type="PackedScene" uid="uid://cal78vmms1mpb" path="res://Scenes/Visualizers/troop_visualizer.tscn" id="5_h1m7h"]
 [ext_resource type="Resource" uid="uid://c8tw1oe0vy5hg" path="res://Resources/Troops/Warrior.tres" id="5_jw32o"]
 [ext_resource type="Resource" uid="uid://dwryn3llrislp" path="res://Resources/Troops/Archer.tres" id="6_50glp"]
 [ext_resource type="Script" uid="uid://cqmxp3uegjwh4" path="res://Scripts/TroopSpawner.cs" id="7_4kpch"]
 [ext_resource type="Script" uid="uid://vhdq4vv602yp" path="res://Scripts/GridNavigation.cs" id="8_50glp"]
 [ext_resource type="Script" uid="uid://bfnuy8u42wosp" path="res://Scripts/PlayableWorldState.cs" id="9_grg3l"]
 [ext_resource type="Script" uid="uid://dv71us8ote7gl" path="res://Scripts/HexGrid3D.cs" id="10_4kpch"]
-[ext_resource type="PackedScene" uid="uid://b6g8e2v1x0w8y" path="res://Scenes/UI/GameOverScreen.tscn" id="10_frkhe"]
 [ext_resource type="PackedScene" uid="uid://dca1xe2caefkk" path="res://Scenes/UI/GameUI.tscn" id="12_grg3l"]
 
 [node name="Main" type="Node3D"]
 
 [node name="Enviroment" type="Node" parent="."]
 
-[node name="MapGenerator" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("grid", "worldState")]
+[node name="MapGenerator" type="Node3D" parent="Enviroment"]
 script = ExtResource("1_r150o")
-hexTileScene = ExtResource("2_idj7w")
+
+[node name="MapVisualizer" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("state", "grid")]
+script = ExtResource("2_grg3l")
+state = NodePath("../../PlayableWorldState")
 grid = NodePath("../../PlayableWorldState/HexGrid3D")
-worldState = NodePath("../../PlayableWorldState")
+hexTileVisualizerScene = ExtResource("2_idj7w")
+metadata/_custom_type_script = "uid://ho0am3pm8f0w"
+
+[node name="TroopVisualizerSpawner" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("state", "grid")]
+script = ExtResource("4_1p5hy")
+troopVisualizerScene = ExtResource("5_h1m7h")
+state = NodePath("../../PlayableWorldState")
+grid = NodePath("../../PlayableWorldState/HexGrid3D")
+metadata/_custom_type_script = "uid://ce75cpal3e01q"
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.8660254, -0.3213938, 0.38302222, 0, 0.76604444, 0.6427876, -0.5, -0.55667037, 0.66341394, 3, 5, 4.5)
@@ -37,18 +50,17 @@ scoutData = ExtResource("4_v1gob")
 warriorData = ExtResource("5_jw32o")
 archerData = ExtResource("6_50glp")
 
-[node name="TroopSpawner" type="Node" parent="Troops" node_paths=PackedStringArray("worldState", "grid")]
+[node name="TroopSpawner" type="Node" parent="Troops"]
 script = ExtResource("7_4kpch")
-worldState = NodePath("../../PlayableWorldState")
-grid = NodePath("../../PlayableWorldState/HexGrid3D")
 
 [node name="GridNavigation" type="Node" parent="."]
 script = ExtResource("8_50glp")
 
-[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("_grid")]
+[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator")]
 script = ExtResource("9_grg3l")
-_gameOverScreenScene = ExtResource("10_frkhe")
-_grid = NodePath("HexGrid3D")
+grid = NodePath("HexGrid3D")
+generator = NodePath("../Enviroment/MapGenerator")
+testTroop = ExtResource("4_v1gob")
 metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="HexGrid3D" type="Node3D" parent="PlayableWorldState"]
@@ -56,5 +68,4 @@ script = ExtResource("10_4kpch")
 CellRadius = 0.5
 metadata/_custom_type_script = "uid://dv71us8ote7gl"
 
-[node name="GameUI" parent="." node_paths=PackedStringArray("_worldState") instance=ExtResource("12_grg3l")]
-_worldState = NodePath("../PlayableWorldState")
+[node name="GameUI" parent="." instance=ExtResource("12_grg3l")]

@@ -1,7 +1,9 @@
-﻿namespace Game.State;
+﻿using System.Threading.Tasks;
+
+namespace Game.State;
 
 public interface IGameStrategy
 {
-	public IGameAction GetNextAction(WorldState state, int playerIndex);
+	public Task<IGameAction> GetNextAction(WorldState state, int playerIndex);
 
 }

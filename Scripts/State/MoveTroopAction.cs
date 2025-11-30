@@ -1,15 +1,13 @@
-﻿using Godot;
+﻿using System.Threading.Tasks;
+using Godot;
 
 namespace Game.State;
 
-public struct MoveTroopAction : IGameAction
+public readonly struct MoveTroopAction(Vector2I troopCoord, Vector2I targetCoord) : IGameAction
 {
-	public MoveTroopAction(Vector2I troopCoord, Vector2I targetCoord)
+
+	public async Task<bool> TryApply(PlayerState playerState,WorldState worldState)
 	{
-		throw new System.NotImplementedException();
-	}
-	public bool TryApply(PlayerState state)
-	{
-		throw new System.NotImplementedException();
+		return await playerState.TryMoveTroop(troopCoord, targetCoord);
 	}
 }

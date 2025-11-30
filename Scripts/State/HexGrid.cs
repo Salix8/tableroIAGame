@@ -34,8 +34,11 @@ public class HexGrid(float cellOuterRadius)
 	}
 
 
-	public static IEnumerable<Vector2I> GetNeighborSpiralCoords(Vector2I center, int radius)
+	public static IEnumerable<Vector2I> GetNeighborSpiralCoords(Vector2I center, int radius, bool includeCenter = false)
 	{
+		if (includeCenter){
+			yield return center;
+		}
 		Vector2I cur = center + DownLeft;
 		for (int rad = 1; rad <= radius; rad++){
 			for (int edge = 0; edge < 6; edge++){

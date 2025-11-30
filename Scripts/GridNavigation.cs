@@ -128,14 +128,13 @@ public partial class GridNavigation : Node
 
 	private int GetMovementCost(HexCell cell)
 	{
-		switch (cell.Terrain)
-		{
-			case HexCell.TerrainType.Plains: return 1;
-			case HexCell.TerrainType.Forest: return 2;
-			case HexCell.TerrainType.Mountain: return 3;
-			case HexCell.TerrainType.Water: return 99999;
-			default: return 1;
-		}
+		return cell.Terrain switch{
+			TerrainState.TerrainType.Plains => 1,
+			TerrainState.TerrainType.Forest => 2,
+			TerrainState.TerrainType.Mountain => 3,
+			TerrainState.TerrainType.Water => 99999,
+			_ => 1
+		};
 	}
 
 	private IList<Vector2I> ReconstructPath(Vector2I start, Vector2I end, Dictionary<Vector2I, Vector2I> parentLookup)

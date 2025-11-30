@@ -1,15 +1,14 @@
-using Game;
-using Game.State;
-using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Game.State;
+using Godot;
+
+namespace Game;
 
 public partial class MapGenerator : Node3D
 {
-	[Export] private PackedScene hexTileScene;
-	[Export] private HexGrid3D grid;
-	[Export] private PlayableWorldState worldState;
+	// [Export] PlayableWorldState worldState;
 
 	[Export] public int MapRadius { get; private set; } = 5;
 	[Export(PropertyHint.Range, "0,5,1")] public int SmoothingIterations { get; private set; } = 1;
@@ -18,17 +17,17 @@ public partial class MapGenerator : Node3D
 	[Export(PropertyHint.Range, "0,1,0.01")] public float MountainDensity { get; private set; } = 0.12f;
 	[Export(PropertyHint.Range, "0,1,0.01")] public float WizardTowerDensity { get; private set; } = 0.04f;
 	[Export(PropertyHint.Range, "0,100,1")] public int PlainsWeight { get; private set; } = 49;
-    [Export(PropertyHint.Range, "0,100,1")] public int ForestWeight { get; private set; } = 28;
-    [Export(PropertyHint.Range, "0,100,1")] public int WaterWeight { get; private set; } = 23;
+	[Export(PropertyHint.Range, "0,100,1")] public int ForestWeight { get; private set; } = 28;
+	[Export(PropertyHint.Range, "0,100,1")] public int WaterWeight { get; private set; } = 23;
 
 	public override void _Ready()
 	{
-		worldState.State.TerrainState.CellAdded.Subscribe(OnCellAdded);
 
-		if (grid != null)
-		{
-			grid.DebugDrawRadius = MapRadius;
-		}
+
+	}
+
+	public (Dictionary<Vector2I, TerrainState.TerrainType> map, Vector2I mana1Pos, Vector2I mana2Pos) GenerateMap()
+	{
 
 		// Calculate terrain probability thresholds from weights
 		float totalWeight = PlainsWeight + ForestWeight + WaterWeight;
@@ -58,7 +57,7 @@ public partial class MapGenerator : Node3D
 		{
 			smoothedMap = SmoothMap(smoothedMap);
 		}
-		
+
 		// Phase 3: Sprinkle Mountains
 		var mountainMap = new Dictionary<Vector2I, TerrainState.TerrainType>();
 		foreach (var entry in smoothedMap)
@@ -82,7 +81,7 @@ public partial class MapGenerator : Node3D
 			.Where(entry => entry.Value == TerrainState.TerrainType.Plains)
 			.Select(entry => entry.Key)
 			.ToList();
-		
+
 		if (availablePlains.Count < 2)
 		{
 			GD.PrintErr("Not enough plains tiles to place starting Mana Wells! Using fallback.");
@@ -91,24 +90,24 @@ public partial class MapGenerator : Node3D
 				.Select(entry => entry.Key)
 				.ToList();
 		}
-		
+
 		GD.Randomize();
 
 		// Select first Mana Well for Player 0
 		int randomIndex1 = (int)(GD.Randi() % availablePlains.Count);
 		Vector2I well1Coords = availablePlains[randomIndex1];
-		finalMap[well1Coords] = TerrainState.TerrainType.WizardTower;
-		worldState.State.ManaWells.Add(well1Coords, new ManaWellState { OwnerIndex = 0 });
+		finalMap[well1Coords] = TerrainState.TerrainType.ManaPool;
+		// worldState.State.ManaWells.Add(well1Coords, new ManaWellState { OwnerIndex = 0 });
 		startingWellCoords.Add(well1Coords);
 		availablePlains.RemoveAt(randomIndex1);
 
 		// Select second Mana Well for Player 1
 		int randomIndex2 = (int)(GD.Randi() % availablePlains.Count);
 		Vector2I well2Coords = availablePlains[randomIndex2];
-		finalMap[well2Coords] = TerrainState.TerrainType.WizardTower;
-		worldState.State.ManaWells.Add(well2Coords, new ManaWellState { OwnerIndex = 1 });
+		finalMap[well2Coords] = TerrainState.TerrainType.ManaPool;
+		// worldState.State.ManaWells.Add(well2Coords, new ManaWellState { OwnerIndex = 1 });
 		startingWellCoords.Add(well2Coords);
-		
+
 		// --- Sprinkle neutral wells ---
 		foreach (var entry in mountainMap)
 		{
@@ -121,26 +120,23 @@ public partial class MapGenerator : Node3D
 			if (GD.Randf() < WizardTowerDensity)
 			{
 				finalMap[entry.Key] = TerrainState.TerrainType.WizardTower;
-				worldState.State.ManaWells.Add(entry.Key, new ManaWellState { OwnerIndex = null });
+				// worldState.State.ManaWells.Add(entry.Key, new ManaWellState { OwnerIndex = null });
 			}
 		}
 
 		// Final Population
-		foreach (var entry in finalMap)
-		{
-			worldState.State.TerrainState.AddCellAt(entry.Key, entry.Value);
-		}
+		return (finalMap,well1Coords,well2Coords);
 	}
 
-	private Dictionary<Vector2I, TerrainState.TerrainType> SmoothMap(Dictionary<Vector2I, TerrainState.TerrainType> originalMap)
+	static Dictionary<Vector2I, TerrainState.TerrainType> SmoothMap(Dictionary<Vector2I, TerrainState.TerrainType> originalMap)
 	{
 		var newMap = new Dictionary<Vector2I, TerrainState.TerrainType>();
-		var terrainTypes = System.Enum.GetValues(typeof(TerrainState.TerrainType)).Cast<TerrainState.TerrainType>();
+		var terrainTypes = Enum.GetValues(typeof(TerrainState.TerrainType));
 
-		foreach (var cellCoords in originalMap.Keys)
+		foreach (Vector2I cellCoords in originalMap.Keys)
 		{
 			var voteCounts = new Dictionary<TerrainState.TerrainType, int>();
-			foreach(var type in terrainTypes) voteCounts[type] = 0;
+			foreach(TerrainState.TerrainType type in terrainTypes) voteCounts[type] = 0;
 
 			// Central cell gets more votes (weight = 2)
 			voteCounts[originalMap[cellCoords]] += 2;
@@ -161,14 +157,4 @@ public partial class MapGenerator : Node3D
 		return newMap;
 	}
 
-
-	private async System.Threading.Tasks.Task OnCellAdded((Vector2I, TerrainState.TerrainType) cellData)
-	{
-		var (cellCoords, terrainType) = cellData;
-		var tile = hexTileScene.Instantiate<HexTile>();
-		AddChild(tile);
-		tile.Position = grid.HexToWorld(cellCoords);
-		tile.SetTerrain(terrainType);
-		await Task.CompletedTask; // Resolve CS1998 warning
-	}
 }
