@@ -109,9 +109,9 @@ public class Troop(TroopData data, Vector2I startPos, Action<Troop> onKilled)
 {
 	public TroopData Data => data;
 	public Vector2I Position { get; set; }= startPos;
-	public AsyncEvent Killed = new();
-	public AsyncEvent<Vector2I> MovedTo = new();
-	public AsyncEvent<(int health, int damage)> Damaged = new();
+	public readonly AsyncEvent Killed = new();
+	public readonly AsyncEvent<Vector2I> MovedTo = new();
+	public readonly AsyncEvent<(int health, int damage)> Damaged = new();
 	public int CurrentHealth { get; set; } = data.Health;
 
 	public async Task Damage(int damage)

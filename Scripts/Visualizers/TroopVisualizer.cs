@@ -30,6 +30,7 @@ public partial class TroopVisualizer : Node3D
 	{
 		if (grid == null) return;
 		Vector3 targetPosition = grid.HexToWorld(pos);
+		LookAt(targetPosition,Vector3.Up);
 		Tween move = GetTree().CreateTween();
 		move.TweenMethod(Callable.From((Vector3 newPos) => {
 			GlobalPosition = newPos;
