@@ -107,6 +107,7 @@ public class PlayerState(int playerIndex)
 
 public class Troop(TroopData data, Vector2I startPos, Action<Troop> onKilled)
 {
+	public Guid Id { get; } = Guid.NewGuid(); // Add this line
 	public TroopData Data => data;
 	public Vector2I Position { get; set; }= startPos;
 	public readonly AsyncEvent Killed = new();

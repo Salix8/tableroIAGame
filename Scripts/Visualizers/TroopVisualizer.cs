@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Godot;
+using Game;
 
 namespace Game.Visualizers;
 
@@ -46,7 +47,23 @@ public partial class TroopVisualizer : Node3D
 		troop.Killed.Subscribe(Kill);
 		GlobalPosition = grid.HexToWorld(troop.Position);
 		spawnedTroop?.QueueFree();
+		
 		spawnedTroop = troop.Data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);
+
+		// Find the Area3D within the spawned model to make it clickable
+		var area = spawnedTroop.FindChild("TroopClickArea", recursive: true) as Area3D;
+		if (area != null)
+		{
+			// Layer 3 for "Interactables" (1 << 2 means the 3rd bit is 1)
+			area.CollisionLayer = 1 << 2; 
+			// Store the logical troop's ID (as a string) in the area's metadata
+			area.SetMeta("troop_id", troop.Id.ToString());
+		}
+		else
+		{
+			GD.PrintErr($"Troop model '{spawnedTroop.Name}' is missing an Area3D named 'TroopClickArea'. It will not be clickable.");
+		}
+
 		spawnedTroop.Scale = Vector3.Zero;
 		Tween appear = GetTree().CreateTween();
 		appear.TweenMethod(Callable.From((Vector3 scale) => {
