@@ -1,3 +1,4 @@
+using System; // Added for Guid
 using System.Collections.Generic;
 using Game.State;
 using Game.UI;
@@ -63,7 +64,7 @@ public partial class PlayableWorldState : Node
 		CurrentPlayerIndex = 0;
 	}
 
-	public void HandlePlayerClick(Vector2I hexCoord)
+	public void HandleClickOnHex(Vector2I hexCoord)
 	{
 		// Get the current player's strategy based on CurrentPlayerIndex
 		IGameStrategy currentStrategy = (CurrentPlayerIndex == 0) ? Player1Strategy : Player2Strategy;
@@ -73,12 +74,48 @@ public partial class PlayableWorldState : Node
 		{
 			humanStrategy.OnHexClicked(hexCoord);
 			GD.Print($"PlayableWorldState: Human player {CurrentPlayerIndex} clicked hex {hexCoord}");
-			// After handling click, the game loop (elsewhere) should await the action
-			// and then advance the turn.
 		}
-		else
+	}
+
+	public void HandleClickOnTroop(Troop troop)
+	{
+		// Get the current player's strategy based on CurrentPlayerIndex
+		IGameStrategy currentStrategy = (CurrentPlayerIndex == 0) ? Player1Strategy : Player2Strategy;
+
+		// If the current player is human, pass the click to their strategy
+		if (currentStrategy is HumanGameStrategy humanStrategy)
 		{
-			GD.PrintErr($"PlayableWorldState: Non-human player {CurrentPlayerIndex} is active, click ignored.");
+			humanStrategy.OnTroopClicked(troop);
+			GD.Print($"PlayableWorldState: Human player {CurrentPlayerIndex} clicked on troop {troop.Data.Name} at {troop.Position}");
 		}
+	}
+	
+	public void HandleClickOnManaPool(Vector2I coord)
+	{
+		// Get the current player's strategy based on CurrentPlayerIndex
+		IGameStrategy currentStrategy = (CurrentPlayerIndex == 0) ? Player1Strategy : Player2Strategy;
+
+		// If the current player is human, pass the click to their strategy
+		if (currentStrategy is HumanGameStrategy humanStrategy)
+		{
+			humanStrategy.OnManaPoolClicked(coord);
+			GD.Print($"PlayableWorldState: Human player {CurrentPlayerIndex} clicked on Mana Pool at {coord}");
+		}
+	}
+
+	public Troop GetTroopById(Guid id)
+	{
+		foreach (PlayerState playerState in State.PlayerStates)
+		{
+			foreach (Troop troop in playerState.Troops)
+			{
+				if (troop.Id == id)
+				{
+					return troop;
+				}
+			}
+		}
+		GD.PrintErr($"PlayableWorldState: Troop with ID {id} not found.");
+		return null;
 	}
 }
