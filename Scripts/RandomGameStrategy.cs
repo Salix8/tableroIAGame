@@ -12,9 +12,10 @@ public class RandomGameStrategy(TroopData troopToSpawn, InfluenceMapManager mapM
 	public Task<IGameAction> GetNextAction(WorldState state, int playerIndex)
 	{
 		mapManager.UpdateMaps(state, playerIndex);
+
 		PlayerState playerState = state.GetPlayerState(playerIndex);
 		
-		GD.Print($"--- TURNO IA (Jugador {playerIndex}) ---"); // Debug
+		GD.Print($"--- TURNO IA (Jugador {playerIndex}) ---");
 
 		if (playerState.Troops.Count > 0)
 		{
@@ -29,12 +30,8 @@ public class RandomGameStrategy(TroopData troopToSpawn, InfluenceMapManager mapM
 				{
 					if (state.IsOccupied(neighbor)) continue;
 					
-					// float score = mapManager.GetTileScore(neighbor); // Usamos mapa
-					// Si falla el mapa, prueba con esta linea temporal: float score = 1f; 
 					float score = mapManager.GetTileScore(neighbor);
 
-					// DEBUG: Ver qué piensa la IA
-					GD.Print($"Evaluando mover tropa en {troop.Position} hacia {neighbor}. Puntuación: {score}");
 
 					if (score > bestScore)
 					{
@@ -48,12 +45,10 @@ public class RandomGameStrategy(TroopData troopToSpawn, InfluenceMapManager mapM
 
 			if (foundMove)
 			{
-				GD.Print($"¡DECISIÓN! Mover a {bestMove} con puntuación {bestScore}"); // Debug
+				GD.Print($"IA Mueve: {bestMove} (Score: {bestScore:0.0})");
 				return Task.FromResult<IGameAction>(new MoveTroopAction(bestTroop.Position, bestMove));
 			}
 		}
-
-		// Spawn logic
 		var spawns = playerState.GetSpawnableCoords().ToArray();
 		if (spawns.Length == 0){
 			return Task.FromResult<IGameAction>(new EmptyAction());
@@ -65,16 +60,14 @@ public class RandomGameStrategy(TroopData troopToSpawn, InfluenceMapManager mapM
 		foreach (var spawn in spawns)
 		{
 			float score = mapManager.GetTileScore(spawn);
-			// GD.Print($"Evaluando spawn en {spawn}. Puntuación: {score}"); // Debug opcional
-
 			if (score > bestSpawnScore)
 			{
 				bestSpawnScore = score;
 				bestSpawnPos = spawn;
 			}
 		}
-		
-		GD.Print($"¡DECISIÓN! Spawnear en {bestSpawnPos} con puntuación {bestSpawnScore}");
+
+		GD.Print($"IA Spawnea: {bestSpawnPos} (Score: {bestSpawnScore:0.0})");
 		return Task.FromResult<IGameAction>(new CreateTroopAction(troopToSpawn, bestSpawnPos));
 	}
 }

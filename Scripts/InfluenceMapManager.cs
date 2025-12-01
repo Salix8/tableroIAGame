@@ -8,42 +8,40 @@ namespace Game.AI;
 public partial class InfluenceMapManager : Node
 {
 	public InfluenceMap InterestMap { get; private set; } = new();
-	public InfluenceMap SecurityMap { get; private set; } = new();
+	public InfluenceMap SecurityMap { get; private set; } = new(); // Este será el mapa de Amenaza/Proximidad
 
-	[Export] private float _decayFactor = 0.5f;
-	[Export] private int _securityPropagation = 3;
+	[Export] private float _decayFactor = 0.5f; // Cuánto se difumina el peligro por casilla
+	[Export] private int _securityPropagation = 4; // Radio de visión de amenaza (4 casillas)
 
 	public void UpdateMaps(WorldState state, int aiPlayerIndex)
 	{
-		// 1. Mapa de Interés (Bosques = 1, Agua = 0.5, Mana = 1)
 		InterestMap.Clear();
 		foreach (var pos in state.TerrainState.GetFilledPositions())
 		{
 			var type = state.TerrainState.GetTerrainType(pos);
 			float score = type switch
 			{
-				TerrainState.TerrainType.Forest => 1.0f,
-				TerrainState.TerrainType.ManaPool => 1.0f,
-				TerrainState.TerrainType.Water => 0.5f, // Terreno dificil, pero no nulo
+				TerrainState.TerrainType.Forest => 1.5f,
+				TerrainState.TerrainType.ManaPool => 2.0f,
+				TerrainState.TerrainType.Water => 0.5f,
 				_ => 0.1f
 			};
 			InterestMap.AddInfluence(pos, score);
 		}
-		// No propagamos interés (o muy poco) para que la IA vaya a la casilla exacta
-
-		// 2. Mapa de Seguridad (Enemigos = Peligro)
 		SecurityMap.Clear();
+		
 		foreach (var player in state.PlayerStates)
 		{
-			if (player.PlayerIndex == aiPlayerIndex) continue; // Mis tropas no son peligro
+			if (player.PlayerIndex == aiPlayerIndex) continue;
 
 			foreach (var troop in player.Troops)
 			{
-				// Usamos daño como amenaza, si no tienes daño accesible usa 10f
-				float threat = troop.Data.Damage > 0 ? troop.Data.Damage : 10f;
-				SecurityMap.AddInfluence(troop.Position, threat);
+				float threatValue = troop.Data.Damage > 0 ? troop.Data.Damage : 5f; 
+				
+				SecurityMap.AddInfluence(troop.Position, threatValue);
 			}
 		}
+
 		SecurityMap.Propagate(_decayFactor, _securityPropagation);
 	}
 
