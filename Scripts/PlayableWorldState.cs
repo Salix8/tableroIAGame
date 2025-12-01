@@ -21,28 +21,29 @@ public partial class PlayableWorldState : Node
 	public override async void _Ready()
 	{
 		(Dictionary<Vector2I, TerrainState.TerrainType> map, Vector2I mana1Pos, Vector2I mana2Pos) = generator.GenerateMap();
-		foreach (Vector2I neighborSpiralCoord in HexGrid.GetNeighborSpiralCoords(Vector2I.Zero,generator.MapRadius,true)){
+		foreach (Vector2I neighborSpiralCoord in HexGrid.GetNeighbourSpiralCoords(Vector2I.Zero,generator.MapRadius,true)){
 			await State.TerrainState.AddCellAt(neighborSpiralCoord, map[neighborSpiralCoord]);
 		}
-		GD.Print("Generation complete");
-		State.GetPlayerState(0).AddClaim(mana1Pos);
-		State.GetPlayerState(1).AddClaim(mana2Pos);
 
-		Player1Strategy = new HumanGameStrategy(); // Player 0 is now human
-		Player2Strategy = new RandomGameStrategy(testTroop); // Player 1 is AI
+		var players = State.PlayerIds.ToArray();
+		GD.Print("Generation complete");
+		State.TryClaimManaPool(players[0], mana1Pos);
+		State.TryClaimManaPool(players[1], mana2Pos);
+
+		Player1Strategy = new RandomGameStrategy(testTroop);
+		Player2Strategy = new RandomGameStrategy(testTroop);
 
 		// This loop simulates game turns, will need adjustment for actual human input flow
 		// For now, it just sets up some initial actions.
 		// The actual game loop and turn progression will need to be implemented separately.
-		for (int i = 0; i < 2; i++){ // Reduced loop for initial testing
-			if (i % 2 == 0){ // Player 0's turn (Human)
-				// The action for the human player will come via a click, so we don't process it here.
-				// For now, we'll just simulate a wait or a pass for human turn in this initial setup.
-				// In a real game loop, this would await the human action.
+		for (int i = 0; i < 100; i++){ // Reduced loop for initial testing
+			if (i % 2 == 0){
+				IGameAction action = await Player2Strategy.GetNextAction(State, players[1]);
+				await action.TryApply(State);
 			}
-			else{ // Player 1's turn (AI)
-				IGameAction action = await Player2Strategy.GetNextAction(State, 1);
-				await action.TryApply(State.GetPlayerState(1), State);
+			else{
+				IGameAction action = await Player1Strategy.GetNextAction(State, players[0]);
+				await action.TryApply(State);
 			}
 		}
 		// Assuming Player 0 (human) is the current player to start receiving clicks

@@ -3,24 +3,11 @@ using Godot;
 
 namespace Game.State;
 
-public readonly struct CreateTroopAction(TroopData troopData, Vector2I position) : IGameAction
+public readonly struct CreateTroopAction(TroopData troopData, Vector2I position, PlayerId owner) : IGameAction
 {
 
-	public async Task<bool> TryApply(PlayerState playerState,WorldState worldState)
+	public async Task<bool> TryApply(WorldState worldState)
 	{
-		if (!playerState.IsSpawnableCoord(position)){
-			return false;
-		}
-
-		if (worldState.IsOccupied(position)){
-			return false;
-		}
-
-		if (worldState.TerrainState.GetTerrainType(position) is TerrainState.TerrainType.Mountain or null){
-			return false;
-		}
-
-		return await playerState.TrySpawnTroop(troopData, position);
-
+		return await worldState.TrySpawnTroop(troopData, position, owner);
 	}
 }

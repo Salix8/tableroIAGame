@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Game.State;
 using Godot;
 
 namespace Game.Visualizers;
@@ -11,14 +12,14 @@ public partial class TroopVisualizerSpawner : Node3D
 	[Export] HexGrid3D grid;
 	public override void _Ready()
 	{
-		foreach (PlayerState playerState in state.State.PlayerStates){
-			playerState.TroopSpawned.Subscribe(VisualizeTroop);
-		}
+		state.State.TroopSpawned.Subscribe(VisualizeTroop);
 	}
 
-	async Task VisualizeTroop(Troop troop)
+	async Task VisualizeTroop((ITroopEventsHandler, TroopManager.Troop) args)
 	{
+		(ITroopEventsHandler troopEventsHandler, TroopManager.Troop troop) = args;
 		TroopVisualizer visualizer = troopVisualizerScene.InstantiateUnderAs<TroopVisualizer>(this);
-		await visualizer.Spawn(troop,grid);
+		visualizer.Initialize(grid);
+		await visualizer.Spawn(troop,troopEventsHandler);
 	}
 }

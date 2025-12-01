@@ -8,7 +8,7 @@ public class HumanGameStrategy : IGameStrategy
 {
     private TaskCompletionSource<IGameAction> _nextActionCompletionSource;
 
-    public Task<IGameAction> GetNextAction(WorldState state, int playerIndex)
+    public Task<IGameAction> GetNextAction(WorldState state, PlayerId player)
     {
         // Ensure a new TaskCompletionSource is ready for the next player action
         _nextActionCompletionSource = new TaskCompletionSource<IGameAction>();

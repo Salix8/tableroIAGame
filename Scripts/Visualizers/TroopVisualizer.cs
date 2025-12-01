@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Game.State;
 using Godot;
 
 namespace Game.Visualizers;
@@ -26,10 +27,24 @@ public partial class TroopVisualizer : Node3D
 		QueueFree();
 	}
 
-	async Task MoveTo(Vector2I pos)
+	async Task Attack(Vector2I coord)
+	{
+		Vector3 target = grid.HexToWorld(coord);
+		LookAt(target,Vector3.Up);
+		DebugDraw3D.DrawArrow(GlobalPosition + Vector3.Up*1f, target + Vector3.Up*1f, Colors.Red,arrow_size:0.1f,  duration:0.3f);
+		await ToSignal(GetTree().CreateTimer(0.3f), Timer.SignalName.Timeout);
+	}
+
+	async Task Damaged(int damage)
+	{
+
+		await ToSignal(GetTree().CreateTimer(0.3f), Timer.SignalName.Timeout);
+	}
+
+	async Task MoveTo(Vector2I coord)
 	{
 		if (grid == null) return;
-		Vector3 targetPosition = grid.HexToWorld(pos);
+		Vector3 targetPosition = grid.HexToWorld(coord);
 		LookAt(targetPosition,Vector3.Up);
 		Tween move = GetTree().CreateTween();
 		move.TweenMethod(Callable.From((Vector3 newPos) => {
@@ -39,11 +54,17 @@ public partial class TroopVisualizer : Node3D
 		await ToSignal(move, Tween.SignalName.Finished);
 	}
 
-	public async Task Spawn(Troop troop, HexGrid3D troopGrid)
+	public void Initialize(HexGrid3D hexGrid)
 	{
-		grid = troopGrid;
-		troop.MovedTo.Subscribe(MoveTo);
-		troop.Killed.Subscribe(Kill);
+		grid = hexGrid;
+	}
+
+	public async Task Spawn(TroopManager.Troop troop, ITroopEventsHandler troopEventsHandler)
+	{
+		troopEventsHandler.GetTroopMovedHandler().Subscribe(MoveTo);
+		troopEventsHandler.GetTroopKilledHandler().Subscribe(Kill);
+		troopEventsHandler.GetTroopAttackingHandler().Subscribe(Attack);
+		troopEventsHandler.GetTroopDamagedHandler().Subscribe(Damaged);
 		GlobalPosition = grid.HexToWorld(troop.Position);
 		spawnedTroop?.QueueFree();
 		spawnedTroop = troop.Data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);

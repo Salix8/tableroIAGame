@@ -6,7 +6,7 @@ public class AiGameStrategy : IGameStrategy
 {
 	//todo implement AI player specific logic
 
-	public Task<IGameAction> GetNextAction(WorldState state, int playerIndex)
+	public Task<IGameAction> GetNextAction(WorldState state, PlayerId player)
 	{
 		throw new System.NotImplementedException();
 	}

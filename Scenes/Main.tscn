@@ -24,6 +24,7 @@ size = Vector3(500, 1, 500)
 
 [node name="MapGenerator" type="Node3D" parent="Enviroment"]
 script = ExtResource("1_r150o")
+MapRadius = 2
 
 [node name="MapVisualizer" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("state", "grid")]
 script = ExtResource("2_grg3l")
