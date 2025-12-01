@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://im52skll4w43"]
+
+[ext_resource type="PackedScene" uid="uid://ckw7qx5gey2ne" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Knight.fbx" id="1_4nkk3"]
+
+[node name="warrior" type="Node3D"]
+
+[node name="Knight" parent="." instance=ExtResource("1_4nkk3")]

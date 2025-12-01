@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0go4w3w4k0px"]
+
+[ext_resource type="PackedScene" uid="uid://bvms2m6n77oqt" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Ranger.fbx" id="1_txnr6"]
+
+[node name="ranger" type="Node3D"]
+
+[node name="Ranger" parent="." instance=ExtResource("1_txnr6")]
