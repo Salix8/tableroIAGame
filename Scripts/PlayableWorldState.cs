@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Game.State;
 using Game.UI;
+using Game.AI; // Added namespace for InfluenceMapManager
 using Godot;
 using System.Linq;
 
@@ -13,6 +14,7 @@ public partial class PlayableWorldState : Node
 	public readonly WorldState State = new(2);
 	[Export] MapGenerator generator;
 	[Export] TroopData testTroop;
+	[Export] Node mapManager; // Added Influence Map Manager Reference
 	public IGameStrategy Player1Strategy { get; private set; } // Made public property
 	public IGameStrategy Player2Strategy { get; private set; } // Made public property
 
@@ -29,7 +31,16 @@ public partial class PlayableWorldState : Node
 		State.GetPlayerState(1).AddClaim(mana2Pos);
 
 		Player1Strategy = new HumanGameStrategy(); // Player 0 is now human
-		Player2Strategy = new RandomGameStrategy(testTroop); // Player 1 is AI
+		
+		var managerTyped = mapManager as InfluenceMapManager;
+		// Updated: Pass the mapManager to the strategy
+
+		if (managerTyped != null) {
+			// Ahora sí le pasamos el tipo correcto
+			Player2Strategy = new RandomGameStrategy(testTroop, managerTyped); 
+		} else {
+			GD.PrintErr("PlayableWorldState: MapManager no asignado o es el tipo incorrecto!");
+		}
 
 		// This loop simulates game turns, will need adjustment for actual human input flow
 		// For now, it just sets up some initial actions.
@@ -41,8 +52,11 @@ public partial class PlayableWorldState : Node
 				// In a real game loop, this would await the human action.
 			}
 			else{ // Player 1's turn (AI)
-				IGameAction action = await Player2Strategy.GetNextAction(State, 1);
-				await action.TryApply(State.GetPlayerState(1), State);
+				// Ensure strategy exists before calling
+				if (Player2Strategy != null) {
+					IGameAction action = await Player2Strategy.GetNextAction(State, 1);
+					await action.TryApply(State.GetPlayerState(1), State);
+				}
 			}
 		}
 		// Assuming Player 0 (human) is the current player to start receiving clicks

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=17 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://ho0am3pm8f0w" path="res://Scripts/Visualizers/MapVisualizer.cs" id="2_grg3l"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://bfnuy8u42wosp" path="res://Scripts/PlayableWorldState.cs" id="9_grg3l"]
 [ext_resource type="Script" uid="uid://dv71us8ote7gl" path="res://Scripts/HexGrid3D.cs" id="10_4kpch"]
 [ext_resource type="PackedScene" uid="uid://dca1xe2caefkk" path="res://Scenes/UI/GameUI.tscn" id="12_grg3l"]
+[ext_resource type="Script" uid="uid://bvpyoe423bqe" path="res://Scripts/InfluenceMapManager.cs" id="13_h1m7h"]
 [ext_resource type="Script" uid="uid://ceolt7t8o253r" path="res://Scripts/Visualizers/PlayerInputHandler.cs" id="14_1p5hy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_h1m7h"]
@@ -56,17 +57,21 @@ archerData = ExtResource("6_50glp")
 [node name="GridNavigation" type="Node" parent="."]
 script = ExtResource("8_50glp")
 
-[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator")]
+[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "mapManager")]
 script = ExtResource("9_grg3l")
 grid = NodePath("HexGrid3D")
 generator = NodePath("../Enviroment/MapGenerator")
 testTroop = ExtResource("4_v1gob")
+mapManager = NodePath("InfluenceManager")
 metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="HexGrid3D" type="Node3D" parent="PlayableWorldState"]
 script = ExtResource("10_4kpch")
 CellRadius = 0.5
 metadata/_custom_type_script = "uid://dv71us8ote7gl"
+
+[node name="InfluenceManager" type="Node" parent="PlayableWorldState"]
+script = ExtResource("13_h1m7h")
 
 [node name="GameUI" parent="." instance=ExtResource("12_grg3l")]
 
