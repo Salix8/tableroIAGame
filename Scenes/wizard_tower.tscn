@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://dge6mrxk6jxnf"]
+
+[ext_resource type="PackedScene" uid="uid://cu8ge54xg865e" path="res://Assets/kenney_hexagon-kit/Models/FBX format/building-wizard-tower.fbx" id="1_abcde"]
+
+[node name="wizard-tower" instance=ExtResource("1_abcde")]

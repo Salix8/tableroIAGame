@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://teixh4in3pk6"]
+
+[ext_resource type="PackedScene" uid="uid://d4juwtwbk7a22" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Rogue.fbx" id="1_77dhu"]
+
+[node name="Scout" type="Node3D"]
+
+[node name="Rogue" parent="." instance=ExtResource("1_77dhu")]
+transform = Transform3D(-0.4, 0, 3.4969112e-08, 0, 0.4, 0, -3.4969112e-08, 0, -0.4, 0, 0, 0)

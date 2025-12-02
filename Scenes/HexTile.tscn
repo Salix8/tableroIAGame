@@ -1,0 +1,25 @@
+[gd_scene load_steps=7 format=3 uid="uid://c2rse3fufys66"]
+
+[ext_resource type="Script" uid="uid://cwyg8kd126077" path="res://Scripts/Visualizers/HexTileVisualizer.cs" id="1_5idql"]
+[ext_resource type="PackedScene" uid="uid://djo3gw5hit78w" path="res://Scenes/Visualizers/Terrains/grass.tscn" id="2_5idql"]
+[ext_resource type="PackedScene" uid="uid://crenp18o3wjcl" path="res://Scenes/Visualizers/Terrains/grass_forest.tscn" id="3_3e4qa"]
+[ext_resource type="PackedScene" uid="uid://bodtfb0fprvh7" path="res://Scenes/Visualizers/Terrains/stone_mountain.tscn" id="4_lllv2"]
+[ext_resource type="PackedScene" uid="uid://bea5epcaqpgxh" path="res://Scenes/Visualizers/Terrains/water.tscn" id="5_1axyw"]
+[ext_resource type="PackedScene" uid="uid://dge6mrxk6jxnf" path="res://Scenes/wizard_tower.tscn" id="6_wizard_tower"]
+
+[node name="HexTile" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
+script = ExtResource("1_5idql")
+terrainScenes = Dictionary[int, PackedScene]({
+0: ExtResource("2_5idql"),
+1: ExtResource("3_3e4qa"),
+2: ExtResource("4_lllv2"),
+3: ExtResource("5_1axyw"),
+4: ExtResource("6_wizard_tower"),
+5: ExtResource("6_wizard_tower")
+})
+totalAnimationDuration = 0.4
+skippedDuration = 0.37
+spawnPoint = NodePath("spawn")
+
+[node name="spawn" type="Node3D" parent="."]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 0, 0, 0)

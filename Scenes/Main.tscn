@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://ho0am3pm8f0w" path="res://Scripts/Visualizers/MapVisualizer.cs" id="2_grg3l"]
-[ext_resource type="PackedScene" uid="uid://r2h24eifhmyj" path="res://Scenes/Visualizers/HexTile.tscn" id="2_idj7w"]
+[ext_resource type="PackedScene" uid="uid://c2rse3fufys66" path="res://Scenes/HexTile.tscn" id="2_idj7w"]
 [ext_resource type="Script" uid="uid://c7mepqwd3dhsh" path="res://Scripts/Troops.cs" id="3_rgh2o"]
 [ext_resource type="Script" uid="uid://ce75cpal3e01q" path="res://Scripts/Visualizers/TroopVisualizerSpawner.cs" id="4_1p5hy"]
+[ext_resource type="PackedScene" path="res://Scenes/Visualizers/TroopVisualizer.tscn" id="4_frkhe"]
 [ext_resource type="Resource" uid="uid://cluvypf4r7vcj" path="res://Resources/Troops/Scout.tres" id="4_v1gob"]
-[ext_resource type="PackedScene" uid="uid://cal78vmms1mpb" path="res://Scenes/Visualizers/TroopVisualizer.tscn" id="5_h1m7h"]
 [ext_resource type="Resource" uid="uid://c8tw1oe0vy5hg" path="res://Resources/Troops/Warrior.tres" id="5_jw32o"]
 [ext_resource type="Resource" uid="uid://dwryn3llrislp" path="res://Resources/Troops/Archer.tres" id="6_50glp"]
 [ext_resource type="Script" uid="uid://vhdq4vv602yp" path="res://Scripts/GridNavigation.cs" id="8_50glp"]
@@ -35,7 +35,7 @@ metadata/_custom_type_script = "uid://ho0am3pm8f0w"
 
 [node name="TroopVisualizerSpawner" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("state", "grid")]
 script = ExtResource("4_1p5hy")
-troopVisualizerScene = ExtResource("5_h1m7h")
+troopVisualizerScene = ExtResource("4_frkhe")
 state = NodePath("../../PlayableWorldState")
 grid = NodePath("../../PlayableWorldState/HexGrid3D")
 metadata/_custom_type_script = "uid://ce75cpal3e01q"

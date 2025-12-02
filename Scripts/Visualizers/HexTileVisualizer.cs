@@ -32,6 +32,7 @@ public partial class HexTileVisualizer : Node3D
 			currentTerrain.QueueFree();
 
 		}
+		GD.Print(terrainScenes[terrain]);
 		currentTerrain = terrainScenes[terrain].InstantiateUnderAs<Node3D>(spawnPoint);
 		currentTerrain.Scale = Vector3.Zero;
 		Tween scaleUpTween = GetTree().CreateTween();
