@@ -34,7 +34,7 @@ public class TroopManager
 
 	public bool TryDamageTroop(ref Troop troop, int damage)
 	{
-		Debug.Assert(Troops.Values.Contains(troop));
+		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
 		troop = troop with{ CurrentHealth = Mathf.Max(troop.CurrentHealth - damage,0) };
 		if (troop.CurrentHealth <= 0){
 			deadTroops.Add(troop);
@@ -47,7 +47,7 @@ public class TroopManager
 	public bool TryRemoveTroop(Troop troopToRemove)
 	{
 
-		Debug.Assert(Troops.Values.Contains(troopToRemove));
+		Debug.Assert(Troops.Values.Contains(troopToRemove),"Troop manager doesn't contain provided troop");
 		deadTroops.Remove(troopToRemove);
 		return troops.Remove(troopToRemove.Position);
 	}
@@ -56,12 +56,12 @@ public class TroopManager
 
 	public bool CanMoveTroop(Troop troop, Vector2I to)
 	{
-		Debug.Assert(Troops.Values.Contains(troop));
+		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
 		return !IsOccupied(to) && troops.ContainsKey(troop.Position);
 	}
 	public bool TryMoveTroop(ref Troop movedTroop, Vector2I to)
 	{
-		Debug.Assert(Troops.Values.Contains(movedTroop));
+		Debug.Assert(Troops.Values.Contains(movedTroop), "Troop manager doesn't contain provided troop");
 		if (IsOccupied(to)) return false;
 		if (!troops.Remove(movedTroop.Position, out Troop? troop)) return false;
 		troops[to] = troop with{ Position = to };
