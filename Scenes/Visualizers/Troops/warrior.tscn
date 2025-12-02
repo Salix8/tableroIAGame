@@ -1,7 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://im52skll4w43"]
+[gd_scene load_steps=3 format=3 uid="uid://im52skll4w43"]
 
 [ext_resource type="PackedScene" uid="uid://ckw7qx5gey2ne" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Knight.fbx" id="1_4nkk3"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_imii8"]
+radius = 0.3
+height = 1.0
 
 [node name="warrior" type="Node3D"]
 
 [node name="Knight" parent="." instance=ExtResource("1_4nkk3")]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+
+[node name="TroopClickArea" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TroopClickArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("CapsuleShape3D_imii8")

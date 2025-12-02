@@ -4,7 +4,7 @@ using Godot;
 namespace Game.State;
 
 // Represents a player's click on a specific hex coordinate.
-public readonly struct ClickAction(Vector2I hexCoord) : IGameAction
+public readonly struct ClickHexAction(Vector2I hexCoord) : IGameAction
 {
     public Vector2I HexCoord { get; } = hexCoord;
 
