@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cal78vmms1mpb"]
+[gd_scene load_steps=3 format=3 uid="uid://cal78vmms1mpb"]
 
 [ext_resource type="Script" uid="uid://ciddeviryl38y" path="res://Scripts/Visualizers/TroopVisualizer.cs" id="1_anh3s"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yvtm8"]
+radius = 0.32373047
+height = 1.4354248
 
 [node name="TroopVisualizer" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
 script = ExtResource("1_anh3s")
@@ -11,3 +15,9 @@ metadata/_custom_type_script = "uid://ciddeviryl38y"
 
 [node name="spawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45052063, 0)
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7177124, 0)
+shape = SubResource("CapsuleShape3D_yvtm8")

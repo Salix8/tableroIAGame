@@ -1,46 +1,83 @@
+#nullable enable
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Godot;
+using Godot; // Added for Vector2I
 using Game.State;
+using Game.Visualizers;
+using Godot.Collections;
 
 namespace Game;
 
-public class HumanGameStrategy : IGameStrategy
+[GlobalClass]
+public partial class HumanGameStrategy : Node, IGameStrategy
 {
-	private TaskCompletionSource<IGameAction> _nextActionCompletionSource;
-
-	public Task<IGameAction> GetNextAction(WorldState state, int playerIndex)
+	enum SelectionType
 	{
-		_nextActionCompletionSource = new TaskCompletionSource<IGameAction>();
-		return _nextActionCompletionSource.Task;
+		Troop,
+		TroopTarget,
+
 	}
 
-	public void OnHexClicked(Vector2I hexCoord)
+	[Export] TileClickHandler tileClickHandler;
+	[Export] HexGrid3D grid;
+	TroopManager.TroopInfo? selectedTroop;
+	//
+	// Dictionary<(SelectionType, SelectionType), >
+	public async Task<IGameAction> GetNextAction(WorldState state, PlayerId player)
 	{
-		_nextActionCompletionSource?.TrySetResult(new ClickHexAction(hexCoord));
+		Vector2I? selectedCoord = null;
+		SelectionType? selectionType = null;
+		IGameAction? action = null;
+		while (action != null){
+			(Vector2I clicked, SelectionType clickType) = await GetValidSelection(state, player);
+			switch (clickType){
+				case SelectionType.Troop:
+					TroopManager.TroopInfo? troop = state.GetTroop(clicked);
+					Debug.Assert(troop != null, $"Troop not found at {clicked}");
+					if (troop.Owner != player){
+						continue;
+					}
+
+					selectedTroop = troop;
+					selectionType = clickType;
+
+
+					break;
+				case SelectionType.TroopTarget:
+
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+		}
+
+		return new EmptyAction();
+
 	}
 
-	public void OnTroopClicked(Troop troop)
+	async Task<(Vector2I selection, SelectionType type)> GetValidSelection(WorldState state, PlayerId player)
 	{
-		_nextActionCompletionSource?.TrySetResult(new ClickTroopAction(troop));
+		while (true){
+			(Vector2I selection, SelectionType type)? result = await SelectTile(state, player);
+			if (result != null){
+				return result.Value;
+			}
+		}
 	}
 
-	public void OnManaPoolClicked(Vector2I coord)
+	async Task<(Vector2I selection, SelectionType type)?> SelectTile(WorldState state, PlayerId player)
 	{
-		_nextActionCompletionSource?.TrySetResult(new ClickManaPoolAction(coord));
-	}
+		Vector2I clickedTile = await tileClickHandler.WaitForTileClick();
+		//check contains troop
+		TroopManager.TroopInfo? troop = state.GetTroop(clickedTile);
+		if (troop != null && troop.Owner == player){
+			return (clickedTile, SelectionType.Troop);
+		}
 
-	public void ProcessTroopSelection(Troop troop)
-	{
-		// Future logic will go here. For example, checking if the troop is friendly,
-		// selecting it, and waiting for the next player input (e.g., a move command).
-		throw new NotImplementedException("Logic for troop selection/action is not yet implemented.");
-	}
+		if (state.IsValidTroopCoord(clickedTile)){
+			return (clickedTile, SelectionType.TroopTarget);
+		}
 
-	public void ProcessManaPoolInteraction(Vector2I coord)
-	{
-		// Future logic will go here. For example, checking if the mana pool is owned,
-		// attempting to claim it, or receiving mana.
-		throw new NotImplementedException("Logic for mana pool interaction is not yet implemented.");
+		return null;
 	}
 }

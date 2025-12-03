@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.State;
 
-public partial class GridNavigation : Node
+public class GridNavigation
 {
 
 	// public HashSet<HexCell> ComputeReachableArea(Vector2I startCoords, int maxMovementCost)

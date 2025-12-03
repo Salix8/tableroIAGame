@@ -1,13 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://dplv6acw31v3a"]
+[gd_scene load_steps=4 format=3 uid="uid://dplv6acw31v3a"]
 
 [ext_resource type="PackedScene" uid="uid://cu8ge54xg865e" path="res://Assets/kenney_hexagon-kit/Models/FBX format/building-wizard-tower.fbx" id="1_abcde"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_cuotk"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_cuotk"]
+height = 0.779425
+radius = 0.24560547
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pgxvq"]
+height = 0.20533448
+radius = 0.58
 
 [node name="wizard-tower" instance=ExtResource("1_abcde")]
 
-[node name="ManaPoolClickArea" type="Area3D" parent="." index="1"]
+[node name="Area3D" type="Area3D" parent="." index="1"]
+collision_layer = 2
+collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ManaPoolClickArea" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-shape = SubResource("BoxShape3D_cuotk")
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55077326, 0)
+shape = SubResource("CylinderShape3D_cuotk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13186398, 0)
+shape = SubResource("CylinderShape3D_pgxvq")

@@ -5,4 +5,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>Game</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Scripts\Ask.md" />
+  </ItemGroup>
 </Project>

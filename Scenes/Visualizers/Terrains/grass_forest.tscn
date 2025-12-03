@@ -1,5 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://crenp18o3wjcl"]
+[gd_scene load_steps=3 format=3 uid="uid://crenp18o3wjcl"]
 
 [ext_resource type="PackedScene" uid="uid://bf5m730wyidvh" path="res://Assets/kenney_hexagon-kit/Models/FBX format/grass-forest.fbx" id="1_s8bj7"]
 
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ldbmd"]
+height = 0.4038574
+radius = 0.58
+
 [node name="grass-forest" instance=ExtResource("1_s8bj7")]
+
+[node name="Area3D" type="Area3D" parent="." index="1"]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23112543, 0)
+shape = SubResource("CylinderShape3D_ldbmd")

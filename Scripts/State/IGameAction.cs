@@ -4,6 +4,6 @@ namespace Game.State;
 
 public interface IGameAction
 {
-	Task<bool> TryApply(PlayerState playerState, WorldState worldState);
+	Task<bool> TryApply(WorldState worldState);
 
 }

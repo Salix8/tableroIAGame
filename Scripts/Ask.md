@@ -1,0 +1,4 @@
+﻿- Recursos (Solo hay uno - mana)
+- IA global - (Behaviour tree based on board state -> each behaviour makes actions based of Influence maps)
+- A* tactico - (isn't fully infuence based?)
+- IA de tropas individuales solo tiene influencia en acciones de final de turno.

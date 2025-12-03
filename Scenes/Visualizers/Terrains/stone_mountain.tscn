@@ -1,5 +1,25 @@
-[gd_scene load_steps=2 format=3 uid="uid://bodtfb0fprvh7"]
+[gd_scene load_steps=4 format=3 uid="uid://bodtfb0fprvh7"]
 
 [ext_resource type="PackedScene" uid="uid://657bwi1y7n0l" path="res://Assets/kenney_hexagon-kit/Models/FBX format/stone-mountain.fbx" id="1_q6brl"]
 
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mksdv"]
+height = 0.8188965
+radius = 0.29638672
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_akjup"]
+height = 0.43564454
+radius = 0.58
+
 [node name="stone-mountain" instance=ExtResource("1_q6brl")]
+
+[node name="Area3D" type="Area3D" parent="." index="1"]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68566394, 0)
+shape = SubResource("CylinderShape3D_mksdv")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.247019, 0)
+shape = SubResource("CylinderShape3D_akjup")

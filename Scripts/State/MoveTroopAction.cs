@@ -3,11 +3,10 @@ using Godot;
 
 namespace Game.State;
 
-public readonly struct MoveTroopAction(Vector2I troopCoord, Vector2I targetCoord) : IGameAction
+public readonly struct MoveTroopAction(TroopManager.TroopInfo troop, Vector2I target) : IGameAction
 {
-
-	public async Task<bool> TryApply(PlayerState playerState,WorldState worldState)
+	public async Task<bool> TryApply(WorldState worldState)
 	{
-		return await playerState.TryMoveTroop(troopCoord, targetCoord);
+		return await worldState.TryMoveTroop(troop,target);
 	}
 }

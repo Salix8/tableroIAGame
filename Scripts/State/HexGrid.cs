@@ -34,7 +34,7 @@ public class HexGrid(float cellOuterRadius)
 	}
 
 
-	public static IEnumerable<Vector2I> GetNeighborSpiralCoords(Vector2I center, int radius, bool includeCenter = false)
+	public static IEnumerable<Vector2I> GetNeighbourSpiralCoords(Vector2I center, int radius, bool includeCenter = false)
 	{
 		if (includeCenter){
 			yield return center;
@@ -58,19 +58,23 @@ public class HexGrid(float cellOuterRadius)
 	public Vector2I WorldToHex(Vector2 worldCoords)
 	{
 		Vector2 localCoords = worldCoords / cellOuterRadius;
-		Vector2 hexCoords = localCoords * hexTransform;
+		float q = 0.6666667f * localCoords.X;
+		float r = -0.33333334f * localCoords.X + 0.57735026f * localCoords.Y;
+		Vector2 hexCoords = new(q,r);
 		return CubeToAxial(CubeRound(AxialToCubeF(hexCoords)));
 	}
 
-	Transform2D hexTransform = new(new Vector2(1.5f, Mathf.Sqrt(3f) * 0.5f), new Vector2(0f, Mathf.Sqrt(3f)),
-		Vector2.Zero);
-
+	const float Sqrt3 = 1.73205080757f;
 	public Vector2 HexToWorld(Vector2I hexCoords)
 	{
-		Vector2 localCoords = hexTransform * hexCoords;
+		float x = 1.5f * hexCoords.X;
+		float y = 0.8660254f * hexCoords.X + Sqrt3 * hexCoords.Y;
+		Vector2 localCoords = new(x,y);
 		Vector2 worldCoords = localCoords * cellOuterRadius;
 		return worldCoords;
 	}
+
+
 
 
 	static Vector2I CubeToAxial(Vector3I cubeCoords) => new(cubeCoords.X, cubeCoords.Y);

@@ -45,24 +45,9 @@ public partial class HexGrid3D : Node3D
 		// DrawCell(Vector2I.Zero + HexGrid.UpRight, Colors.Green);
 		// DrawCell(Vector2I.Zero + HexGrid.Up, Colors.Red);
 		// DrawCell(Vector2I.Zero + HexGrid.DownRight, Colors.Blue);
-		foreach (Vector2I neighborSpiralCoord in HexGrid.GetNeighborSpiralCoords(Vector2I.Zero, DebugDrawRadius)){
-			//DebugDraw2D.SetText($"Coord {neighborSpiralCoord}");
-			// DrawCell(neighborSpiralCoord,Colors.Red);
-		}
-	}
-	
-	private static readonly Vector2I[] _directions = 
-	{
-		new(1, 0), new(1, -1), new(0, -1),
-		new(-1, 0), new(-1, 1), new(0, 1)
-	};
-
-	// Ahora la función es estática y vive en HexGrid3D
-	public static System.Collections.Generic.IEnumerable<Vector2I> GetNeighborCoords(Vector2I coord)
-	{
-		foreach (var dir in _directions)
-		{
-			yield return coord + dir;
-		}
+		// foreach (Vector2I neighborSpiralCoord in HexGrid.GetNeighbourSpiralCoords(Vector2I.Zero, DebugDrawRadius)){
+		// 	Vector2I coord = WorldToHex(HexToWorld(neighborSpiralCoord));
+		// 	DrawCell(coord,Colors.Aqua);
+		// }
 	}
 }
