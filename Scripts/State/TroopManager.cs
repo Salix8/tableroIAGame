@@ -11,13 +11,13 @@ namespace Game.State;
 
 public class TroopManager
 {
-	readonly Dictionary<Vector2I, Troop> troops = new();
-	public IReadOnlyDictionary<Vector2I, Troop> Troops => troops;
-	readonly HashSet<Troop> deadTroops = [];
+	readonly Dictionary<Vector2I, TroopInfo> troops = new();
+	public IReadOnlyDictionary<Vector2I, TroopInfo> Troops => troops;
+	readonly HashSet<TroopInfo> deadTroops = [];
 
-	public HashSet<Troop> DeadTroops => deadTroops;
+	public HashSet<TroopInfo> DeadTroops => deadTroops;
 
-	public record Troop
+	public record TroopInfo
 	{
 		public Vector2I Position { get; init; }
 		public PlayerId Owner { get; init; }
@@ -25,14 +25,14 @@ public class TroopManager
 		public int CurrentHealth { get; init; }
 	}
 
-	public IEnumerable<Troop> GetPlayerTroops(PlayerId id) => troops.Values.Where(troop => troop.Owner == id);
+	public IEnumerable<TroopInfo> GetPlayerTroops(PlayerId id) => troops.Values.Where(troop => troop.Owner == id);
 
-	public Troop? TryGetTroop(Vector2I coord)
+	public TroopInfo? TryGetTroop(Vector2I coord)
 	{
 		return troops.GetValueOrDefault(coord);
 	}
 
-	public bool TryDamageTroop(ref Troop troop, int damage)
+	public bool TryDamageTroop(TroopInfo troop, int damage, out TroopInfo damagedTroop)
 	{
 		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
 		troop = troop with{ CurrentHealth = Mathf.Max(troop.CurrentHealth - damage,0) };
@@ -40,11 +40,11 @@ public class TroopManager
 			deadTroops.Add(troop);
 		}
 		troops[troop.Position] = troop;
-
+		damagedTroop = troop;
 		return true;
 	}
 
-	public bool TryRemoveTroop(Troop troopToRemove)
+	public bool TryRemoveTroop(TroopInfo troopToRemove)
 	{
 
 		Debug.Assert(Troops.Values.Contains(troopToRemove),"Troop manager doesn't contain provided troop");
@@ -54,37 +54,38 @@ public class TroopManager
 
 	public bool IsOccupied(Vector2I coord) => troops.ContainsKey(coord);
 
-	public bool CanMoveTroop(Troop troop, Vector2I to)
+	public bool CanMoveTroop(TroopInfo troop, Vector2I to)
 	{
 		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
 		return !IsOccupied(to) && troops.ContainsKey(troop.Position);
 	}
-	public bool TryMoveTroop(ref Troop movedTroop, Vector2I to)
+	public bool TryMoveTroop(TroopInfo toMove, Vector2I to, out TroopInfo movedTroop)
 	{
-		Debug.Assert(Troops.Values.Contains(movedTroop), "Troop manager doesn't contain provided troop");
+		Debug.Assert(Troops.Values.Contains(toMove), "Troop manager doesn't contain provided troop");
+		movedTroop = toMove;
 		if (IsOccupied(to)) return false;
-		if (!troops.Remove(movedTroop.Position, out Troop? troop)) return false;
-		troops[to] = troop with{ Position = to };
-		movedTroop = movedTroop with{ Position = to };
+		if (!troops.Remove(toMove.Position, out TroopInfo? troop)) return false;
+		movedTroop = troop with{ Position = to };
+		troops[to] = movedTroop;
 		return true;
 	}
 
-	public bool TryCreateTroop(TroopData data, PlayerId owner, Vector2I coord, [NotNullWhen(true)] out Troop? troop)
+	public bool TryCreateTroop(TroopData data, PlayerId owner, Vector2I coord, [NotNullWhen(true)] out TroopInfo? troop)
 	{
 		if (IsOccupied(coord)){
 			troop = null;
 			return false;
 		}
 
-		troop = new Troop{ CurrentHealth = data.Health, Data = data, Owner = owner, Position = coord };
+		troop = new TroopInfo{ CurrentHealth = data.Health, Data = data, Owner = owner, Position = coord };
 		troops.Add(coord,troop);
 		return true;
 	}
 
-	public Dictionary<Vector2I, HashSet<Troop>> GetTroopRanges()
+	public Dictionary<Vector2I, HashSet<TroopInfo>> GetTroopRanges()
 	{
-		Dictionary<Vector2I, HashSet<Troop>> ranges = new();
-		foreach (Troop troop in troops.Values){
+		Dictionary<Vector2I, HashSet<TroopInfo>> ranges = new();
+		foreach (TroopInfo troop in troops.Values){
 			foreach (Vector2I coord in HexGrid.GetNeighbourSpiralCoords(troop.Position, troop.Data.AttackRange)){
 				if (!ranges.ContainsKey(coord)){
 					ranges.Add(coord, [troop]);

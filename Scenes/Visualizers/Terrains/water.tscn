@@ -1,5 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://bea5epcaqpgxh"]
+[gd_scene load_steps=3 format=3 uid="uid://bea5epcaqpgxh"]
 
 [ext_resource type="PackedScene" uid="uid://ccml8g0yrs7rg" path="res://Assets/kenney_hexagon-kit/Models/FBX format/water.fbx" id="1_slmpt"]
 
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_x2iq0"]
+height = 0.10231933
+radius = 0.58
+
 [node name="water" instance=ExtResource("1_slmpt")]
+
+[node name="Area3D" type="Area3D" parent="." index="1"]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08035639, 0)
+shape = SubResource("CylinderShape3D_x2iq0")

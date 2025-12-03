@@ -23,22 +23,26 @@ public readonly record struct PlayerId(int Value)
 
 public interface ITroopEventsHandler
 {
-	public IAsyncHandlerCollection GetTroopKilledHandler();
-	public IAsyncHandlerCollection<int> GetTroopDamagedHandler();
-	public IAsyncHandlerCollection<Vector2I> GetTroopMovedHandler();
-	public IAsyncHandlerCollection<Vector2I> GetTroopAttackingHandler();
+	public IAsyncHandlerCollection<TroopManager.TroopInfo> GetTroopKilledHandler();
+
+	public IAsyncHandlerCollection<(TroopManager.TroopInfo before, TroopManager.TroopInfo after)>
+		GetTroopDamagedHandler();
+
+	public IAsyncHandlerCollection<(TroopManager.TroopInfo before, TroopManager.TroopInfo after)>
+		GetTroopMovedHandler();
+	public IAsyncHandlerCollection<(TroopManager.TroopInfo, Vector2I)> GetTroopAttackingHandler();
 }
 
 public class TroopEvents : ITroopEventsHandler
 {
-	public readonly AsyncEvent TroopKilled = new();
-	public readonly AsyncEvent<int> TroopDamaged = new();
-	public readonly AsyncEvent<Vector2I> TroopMoved = new();
-	public readonly AsyncEvent<Vector2I> TroopAttacking = new();
-	public IAsyncHandlerCollection GetTroopKilledHandler() => TroopKilled;
-	public IAsyncHandlerCollection<int> GetTroopDamagedHandler() => TroopDamaged;
-	public IAsyncHandlerCollection<Vector2I> GetTroopMovedHandler() => TroopMoved;
-	public IAsyncHandlerCollection<Vector2I> GetTroopAttackingHandler() => TroopAttacking;
+	public readonly AsyncEvent<TroopManager.TroopInfo> TroopKilled = new();
+	public readonly AsyncEvent<(TroopManager.TroopInfo before,TroopManager.TroopInfo after)> TroopDamaged = new();
+	public readonly AsyncEvent<(TroopManager.TroopInfo before,TroopManager.TroopInfo after)> TroopMoved = new();
+	public readonly AsyncEvent<(TroopManager.TroopInfo, Vector2I)> TroopAttacking = new();
+	public IAsyncHandlerCollection<TroopManager.TroopInfo>  GetTroopKilledHandler() => TroopKilled;
+	public IAsyncHandlerCollection<(TroopManager.TroopInfo before,TroopManager.TroopInfo after)> GetTroopDamagedHandler() => TroopDamaged;
+	public IAsyncHandlerCollection<(TroopManager.TroopInfo before,TroopManager.TroopInfo after)> GetTroopMovedHandler() => TroopMoved;
+	public IAsyncHandlerCollection<(TroopManager.TroopInfo, Vector2I)> GetTroopAttackingHandler() => TroopAttacking;
 }
 
 public class WorldState
@@ -75,8 +79,8 @@ public class WorldState
 		Debug.Assert(!troopEvents.ContainsKey(coord), $"A troop event already exists at {coord}");
 		troopEvents.Add(coord, events);
 	}
-	public IEnumerable<TroopManager.Troop> GetPlayerTroops(PlayerId id) => troopManager.GetPlayerTroops(id);
-	public async Task<bool> TryMoveTroop(TroopManager.Troop troop, Vector2I to)
+	public IEnumerable<TroopManager.TroopInfo> GetPlayerTroops(PlayerId id) => troopManager.GetPlayerTroops(id);
+	public async Task<bool> TryMoveTroop(TroopManager.TroopInfo troop, Vector2I to)
 	{
 		Vector2I from = troop.Position;
 		if (!IsValidTroopCoord(to)) return false;
@@ -89,17 +93,18 @@ public class WorldState
 
 		//opportunity attacks
 		inRange.ExceptWith(newRange);
-		foreach (TroopManager.Troop attacker in inRange.Where(attacker => attacker.Owner != troop.Owner)){
-			await TryExecuteAttack(attacker, ref troop);
+		foreach (TroopManager.TroopInfo attacker in inRange.Where(attacker => attacker.Owner != troop.Owner)){
+			await TryExecuteAttack(attacker, troop, out TroopManager.TroopInfo attackedTarget);
+			troop = attackedTarget;
 		}
 
-		if (!troopManager.TryMoveTroop(ref troop, to)) return false;
+		if (!troopManager.TryMoveTroop(troop, to, out TroopManager.TroopInfo movedTroop)) return false;
 		TroopEvents troopEvent = GetEventWithAssert(from);
 		troopEvents.Remove(from);
 		AddEventWithAssert(to, troopEvent);
 
 
-		await troopEvent.TroopMoved.DispatchSequential(to);
+		await troopEvent.TroopMoved.DispatchSequential((troop, movedTroop));
 
 		return true;
 
@@ -107,25 +112,27 @@ public class WorldState
 	public async Task<bool> TrySpawnTroop(TroopData data, Vector2I coord, PlayerId owner)
 	{
 		if (!IsValidTroopCoord(coord)) return false;
-		if (!troopManager.TryCreateTroop(data, owner, coord, out TroopManager.Troop? troop)) return false;
+		if (!troopManager.TryCreateTroop(data, owner, coord, out TroopManager.TroopInfo? troop)) return false;
 		TroopEvents events = new();
 		AddEventWithAssert(coord, events);
 		await troopSpawned.DispatchSequential((events, troop));
 
 		return true;
 	}
-	public Task<bool> TryExecuteAttack(TroopManager.Troop attacker,ref TroopManager.Troop target)
+	public Task<bool> TryExecuteAttack(TroopManager.TroopInfo attacker,TroopManager.TroopInfo target, out TroopManager.TroopInfo attackedTarget)
 	{
 		Vector2I from = attacker.Position;
 		Vector2I to = target.Position;
 		TerrainState.TerrainType? type = TerrainState.GetTerrainType(to);
+		attackedTarget = target;
 		if (type == null){
 			return Task.FromResult(false);
 		}
 
 		int damage = attacker.Data.Damage;
 		damage = ModifiedDamage(type.Value, damage);
-		if (!troopManager.TryDamageTroop(ref target, damage)) return  Task.FromResult(false);
+		if (!troopManager.TryDamageTroop(target, damage, out TroopManager.TroopInfo damagedTarget)) return  Task.FromResult(false);
+		attackedTarget = damagedTarget;
 		TroopEvents attackerEvents = GetEventWithAssert(from);
 		TroopEvents targetEvents = GetEventWithAssert(to);
 
@@ -135,25 +142,25 @@ public class WorldState
 
 		async void RunEvents()
 		{
-			await attackerEvents.TroopAttacking.DispatchSequential(to);
-			await targetEvents.TroopDamaged.DispatchSequential(damage);
+			await attackerEvents.TroopAttacking.DispatchSequential((attacker, target.Position));
+			await targetEvents.TroopDamaged.DispatchSequential((target, damagedTarget));
 			source.SetResult(true);
 		}
 	}
-	public TroopManager.Troop? GetTroop(Vector2I coord) => troopManager.TryGetTroop(coord);
-	public IReadOnlyDictionary<Vector2I, TroopManager.Troop> GetTroops() => troopManager.Troops;
+	public TroopManager.TroopInfo? GetTroop(Vector2I coord) => troopManager.TryGetTroop(coord);
+	public IReadOnlyDictionary<Vector2I, TroopManager.TroopInfo> GetTroops() => troopManager.Troops;
 
-	readonly AsyncEvent<(ITroopEventsHandler, TroopManager.Troop)> troopSpawned = new();
-	public IAsyncHandlerCollection<(ITroopEventsHandler, TroopManager.Troop)> TroopSpawned => troopSpawned;
+	readonly AsyncEvent<(ITroopEventsHandler, TroopManager.TroopInfo)> troopSpawned = new();
+	public IAsyncHandlerCollection<(ITroopEventsHandler, TroopManager.TroopInfo)> TroopSpawned => troopSpawned;
 
 	public async Task KillDeadTroops()
 	{
-		TroopManager.Troop[] deadTroops = troopManager.DeadTroops.ToArray();
-		foreach (TroopManager.Troop deadTroop in deadTroops){
+		TroopManager.TroopInfo[] deadTroops = troopManager.DeadTroops.ToArray();
+		foreach (TroopManager.TroopInfo deadTroop in deadTroops){
 			troopManager.TryRemoveTroop(deadTroop);
 			TroopEvents events = GetEventWithAssert(deadTroop.Position);
 			troopEvents.Remove(deadTroop.Position);
-			await events.TroopKilled.DispatchSequential();
+			await events.TroopKilled.DispatchSequential(deadTroop);
 		}
 	}
 	public bool IsOccupied(Vector2I coord)

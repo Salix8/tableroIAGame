@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using Game;
+using Game.State;
 
 namespace Game.AI;
 
@@ -26,7 +27,7 @@ public class InfluenceMap
 			foreach (var kvp in _map)
 			{
 				if (kvp.Value <= 0.01f) continue;
-				foreach (var neighbor in HexGrid3D.GetNeighborCoords(kvp.Key))
+				foreach (var neighbor in HexGrid.GetNeighborCoords(kvp.Key))
 				{
 					if (!nextMap.ContainsKey(neighbor)) nextMap[neighbor] = 0f;
 					nextMap[neighbor] += kvp.Value * decay;

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Game.State;
 using Godot;
@@ -12,13 +14,13 @@ public partial class HexTileVisualizer : Node3D
 	[Export] float totalAnimationDuration = 0.5f;
 
 	[Export] float skippedDuration = 0.2f;
-	// [Export] public Node3D Plains { get; set; }
-	// [Export] public Node3D Forest { get; set; }
-	// [Export] public Node3D Mountain { get; set; }
-	// [Export] public Node3D Water { get; set; }
-	// [Export] public Node3D WizardTower { get; set; }
+	public void Highlight(Material material)
+	{
+		terrainMesh.MaterialOverlay = material;
+	}
 	Node3D currentTerrain = null;
 	[Export] Node3D spawnPoint;
+	MeshInstance3D terrainMesh;
 	public Vector2I HexCoord { get; set; } // Added property for the hex coordinate
 
 
@@ -35,22 +37,8 @@ public partial class HexTileVisualizer : Node3D
 		}
 		GD.Print(terrainScenes[terrain]);
 		currentTerrain = terrainScenes[terrain].InstantiateUnderAs<Node3D>(spawnPoint);
-
-		// If it's a ManaPool, make it clickable
-		if (terrain == TerrainState.TerrainType.ManaPool || terrain == TerrainState.TerrainType.WizardTower) // Using WizardTower as a common special tile, adjust if ManaPool has its own distinct scene
-		{
-			var area = currentTerrain.FindChild("ManaPoolClickArea", recursive: true) as Area3D;
-			if (area != null)
-			{
-				area.CollisionLayer = 1 << 2; // Layer 3 for "Interactables"
-				area.SetMeta("mana_pool_coord", HexCoord); // Store the hex coordinate
-			}
-			else
-			{
-				GD.PrintErr($"ManaPool/WizardTower model '{currentTerrain.Name}' is missing an Area3D named 'ManaPoolClickArea'. It will not be clickable.");
-			}
-		}
-
+		terrainMesh = currentTerrain.GetAllChildrenOfType<MeshInstance3D>().FirstOrDefault();
+		Debug.Assert(terrainMesh != null, "No terrain mesh found under terrain scene");
 		currentTerrain.Scale = Vector3.Zero;
 		Tween scaleUpTween = GetTree().CreateTween();
 		scaleUpTween.TweenMethod(Callable.From((Vector3 scale) => {

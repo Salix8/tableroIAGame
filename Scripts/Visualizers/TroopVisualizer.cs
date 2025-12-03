@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Game.State;
 using Godot;
+using Godot.Collections;
 
 namespace Game.Visualizers;
 
@@ -11,11 +14,15 @@ public partial class TroopVisualizer : Node3D
 	[Export] float appearDuration;
 	[Export] float moveDuration;
 	Node3D spawnedTroop;
-	HexGrid3D grid;
 
-	async Task Kill()
+	public void Highlight(Material material)
 	{
-		if (grid == null) return;
+		troopMesh.MaterialOverlay = material;
+	}
+	MeshInstance3D troopMesh;
+
+	public async Task Kill()
+	{
 		if (spawnedTroop == null) return;
 
 		Tween disappear = GetTree().CreateTween();
@@ -24,50 +31,40 @@ public partial class TroopVisualizer : Node3D
 		}), spawnedTroop.Scale, Vector3.Zero, appearDuration).SetEase(Tween.EaseType.Out);
 
 		await ToSignal(disappear, Tween.SignalName.Finished);
-		QueueFree();
 	}
 
-	async Task Attack(Vector2I coord)
+	public async Task Attack(Vector3 target)
 	{
-		Vector3 target = grid.HexToWorld(coord);
 		LookAt(target,Vector3.Up);
 		DebugDraw3D.DrawArrow(GlobalPosition + Vector3.Up*1f, target + Vector3.Up*1f, Colors.Red,arrow_size:0.1f,  duration:0.3f);
 		await ToSignal(GetTree().CreateTimer(0.3f), Timer.SignalName.Timeout);
 	}
 
-	async Task Damaged(int damage)
+	public async Task Damaged(int damage)
 	{
 
 		await ToSignal(GetTree().CreateTimer(0.3f), Timer.SignalName.Timeout);
 	}
 
-	async Task MoveTo(Vector2I coord)
+	public async Task MoveTo(Vector3 target)
 	{
-		if (grid == null) return;
-		Vector3 targetPosition = grid.HexToWorld(coord);
-		LookAt(targetPosition,Vector3.Up);
+		LookAt(target,Vector3.Up);
 		Tween move = GetTree().CreateTween();
 		move.TweenMethod(Callable.From((Vector3 newPos) => {
 			GlobalPosition = newPos;
-		}), GlobalPosition, targetPosition, moveDuration).SetEase(Tween.EaseType.Out);
+		}), GlobalPosition, target, moveDuration).SetEase(Tween.EaseType.Out);
 
 		await ToSignal(move, Tween.SignalName.Finished);
 	}
 
-	public void Initialize(HexGrid3D hexGrid)
+	public async Task Spawn(Vector3 position, TroopData data)
 	{
-		grid = hexGrid;
-	}
-
-	public async Task Spawn(TroopManager.Troop troop, ITroopEventsHandler troopEventsHandler)
-	{
-		troopEventsHandler.GetTroopMovedHandler().Subscribe(MoveTo);
-		troopEventsHandler.GetTroopKilledHandler().Subscribe(Kill);
-		troopEventsHandler.GetTroopAttackingHandler().Subscribe(Attack);
-		troopEventsHandler.GetTroopDamagedHandler().Subscribe(Damaged);
-		GlobalPosition = grid.HexToWorld(troop.Position);
+		GlobalPosition =  position;
 		spawnedTroop?.QueueFree();
-		spawnedTroop = troop.Data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);
+		spawnedTroop = data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);
+
+		troopMesh = spawnedTroop.GetAllChildrenOfType<MeshInstance3D>().FirstOrDefault();
+		Debug.Assert(spawnedTroop != null, "No troop mesh found under troop scene");
 		spawnedTroop.Scale = Vector3.Zero;
 		Tween appear = GetTree().CreateTween();
 		appear.TweenMethod(Callable.From((Vector3 scale) => {

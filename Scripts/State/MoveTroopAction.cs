@@ -3,7 +3,7 @@ using Godot;
 
 namespace Game.State;
 
-public readonly struct MoveTroopAction(TroopManager.Troop troop, Vector2I target) : IGameAction
+public readonly struct MoveTroopAction(TroopManager.TroopInfo troop, Vector2I target) : IGameAction
 {
 	public async Task<bool> TryApply(WorldState worldState)
 	{
