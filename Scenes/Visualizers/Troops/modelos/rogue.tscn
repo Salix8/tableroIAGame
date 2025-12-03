@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://c6btcohydbxv4"]
+
+[ext_resource type="PackedScene" uid="uid://d4juwtwbk7a22" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Rogue.fbx" id="1_4ixfh"]
+
+[node name="Rogue" instance=ExtResource("1_4ixfh")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1"]
