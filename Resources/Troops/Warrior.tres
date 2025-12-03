@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TroopData" load_steps=3 format=3 uid="uid://c8tw1oe0vy5hg"]
 
-[ext_resource type="PackedScene" uid="uid://im52skll4w43" path="res://Scenes/Visualizers/Troops/warrior.tscn" id="1_450tq"]
+[ext_resource type="PackedScene" uid="uid://im52skll4w43" path="res://Scenes/Visualizers/Troops/Warrior.tscn" id="1_450tq"]
 [ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="1_jrcrt"]
 
 [resource]

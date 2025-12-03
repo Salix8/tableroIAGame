@@ -1,40 +1,40 @@
 [gd_scene load_steps=17 format=3 uid="uid://cwy6lslf6mjlk"]
 
-[ext_resource type="PackedScene" uid="uid://bvms2m6n77oqt" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Ranger.fbx" id="1_05j71"]
-[ext_resource type="Animation" uid="uid://wsdobbhyb2yw" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/deathA.res" id="2_ebenb"]
-[ext_resource type="Animation" uid="uid://d3nugg5u5a2en" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/deathB.res" id="3_sxacp"]
-[ext_resource type="Animation" uid="uid://cjl5gomamvtyx" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/hitA.res" id="4_8iatt"]
-[ext_resource type="Animation" uid="uid://ebj70kk44vb5" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/hitB.res" id="5_xygal"]
-[ext_resource type="Animation" uid="uid://babjmqterstdg" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/idleA.res" id="6_vugio"]
-[ext_resource type="Animation" uid="uid://b2tjtygqnl101" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/idleB.res" id="7_t45nl"]
-[ext_resource type="Animation" uid="uid://c2snqtj7oexqa" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/interact.res" id="8_7udm0"]
-[ext_resource type="Animation" uid="uid://jr1n4rud0aje" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/runningA.res" id="9_4lcwl"]
-[ext_resource type="Animation" uid="uid://ci0f2ikt6d0mv" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/runningB.res" id="10_cm1ad"]
-[ext_resource type="Animation" uid="uid://clmpt6t5axrl6" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/spawnA.res" id="11_ogs7s"]
-[ext_resource type="Animation" uid="uid://cwv63o2svvre0" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/throw.res" id="12_acc72"]
-[ext_resource type="Animation" uid="uid://ciree0q6fysa7" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/walkingA.res" id="13_27kur"]
-[ext_resource type="Animation" uid="uid://sa8twba83cg2" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/walkingB.res" id="14_eftxo"]
-[ext_resource type="Animation" uid="uid://2auweelee2y3" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/walkingC.res" id="15_2kxbh"]
+[ext_resource type="PackedScene" uid="uid://bvms2m6n77oqt" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Ranger.fbx" id="1_s0xec"]
+[ext_resource type="Animation" uid="uid://cbpkv7gmevj0x" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/deathA.res" id="2_4yhk5"]
+[ext_resource type="Animation" uid="uid://caipgdpihhxgn" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/deathB.res" id="3_aebdj"]
+[ext_resource type="Animation" uid="uid://cl4kes6tamys3" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/hitA.res" id="4_5sdah"]
+[ext_resource type="Animation" uid="uid://dpmtxv7pmd1vx" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/hitB.res" id="5_xb0gd"]
+[ext_resource type="Animation" uid="uid://ch0f3mk4s13ih" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/idleA.res" id="6_n48jd"]
+[ext_resource type="Animation" uid="uid://bbv3ej6haha2i" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/idleB.res" id="7_7txjg"]
+[ext_resource type="Animation" uid="uid://b2yh1dd00g3sa" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/interact.res" id="8_rax3w"]
+[ext_resource type="Animation" uid="uid://dfouqcnxondti" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/runningA.res" id="9_18wgc"]
+[ext_resource type="Animation" uid="uid://doyg67b4k81u2" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/runningB.res" id="10_5wok8"]
+[ext_resource type="Animation" uid="uid://cm6jrcbtwg4l3" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/spawnA.res" id="11_pg8ri"]
+[ext_resource type="Animation" uid="uid://n7710a4rfgo3" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/throw.res" id="12_salby"]
+[ext_resource type="Animation" uid="uid://du13quawdwt0j" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/walkingA.res" id="13_5n5dn"]
+[ext_resource type="Animation" uid="uid://bvdlh3uoyc6yw" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/walkingB.res" id="14_iofts"]
+[ext_resource type="Animation" uid="uid://djt0tm00t4246" path="res://Assets/KayKit_Adventurers_2.0_FREE/Animations/walkingC.res" id="15_m0lnr"]
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_qte5l"]
 _data = {
-&"deathA": ExtResource("2_ebenb"),
-&"deathB": ExtResource("3_sxacp"),
-&"hitA": ExtResource("4_8iatt"),
-&"hitB": ExtResource("5_xygal"),
-&"idleA": ExtResource("6_vugio"),
-&"idleB": ExtResource("7_t45nl"),
-&"interact": ExtResource("8_7udm0"),
-&"runningA": ExtResource("9_4lcwl"),
-&"runningB": ExtResource("10_cm1ad"),
-&"spawnA": ExtResource("11_ogs7s"),
-&"throw": ExtResource("12_acc72"),
-&"walkingA": ExtResource("13_27kur"),
-&"walkingB": ExtResource("14_eftxo"),
-&"walkingC": ExtResource("15_2kxbh")
+&"deathA": ExtResource("2_4yhk5"),
+&"deathB": ExtResource("3_aebdj"),
+&"hitA": ExtResource("4_5sdah"),
+&"hitB": ExtResource("5_xb0gd"),
+&"idleA": ExtResource("6_n48jd"),
+&"idleB": ExtResource("7_7txjg"),
+&"interact": ExtResource("8_rax3w"),
+&"runningA": ExtResource("9_18wgc"),
+&"runningB": ExtResource("10_5wok8"),
+&"spawnA": ExtResource("11_pg8ri"),
+&"throw": ExtResource("12_salby"),
+&"walkingA": ExtResource("13_5n5dn"),
+&"walkingB": ExtResource("14_iofts"),
+&"walkingC": ExtResource("15_m0lnr")
 }
 
-[node name="Ranger" instance=ExtResource("1_05j71")]
+[node name="Ranger" instance=ExtResource("1_s0xec")]
 
 [node name="Skeleton3D" parent="Rig_Medium" index="0"]
 bones/1/position = Vector3(-2.3665827e-30, 0.39206383, 0)

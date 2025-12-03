@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cyx4hymdxeh3"]
+
+[ext_resource type="PackedScene" uid="uid://dh6dqhfsxvdst" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Barbarian.fbx" id="1_6bn5v"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bfx3w"]
+radius = 0.3
+height = 1.0
+
+[node name="Scout" type="Node3D"]
+
+[node name="Barbarian" parent="." instance=ExtResource("1_6bn5v")]
+
+[node name="TroopClickArea" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TroopClickArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("CapsuleShape3D_bfx3w")
