@@ -47,11 +47,18 @@ public class TroopEvents : ITroopEventsHandler
 
 public class WorldState
 {
+	public event Action? TurnEnded;
+	private readonly List<PlayerId> playerList = new();
+	private int currentPlayerIndex = 0;
+	public PlayerId CurrentPlayerId => playerList[currentPlayerIndex];
+
 	public WorldState(int playerAmount)
 	{
 		TerrainState = new TerrainState();
-		for (int i = 0; i < playerAmount; i++){
+		for (int i = 0; i < playerAmount; i++)
+		{
 			PlayerId playerId = new(i);
+			playerList.Add(playerId);
 			playerResources[playerId] = new PlayerResources();
 		}
 	}
@@ -193,6 +200,11 @@ public class WorldState
 		return playerManaClaims.Where(pair => pair.Value == playerId).Select(pair => pair.Key);
 	}
 
+	public int GetTotalManaPools()
+	{
+		return playerManaClaims.Count;
+	}
+
 	public IEnumerable<Vector2I> GetValidPlayerSpawns(PlayerId playerId)
 	{
 		foreach (Vector2I playerClaimedManaPool in GetPlayerClaimedManaPools(playerId)){
@@ -224,5 +236,11 @@ public class WorldState
 			TerrainState.TerrainType.Forest => Mathf.Max(damage - 1, 0),
 			_ => damage
 		};
+	}
+
+	public void NextTurn()
+	{
+		currentPlayerIndex = (currentPlayerIndex + 1) % playerList.Count;
+		TurnEnded?.Invoke();
 	}
 }

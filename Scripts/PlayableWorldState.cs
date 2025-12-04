@@ -14,6 +14,7 @@ public partial class PlayableWorldState : Node
 	[Export] MapGenerator generator;
 	[Export] TroopData testTroop;
 	[Export] HumanGameStrategy human;
+	public PlayerId id;
 
 
 	public override async void _Ready()

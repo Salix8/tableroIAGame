@@ -8,4 +8,5 @@ script = ExtResource("1_jrcrt")
 ModelScene = ExtResource("1_450tq")
 Name = "Guerrero"
 Health = 6
+VisionRange = 4
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

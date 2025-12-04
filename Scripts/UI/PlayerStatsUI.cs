@@ -4,10 +4,10 @@ namespace Game.UI;
 
 public partial class PlayerStatsUI : Control
 {
-    [Export] private Label _manaLabel;
+    [Export] private Label manaLabel;
 
     public void UpdateMana(int manaAmount)
     {
-        _manaLabel.Text = $"Maná: {manaAmount}";
+        manaLabel.Text = $"Maná: {manaAmount}";
     }
 }
