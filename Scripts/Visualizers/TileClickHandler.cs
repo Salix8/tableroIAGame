@@ -2,6 +2,7 @@ using Game.State;
 using Godot;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Godot.Collections;
 
@@ -20,10 +21,11 @@ public partial class TileClickHandler : Node
 	[Export] Camera3D camera;
 	public event Action<Vector2I> TileClicked;
 
-	public Task<Vector2I> WaitForTileClick()
+	public Task<Vector2I> WaitForTileClick(CancellationToken cancelToken)
 	{
 		TaskCompletionSource<Vector2I> source = new();
 		TileClicked += OnTileClicked;
+		cancelToken.Register(() => TileClicked -= OnTileClicked);
 		return source.Task;
 
 		void OnTileClicked(Vector2I tile)

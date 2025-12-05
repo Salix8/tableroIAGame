@@ -27,9 +27,9 @@ public class TroopManager
 
 	public IEnumerable<TroopInfo> GetPlayerTroops(PlayerId id) => troops.Values.Where(troop => troop.Owner == id);
 
-	public TroopInfo? TryGetTroop(Vector2I coord)
+	public bool TryGetTroop(Vector2I coord, [NotNullWhen(true)] out TroopInfo? troop)
 	{
-		return troops.GetValueOrDefault(coord);
+		return troops.TryGetValue(coord, out troop);
 	}
 
 	public bool TryDamageTroop(TroopInfo troop, int damage, out TroopInfo damagedTroop)

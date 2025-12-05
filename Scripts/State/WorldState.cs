@@ -4,6 +4,7 @@ using Godot;
 using Game;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Game.AsyncEvents;
@@ -154,7 +155,7 @@ public class WorldState
 			source.SetResult(true);
 		}
 	}
-	public TroopManager.TroopInfo? GetTroop(Vector2I coord) => troopManager.TryGetTroop(coord);
+	public bool TryGetTroop(Vector2I coord, [NotNullWhen(true)] out TroopManager.TroopInfo? troop) => troopManager.TryGetTroop(coord, out troop);
 	public IReadOnlyDictionary<Vector2I, TroopManager.TroopInfo> GetTroops() => troopManager.Troops;
 
 	readonly AsyncEvent<(ITroopEventsHandler, TroopManager.TroopInfo)> troopSpawned = new();
