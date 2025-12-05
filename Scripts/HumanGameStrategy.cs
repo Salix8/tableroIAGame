@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Godot; // Added for Vector2I
 using Game.State;
+using Game.UI;
 using Game.Visualizers;
 using Godot.Collections;
 
@@ -17,8 +18,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 	[Export] TileClickHandler tileClickHandler;
 	[Export] HexGrid3D grid;
-	[Export] TroopDataButton[] troopSelectionButtons;
-	TroopManager.TroopInfo? selectedTroop;
+	[Export] GameUI gameInterface;
 	//
 	// Dictionary<(SelectionType, SelectionType), >
 	public async Task<IGameAction> GetNextAction(WorldState state, PlayerId player)
@@ -68,17 +68,17 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		PlayerResources? resources = state.GetPlayerResources(player);
 		Debug.Assert(resources != null, $"Player resources for player {player.Value} not found in world state");
 		List<Task<TroopData>> selectionTasks = [];
-
-		foreach (TroopDataButton troopSelectionButton in troopSelectionButtons){
-			TroopData data = troopSelectionButton.GetRelatedTroop();
-			if (data.Cost <= resources.Value.Mana){
-				troopSelectionButton.Disabled = false;
-				selectionTasks.Add(troopSelectionButton.WaitForSelection(cancellationToken));
-			}
-			else{
-				troopSelectionButton.Disabled = true;
-			}
-		}
+		//gameInterface.SelectTroop
+		// foreach (UI.TroopSelectionButton troopSelectionButton in gameInterface){
+		// 	TroopData data = troopSelectionButton.GetRelatedTroop();
+		// 	if (data.Cost <= resources.Value.Mana){
+		// 		troopSelectionButton.Disabled = false;
+		// 		selectionTasks.Add(troopSelectionButton.WaitForSelection(cancellationToken));
+		// 	}
+		// 	else{
+		// 		troopSelectionButton.Disabled = true;
+		// 	}
+		// }
 
 		return Task.WhenAny(selectionTasks.ToArray()).Result;
 	}

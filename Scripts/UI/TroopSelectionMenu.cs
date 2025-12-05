@@ -6,22 +6,15 @@ namespace Game.UI
 {
     public partial class TroopSelectionMenu : Control
     {
-        public WorldState WorldState { get; set; }
-        private Vector2I? selectedSpawnCoord;
 
         public override void _Ready()
         {
             Visible = false;
-            var buttons = GetChildren().OfType<BtnTroop>();
-            foreach(var btn in buttons)
-            {
-                btn.Pressed += () => OnTroopButtonPressed(btn);
-            }
         }
+        //todo make this work with the troopDataButton
 
-        public void ShowMenu(Vector2I spawnCoord)
+        public void ShowMenu()
         {
-            selectedSpawnCoord = spawnCoord;
             if (Visible) return;
 
             Visible = true;
@@ -31,6 +24,8 @@ namespace Game.UI
                 .SetTrans(Tween.TransitionType.Cubic)
                 .SetEase(Tween.EaseType.Out);
         }
+
+        //todo rewrite this
 
         public void HideMenu()
         {
@@ -43,18 +38,7 @@ namespace Game.UI
                 .SetEase(Tween.EaseType.In);
             tween.Finished += () => {
                 Visible = false;
-                selectedSpawnCoord = null;
             };
-        }
-
-        private void OnTroopButtonPressed(BtnTroop button)
-        {
-            if (selectedSpawnCoord.HasValue && WorldState != null)
-            {
-                WorldState.TrySpawnTroop(button.TroopData, selectedSpawnCoord.Value, WorldState.CurrentPlayerId);
-                GD.Print($"Troop {button.TroopData.Name} requested to spawn at {selectedSpawnCoord.Value}");
-            }
-            HideMenu();
         }
     }
 }

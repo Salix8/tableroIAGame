@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Game.State;
 using Godot;
 
-namespace Game;
+namespace Game.UI;
 
-public partial class TroopDataButton : Button
+[GlobalClass]
+public partial class TroopSelectionButton : Button
 {
 	[Export] TroopData troopToSpawn;
 
