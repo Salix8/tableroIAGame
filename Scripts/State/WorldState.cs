@@ -55,9 +55,7 @@ public class WorldState
 		for (int i = 0; i < playerAmount; i++)
 		{
 			PlayerId playerId = new(i);
-			PlayerResources playerResource = new(){
-				Mana = 100
-			};
+			PlayerResources playerResource = new();
 			playerResources[playerId] = playerResource;
 			resourceChangeEvents[playerId] = new AsyncEvent<(PlayerResources before, PlayerResources after)>();
 		}
@@ -78,7 +76,7 @@ public class WorldState
 		return playerResources.GetValueOrDefault(id);
 	}
 
-	public async void ChangePlayerResources(PlayerId id, Func<PlayerResources, PlayerResources> mutator)
+	public async Task MutatePlayerResources(PlayerId id, Func<PlayerResources, PlayerResources> mutator)
 	{
 		Debug.Assert(playerResources.ContainsKey(id), $"Player {id} is not valid!");
 		PlayerResources currentResources = playerResources[id];
@@ -140,10 +138,16 @@ public class WorldState
 	public async Task<bool> TrySpawnTroop(TroopData data, Vector2I coord, PlayerId owner)
 	{
 		if (!IsValidTroopCoord(coord)) return false;
+		var resources = GetPlayerResources(owner);
+		Debug.Assert(resources != null, $"No resources found for player {owner}");
+		if (resources.Mana < data.Cost) return false;
 		if (!troopManager.TryCreateTroop(data, owner, coord, out TroopManager.TroopInfo? troop)) return false;
 		TroopEvents events = new();
 		AddEventWithAssert(coord, events);
-		await troopSpawned.DispatchSequential((events, troop));
+		await Task.WhenAll(
+			MutatePlayerResources(owner, res => new PlayerResources{ Mana = res.Mana - data.Cost }),
+			troopSpawned.DispatchSequential((events, troop))
+		);
 
 		return true;
 	}

@@ -61,18 +61,17 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		CancellationTokenSource tokenSource = new();
 		Task<TroopData?> spawnTask = GetSpawnSelection(state, player, tokenSource.Token);
 		Task<Vector2I> cancelTask = tileClickHandler.WaitForTileClick(tokenSource.Token);
-
 		await Task.WhenAny([spawnTask, cancelTask]);
 		await tokenSource.CancelAsync();
+		await Task.WhenAll(
+			HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.None),
+			HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
+		);
 		if (cancelTask.IsCompleted) return null;
 		if (spawnTask.Result == null) return null;
 		TroopData troopToSpawn = spawnTask.Result;
 
 
-		await Task.WhenAll(
-			HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.None),
-			HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
-		);
 
 		return new CreateTroopAction(troopToSpawn, spawnPosition, player);
 	}

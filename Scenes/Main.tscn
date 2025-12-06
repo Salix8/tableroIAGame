@@ -58,12 +58,13 @@ barbarianData = ExtResource("10_2w5on")
 [node name="GridNavigation" type="Node" parent="."]
 script = ExtResource("8_50glp")
 
-[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human")]
+[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human", "gameInterface")]
 script = ExtResource("9_grg3l")
 grid = NodePath("HexGrid3D")
 generator = NodePath("../Enviroment/MapGenerator")
 testTroop = ExtResource("4_v1gob")
 human = NodePath("../HumanGameStrategy")
+gameInterface = NodePath("../GameUI")
 metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="HexGrid3D" type="Node3D" parent="PlayableWorldState"]

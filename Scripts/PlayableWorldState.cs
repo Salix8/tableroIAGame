@@ -4,6 +4,7 @@ using Game.State;
 using Game.UI;
 using Godot;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Game;
 
@@ -15,6 +16,7 @@ public partial class PlayableWorldState : Node
 	[Export] MapGenerator generator;
 	[Export] TroopData testTroop;
 	[Export] HumanGameStrategy human;
+	[Export] GameUI gameInterface;
 	public PlayerId id;
 
 
@@ -29,6 +31,11 @@ public partial class PlayableWorldState : Node
 		GD.Print("Generation complete");
 		State.TryClaimManaPool(players[0], mana1Pos);
 		State.TryClaimManaPool(players[1], mana2Pos);
+		State.GetResourceChangedHandler(players[0])?.Subscribe(gameInterface.UpdatePlayerResources);
+		await Task.WhenAll(
+			State.MutatePlayerResources(players[0], resources => new PlayerResources{ Mana = 5 }),
+			State.MutatePlayerResources(players[1], resources => new PlayerResources{ Mana = 5 })
+		);
 		try{
 			IGameStrategy Player1Strategy = human;
 			IGameStrategy Player2Strategy = new RandomGameStrategy(testTroop);

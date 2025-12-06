@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Godot;
 using Game.State;
 using System.Linq;
@@ -10,22 +11,34 @@ namespace Game.UI;
 
 public partial class GameUI : CanvasLayer
 {
-    [Export] PlayerStatsUI playerStatsUI;
-    [Export] Button nextTurnButton;
-    [Export] Label turnInfoLabel;
-    [Export] TroopSelectionMenu troopSelectionMenu;
+	[Export] PlayerStatsUI playerStatsUI;
+	[Export] Button nextTurnButton;
+	[Export] Label turnInfoLabel;
+	[Export] TroopSelectionMenu troopSelectionMenu;
 
-    public override void _Ready()
-    {
+	public override void _Ready()
+	{
+	}
 
-    }
-    //todo work all the ui interaction methods in here as async methods
-    public async Task<TroopData?> GetTroopSpawnSelection(PlayerResources availableResources, CancellationToken token)
-    {
-        troopSelectionMenu.SetEnabledTroops(troopData=> troopData.Cost <= availableResources.Mana);
-        await troopSelectionMenu.ShowMenu();
-        TroopData? troop = await troopSelectionMenu.GetSelection(token);
-        await troopSelectionMenu.HideMenu();
-        return troop;
-    }
+	//todo work all the ui interaction methods in here as async methods
+	public async Task UpdatePlayerResources((PlayerResources, PlayerResources ) args)
+	{
+		(PlayerResources before, PlayerResources after) = args;
+		var manaTween = GetTree().CreateTween();
+		manaTween.TweenMethod(Callable.From((int mana) => playerStatsUI.UpdateMana(mana)),
+			before.Mana,
+			after.Mana,
+			Mathf.Abs(after.Mana - before.Mana) * 0.05f);
+		await ToSignal(manaTween, Tween.SignalName.Finished);
+	}
+
+	public async Task<TroopData?> GetTroopSpawnSelection(PlayerResources availableResources, CancellationToken token)
+	{
+		troopSelectionMenu.SetEnabledTroops(troopData => troopData.Cost <= availableResources.Mana);
+		await troopSelectionMenu.ShowMenu();
+		TroopData? troop;
+		troop = await troopSelectionMenu.GetSelection(token);
+		await troopSelectionMenu.HideMenu();
+		return troop;
+	}
 }

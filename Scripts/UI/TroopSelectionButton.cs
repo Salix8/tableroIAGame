@@ -15,7 +15,10 @@ public partial class TroopSelectionButton : Button
 		TaskCompletionSource<TroopData> source = new();
 		ButtonUp += ClickHandler;
 		token.Register(() => {
-			ButtonUp -= ClickHandler;
+			Callable.From(() => {
+				ButtonUp -= ClickHandler;
+			}).CallDeferred();
+			source.TrySetCanceled();
 		});
 
 		return source.Task;

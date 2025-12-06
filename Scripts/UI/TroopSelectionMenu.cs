@@ -44,15 +44,21 @@ namespace Game.UI
 			using CancellationTokenSource buttonCancelSource = new();
 			using CancellationTokenSource linkedSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, buttonCancelSource.Token);
 			Task<TroopData>[] selectionTasks = troopButtons
-				.Where(btn => !btn.Disabled)
+				// .Where(btn => !btn.Disabled) // commented out cuz this honestly makes more sense without relying on disabled
 				.Select(btn => btn.WaitForSelection(linkedSource.Token))
 				.ToArray();
-			TroopData? result = null;
-			if (selectionTasks.Length > 0){
-				result = (await Task.WhenAny(selectionTasks)).Result;
+			if (selectionTasks.Length == 0){
+				await buttonCancelSource.CancelAsync();
+				return null;
 			}
+			Task<TroopData> resultTask = await Task.WhenAny(selectionTasks);
 			await buttonCancelSource.CancelAsync();
-			return result;
+			if (resultTask.IsCanceled || resultTask.IsFaulted){
+				return null;
+			}
+
+			return await resultTask;
+
 		}
 
 		public async Task HideMenu()

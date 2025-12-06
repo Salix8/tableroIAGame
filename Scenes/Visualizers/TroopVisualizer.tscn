@@ -22,7 +22,6 @@ albedo_color = Color(0.5176471, 0.5176471, 0.5176471, 0.6745098)
 
 [sub_resource type="Resource" id="Resource_ps6mu"]
 script = ExtResource("2_a3ldm")
-scale = 0.7
 overrideMaterial = SubResource("StandardMaterial3D_jjh4i")
 metadata/_custom_type_script = "uid://b33clvextfukk"
 

@@ -6,4 +6,4 @@
 render_priority = 0
 shader = ExtResource("1_ffbqu")
 shader_parameter/rim_color = Color(0, 0.827451, 1, 1)
-shader_parameter/rim_power = 0.34000001289012
+shader_parameter/rim_power = 0.50000002049012
