@@ -55,7 +55,6 @@ public partial class HexTileVisualizer : Node3D
 			currentTerrain.QueueFree();
 
 		}
-		GD.Print(terrainScenes[terrain]);
 		currentTerrain = terrainScenes[terrain].InstantiateUnderAs<Node3D>(spawnPoint);
 		terrainMeshes = currentTerrain.GetAllChildrenOfType<MeshInstance3D>().ToArray();
 		Debug.Assert(terrainMeshes != null, "No terrain mesh found under terrain scene");

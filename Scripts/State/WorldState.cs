@@ -48,17 +48,14 @@ public class TroopEvents : ITroopEventsHandler
 
 public class WorldState
 {
-
-	public WorldState(int playerAmount)
+	public PlayerId RegisterNewPlayer()
 	{
-		TerrainState = new TerrainState();
-		for (int i = 0; i < playerAmount; i++)
-		{
-			PlayerId playerId = new(i);
-			PlayerResources playerResource = new();
-			playerResources[playerId] = playerResource;
-			resourceChangeEvents[playerId] = new AsyncEvent<(PlayerResources before, PlayerResources after)>();
-		}
+		int playerCount = PlayerIds.Count();
+		PlayerId player = new(playerCount);
+		PlayerResources playerResource = new();
+		playerResources[player] = playerResource;
+		resourceChangeEvents[player] = new AsyncEvent<(PlayerResources before, PlayerResources after)>();
+		return player;
 	}
 
 	readonly Dictionary<PlayerId, PlayerResources> playerResources = new();
@@ -189,10 +186,10 @@ public class WorldState
 	{
 		TroopManager.TroopInfo[] deadTroops = troopManager.DeadTroops.ToArray();
 		foreach (TroopManager.TroopInfo deadTroop in deadTroops){
-			troopManager.TryRemoveTroop(deadTroop);
 			TroopEvents events = GetEventWithAssert(deadTroop.Position);
-			troopEvents.Remove(deadTroop.Position);
 			await events.TroopKilled.DispatchSequential(deadTroop);
+			troopManager.TryRemoveTroop(deadTroop);
+			troopEvents.Remove(deadTroop.Position);
 		}
 	}
 	public bool IsOccupied(Vector2I coord)
@@ -253,7 +250,7 @@ public class WorldState
 		return playerResources.ContainsKey(playerId);
 	}
 
-	public TerrainState TerrainState { get; }
+	public TerrainState TerrainState { get; } = new();
 
 
 	public static int ModifiedDamage(TerrainState.TerrainType type, int damage)

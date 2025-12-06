@@ -13,9 +13,8 @@ public class TroopManager
 {
 	readonly Dictionary<Vector2I, TroopInfo> troops = new();
 	public IReadOnlyDictionary<Vector2I, TroopInfo> Troops => troops;
-	readonly HashSet<TroopInfo> deadTroops = [];
 
-	public HashSet<TroopInfo> DeadTroops => deadTroops;
+	public IEnumerable<TroopInfo> DeadTroops => Troops.Values.Where(troop=>troop.CurrentHealth <= 0);
 
 	public record TroopInfo
 	{
@@ -36,9 +35,6 @@ public class TroopManager
 	{
 		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
 		troop = troop with{ CurrentHealth = Mathf.Max(troop.CurrentHealth - damage,0) };
-		if (troop.CurrentHealth <= 0){
-			deadTroops.Add(troop);
-		}
 		troops[troop.Position] = troop;
 		damagedTroop = troop;
 		return true;
@@ -48,7 +44,6 @@ public class TroopManager
 	{
 
 		Debug.Assert(Troops.Values.Contains(troopToRemove),"Troop manager doesn't contain provided troop");
-		deadTroops.Remove(troopToRemove);
 		return troops.Remove(troopToRemove.Position);
 	}
 
