@@ -24,7 +24,7 @@
 
 [node name="MapGenerator" type="Node3D" parent="Enviroment"]
 script = ExtResource("1_r150o")
-MapRadius = 8
+MapRadius = 4
 
 [node name="MapVisualizer" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("state", "grid")]
 script = ExtResource("2_grg3l")
@@ -58,11 +58,12 @@ barbarianData = ExtResource("10_2w5on")
 [node name="GridNavigation" type="Node" parent="."]
 script = ExtResource("8_50glp")
 
-[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator")]
+[node name="PlayableWorldState" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human")]
 script = ExtResource("9_grg3l")
 grid = NodePath("HexGrid3D")
 generator = NodePath("../Enviroment/MapGenerator")
 testTroop = ExtResource("4_v1gob")
+human = NodePath("../HumanGameStrategy")
 metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="HexGrid3D" type="Node3D" parent="PlayableWorldState"]
@@ -73,9 +74,7 @@ metadata/_custom_type_script = "uid://dv71us8ote7gl"
 [node name="InfluenceManager" type="Node" parent="PlayableWorldState"]
 script = ExtResource("13_h1m7h")
 
-[node name="GameUI" parent="." node_paths=PackedStringArray("playableWorldState", "tileClickHandler") instance=ExtResource("12_grg3l")]
-playableWorldState = NodePath("../PlayableWorldState")
-tileClickHandler = NodePath("../PlayerInputHandler")
+[node name="GameUI" parent="." instance=ExtResource("12_grg3l")]
 
 [node name="PlayerInputHandler" type="Node" parent="." node_paths=PackedStringArray("grid", "playableWorldState", "camera")]
 script = ExtResource("14_erwvk")
@@ -83,8 +82,11 @@ grid = NodePath("../PlayableWorldState/HexGrid3D")
 playableWorldState = NodePath("../PlayableWorldState")
 camera = NodePath("../Camera3D")
 
-[node name="HumanGameStrategy" type="Node" parent="." node_paths=PackedStringArray("tileClickHandler", "grid")]
+[node name="HumanGameStrategy" type="Node" parent="." node_paths=PackedStringArray("tileClickHandler", "grid", "gameInterface", "troopVisualizerManager", "mapVisualizer")]
 script = ExtResource("16_erwvk")
 tileClickHandler = NodePath("../PlayerInputHandler")
 grid = NodePath("../PlayableWorldState/HexGrid3D")
+gameInterface = NodePath("../GameUI")
+troopVisualizerManager = NodePath("../Enviroment/TroopVisualizerSpawner")
+mapVisualizer = NodePath("../Enviroment/MapVisualizer")
 metadata/_custom_type_script = "uid://t7gock5q4pfd"

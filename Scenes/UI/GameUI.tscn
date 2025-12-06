@@ -5,8 +5,8 @@
 [ext_resource type="Script" uid="uid://b18nw1xetlm1y" path="res://Scripts/UI/TroopSelectionMenu.cs" id="3_ikj5o"]
 [ext_resource type="Texture2D" uid="uid://dn00hd3t1lvkw" path="res://Assets/KayKit_Adventurers_2.0_FREE/Assets/imgScout.png" id="3_npa51"]
 [ext_resource type="Texture2D" uid="uid://brcsfoja6xh8k" path="res://Assets/KayKit_Adventurers_2.0_FREE/Assets/imgWarrior.png" id="4_intyv"]
-[ext_resource type="Script" uid="uid://bjaor11hxqquo" path="res://Scripts/UI/BtnTroop.cs" id="5_4efff"]
 [ext_resource type="Texture2D" uid="uid://c3alphkatvx2x" path="res://Assets/KayKit_Adventurers_2.0_FREE/Assets/imgBarbarian.png" id="5_4284l"]
+[ext_resource type="Script" uid="uid://bef7ddnrp4a40" path="res://Scripts/UI/TroopSelectionButton.cs" id="5_ikj5o"]
 [ext_resource type="Resource" uid="uid://cluvypf4r7vcj" path="res://Resources/Troops/Scout.tres" id="6_78ss0"]
 [ext_resource type="Texture2D" uid="uid://dfkelxs4q1ito" path="res://Assets/KayKit_Adventurers_2.0_FREE/Assets/imgArcher.png" id="6_sinwf"]
 [ext_resource type="Resource" uid="uid://c8tw1oe0vy5hg" path="res://Resources/Troops/Warrior.tres" id="8_s5b58"]
@@ -145,8 +145,8 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_78ss0")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tq70y")
 icon = ExtResource("3_npa51")
 icon_alignment = 1
-script = ExtResource("5_4efff")
-TroopData = ExtResource("6_78ss0")
+script = ExtResource("5_ikj5o")
+troopToSpawn = ExtResource("6_78ss0")
 
 [node name="BtnWarrior" type="Button" parent="MenuTroopSelection/HBoxContainer"]
 custom_minimum_size = Vector2(0, 171)
@@ -156,8 +156,8 @@ size_flags_vertical = 4
 theme_override_constants/icon_max_width = 125
 theme_override_styles/normal = SubResource("StyleBoxFlat_s5b58")
 icon = ExtResource("4_intyv")
-script = ExtResource("5_4efff")
-TroopData = ExtResource("8_s5b58")
+script = ExtResource("5_ikj5o")
+troopToSpawn = ExtResource("8_s5b58")
 
 [node name="BtnBarbarian" type="Button" parent="MenuTroopSelection/HBoxContainer"]
 layout_mode = 2
@@ -166,8 +166,8 @@ size_flags_vertical = 4
 theme_override_constants/icon_max_width = 125
 theme_override_styles/normal = SubResource("StyleBoxFlat_l2rr8")
 icon = ExtResource("5_4284l")
-script = ExtResource("5_4efff")
-TroopData = ExtResource("10_l2rr8")
+script = ExtResource("5_ikj5o")
+troopToSpawn = ExtResource("10_l2rr8")
 
 [node name="BtnArcher" type="Button" parent="MenuTroopSelection/HBoxContainer"]
 layout_mode = 2
@@ -176,8 +176,8 @@ size_flags_vertical = 4
 theme_override_constants/icon_max_width = 125
 theme_override_styles/normal = SubResource("StyleBoxFlat_k6cpl")
 icon = ExtResource("6_sinwf")
-script = ExtResource("5_4efff")
-TroopData = ExtResource("12_k6cpl")
+script = ExtResource("5_ikj5o")
+troopToSpawn = ExtResource("12_k6cpl")
 
 [node name="VSeparator" type="VSeparator" parent="MenuTroopSelection/HBoxContainer"]
 layout_mode = 2

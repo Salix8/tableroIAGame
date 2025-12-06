@@ -15,11 +15,31 @@ public partial class TroopVisualizer : Node3D
 	[Export] float moveDuration;
 	Node3D spawnedTroop;
 
-	public void Highlight(Material material)
+
+	public enum HighlightType
 	{
-		troopMesh.MaterialOverlay = material;
+		None,
+		Selected,
+		Gray,
 	}
-	MeshInstance3D troopMesh;
+
+	[Export] Dictionary<HighlightType, ModelHighlightState> highlightStates;
+
+	public Task Highlight(HighlightType type)
+	{
+		return highlightStates[type].Transition(spawnedTroop, troopMeshes);
+	}
+
+	public void SetBaseColor(Color color)
+	{
+		foreach (MeshInstance3D troopMesh in troopMeshes){
+			int count = troopMesh.Mesh.GetSurfaceCount();
+			for (int i = 0; i < count; i++){
+				if (troopMesh.Mesh.SurfaceGetMaterial(i) is StandardMaterial3D mat) mat.AlbedoColor = color;
+			}
+		}
+	}
+	MeshInstance3D[] troopMeshes;
 
 	public async Task Kill()
 	{
@@ -63,7 +83,7 @@ public partial class TroopVisualizer : Node3D
 		spawnedTroop?.QueueFree();
 		spawnedTroop = data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);
 
-		troopMesh = spawnedTroop.GetAllChildrenOfType<MeshInstance3D>().FirstOrDefault();
+		troopMeshes = spawnedTroop.GetAllChildrenOfType<MeshInstance3D>().ToArray();
 		Debug.Assert(spawnedTroop != null, "No troop mesh found under troop scene");
 		spawnedTroop.Scale = Vector3.Zero;
 		Tween appear = GetTree().CreateTween();

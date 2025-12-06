@@ -24,14 +24,16 @@ public partial class TileClickHandler : Node
 	public Task<Vector2I> WaitForTileClick(CancellationToken cancelToken)
 	{
 		TaskCompletionSource<Vector2I> source = new();
+		cancelToken.Register(() => {
+			TileClicked -= OnTileClicked;
+		});
 		TileClicked += OnTileClicked;
-		cancelToken.Register(() => TileClicked -= OnTileClicked);
 		return source.Task;
 
 		void OnTileClicked(Vector2I tile)
 		{
-			source.SetResult(tile);
 			TileClicked -= OnTileClicked;
+			source.SetResult(tile);
 		}
 	}
 
@@ -61,6 +63,7 @@ public partial class TileClickHandler : Node
 		// DebugDraw3D.DrawSphere(tileWorld, 0.5f, Colors.Chartreuse, duration: 1);
 		// DebugDraw3D.DrawSphere(rayPos, 0.5f, Colors.DarkGreen, duration: 1);
 		TileClicked?.Invoke(tile);
+
 
 
 		// // Check if we hit a troop by checking for metadata

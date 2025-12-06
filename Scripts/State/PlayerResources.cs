@@ -1,7 +1,7 @@
 ﻿
 namespace Game.State;
 
-public struct PlayerResources
+public record PlayerResources
 {
 	public int Mana;
 }

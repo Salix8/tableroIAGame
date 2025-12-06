@@ -1,6 +1,30 @@
-[gd_scene load_steps=3 format=3 uid="uid://cal78vmms1mpb"]
+[gd_scene load_steps=9 format=3 uid="uid://cal78vmms1mpb"]
 
 [ext_resource type="Script" uid="uid://ciddeviryl38y" path="res://Scripts/Visualizers/TroopVisualizer.cs" id="1_anh3s"]
+[ext_resource type="Script" uid="uid://b33clvextfukk" path="res://Scripts/Visualizers/ModelHighlightState.cs" id="2_a3ldm"]
+[ext_resource type="Material" uid="uid://cdwmg75yludo3" path="res://VFX/RimOverlay.tres" id="3_8pif0"]
+
+[sub_resource type="Resource" id="Resource_fot3o"]
+script = ExtResource("2_a3ldm")
+metadata/_custom_type_script = "uid://b33clvextfukk"
+
+[sub_resource type="Resource" id="Resource_aabm5"]
+script = ExtResource("2_a3ldm")
+scale = 1.4
+elevation = 0.3
+overlayMaterial = ExtResource("3_8pif0")
+metadata/_custom_type_script = "uid://b33clvextfukk"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jjh4i"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.5176471, 0.5176471, 0.5176471, 0.6745098)
+
+[sub_resource type="Resource" id="Resource_ps6mu"]
+script = ExtResource("2_a3ldm")
+scale = 0.7
+overrideMaterial = SubResource("StandardMaterial3D_jjh4i")
+metadata/_custom_type_script = "uid://b33clvextfukk"
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yvtm8"]
 radius = 0.32373047
@@ -11,6 +35,11 @@ script = ExtResource("1_anh3s")
 spawnPoint = NodePath("spawn")
 appearDuration = 0.3
 moveDuration = 0.3
+highlightStates = Dictionary[int, Object]({
+0: SubResource("Resource_fot3o"),
+1: SubResource("Resource_aabm5"),
+2: SubResource("Resource_ps6mu")
+})
 metadata/_custom_type_script = "uid://ciddeviryl38y"
 
 [node name="spawn" type="Node3D" parent="."]

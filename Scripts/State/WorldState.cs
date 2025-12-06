@@ -55,16 +55,41 @@ public class WorldState
 		for (int i = 0; i < playerAmount; i++)
 		{
 			PlayerId playerId = new(i);
-			playerResources[playerId] = new PlayerResources();
+			PlayerResources playerResource = new(){
+				Mana = 100
+			};
+			playerResources[playerId] = playerResource;
+			resourceChangeEvents[playerId] = new AsyncEvent<(PlayerResources before, PlayerResources after)>();
 		}
 	}
 
 	readonly Dictionary<PlayerId, PlayerResources> playerResources = new();
+	readonly Dictionary<PlayerId, AsyncEvent<(PlayerResources before, PlayerResources after)>> resourceChangeEvents = new();
+
+	public IAsyncHandlerCollection<(PlayerResources before, PlayerResources after)>? GetResourceChangedHandler(PlayerId id)
+	{
+		resourceChangeEvents.TryGetValue(id,
+			out AsyncEvent<(PlayerResources before, PlayerResources after)>? value);
+		return value;
+	}
 
 	public PlayerResources? GetPlayerResources(PlayerId id)
 	{
 		return playerResources.GetValueOrDefault(id);
 	}
+
+	public async void ChangePlayerResources(PlayerId id, Func<PlayerResources, PlayerResources> mutator)
+	{
+		Debug.Assert(playerResources.ContainsKey(id), $"Player {id} is not valid!");
+		PlayerResources currentResources = playerResources[id];
+		Debug.Assert(resourceChangeEvents.ContainsKey(id), $"No resource change event exits for player {id}");
+		PlayerResources newResources = mutator(currentResources);
+		playerResources[id] = newResources;
+		if (currentResources != newResources){
+			await resourceChangeEvents[id].DispatchSequential((currentResources, newResources));
+		}
+	}
+
 
 	public IEnumerable<PlayerId> PlayerIds => playerResources.Keys;
 
@@ -212,7 +237,12 @@ public class WorldState
 
 	public bool IsValidSpawn(PlayerId playerId, Vector2I coord)
 	{
-		return HexGrid.GetNeighbourSpiralCoords(coord, 1).Where(IsValidTroopCoord).Any(neighbour => playerManaClaims.ContainsKey(neighbour));
+		return HexGrid.GetNeighbourSpiralCoords(coord, 1).Where(IsValidTroopCoord).Any(neighbour => {
+			if (!playerManaClaims.TryGetValue(neighbour, out PlayerId id)){
+				return false;
+			}
+			return id == playerId;
+		});
 	}
 	bool IsValidPlayerId(PlayerId playerId)
 	{

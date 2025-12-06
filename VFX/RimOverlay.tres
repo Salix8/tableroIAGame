@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cdwmg75yludo3"]
+
+[ext_resource type="Shader" uid="uid://ccjohacs2bqas" path="res://VFX/SelectedShader.gdshader" id="1_ffbqu"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ffbqu")
+shader_parameter/rim_color = Color(0, 0.827451, 1, 1)
+shader_parameter/rim_power = 0.34000001289012

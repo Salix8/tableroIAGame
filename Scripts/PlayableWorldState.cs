@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Game.State;
 using Game.UI;
@@ -28,22 +29,28 @@ public partial class PlayableWorldState : Node
 		GD.Print("Generation complete");
 		State.TryClaimManaPool(players[0], mana1Pos);
 		State.TryClaimManaPool(players[1], mana2Pos);
+		try{
+			IGameStrategy Player1Strategy = human;
+			IGameStrategy Player2Strategy = new RandomGameStrategy(testTroop);
 
-		IGameStrategy Player1Strategy = new RandomGameStrategy(testTroop);
-		IGameStrategy Player2Strategy = new RandomGameStrategy(testTroop);
+			// This loop simulates game turns, will need adjustment for actual human input flow
+			// For now, it just sets up some initial actions.
+			// The actual game loop and turn progression will need to be implemented separately.
+			for (int i = 0; i < 100; i++){
+				// Reduced loop for initial testing
+				if (i % 2 == 0){
+					IGameAction action = await Player2Strategy.GetNextAction(State, players[1]);
+					await action.TryApply(State);
+				}
+				else{
+					IGameAction action = await Player1Strategy.GetNextAction(State, players[0]);
+					await action.TryApply(State);
+				}
+			}
 
-		// This loop simulates game turns, will need adjustment for actual human input flow
-		// For now, it just sets up some initial actions.
-		// The actual game loop and turn progression will need to be implemented separately.
-		for (int i = 0; i < 100; i++){ // Reduced loop for initial testing
-			if (i % 10 < 5){
-				IGameAction action = await Player2Strategy.GetNextAction(State, players[1]);
-				await action.TryApply(State);
-			}
-			else{
-				IGameAction action = await Player1Strategy.GetNextAction(State, players[0]);
-				await action.TryApply(State);
-			}
+		}
+		catch(Exception e){
+			GD.Print(e);
 		}
 	}
 }

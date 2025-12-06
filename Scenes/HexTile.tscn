@@ -1,14 +1,44 @@
-[gd_scene load_steps=7 format=3 uid="uid://bh5qard77knhr"]
+[gd_scene load_steps=13 format=3 uid="uid://bh5qard77knhr"]
 
 [ext_resource type="Script" uid="uid://cwyg8kd126077" path="res://Scripts/Visualizers/HexTileVisualizer.cs" id="1_5idql"]
 [ext_resource type="PackedScene" uid="uid://djo3gw5hit78w" path="res://Scenes/Visualizers/Terrains/grass.tscn" id="2_5idql"]
+[ext_resource type="Script" uid="uid://b33clvextfukk" path="res://Scripts/Visualizers/ModelHighlightState.cs" id="2_lllv2"]
 [ext_resource type="PackedScene" uid="uid://crenp18o3wjcl" path="res://Scenes/Visualizers/Terrains/grass_forest.tscn" id="3_3e4qa"]
 [ext_resource type="PackedScene" uid="uid://bodtfb0fprvh7" path="res://Scenes/Visualizers/Terrains/stone_mountain.tscn" id="4_lllv2"]
 [ext_resource type="PackedScene" uid="uid://bea5epcaqpgxh" path="res://Scenes/Visualizers/Terrains/water.tscn" id="5_1axyw"]
 [ext_resource type="PackedScene" uid="uid://dplv6acw31v3a" path="res://Scenes/Visualizers/Terrains/wizard_tower.tscn" id="6_5idql"]
 
+[sub_resource type="Resource" id="Resource_wkulw"]
+script = ExtResource("2_lllv2")
+metadata/_custom_type_script = "uid://b33clvextfukk"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3e4qa"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.5068417, 1, 0.64737535, 0.6901961)
+
+[sub_resource type="Resource" id="Resource_mlnnr"]
+script = ExtResource("2_lllv2")
+overlayMaterial = SubResource("StandardMaterial3D_3e4qa")
+metadata/_custom_type_script = "uid://b33clvextfukk"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lllv2"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.5568628, 0.5568628, 0.5568628, 0.65882355)
+
+[sub_resource type="Resource" id="Resource_1axyw"]
+script = ExtResource("2_lllv2")
+overlayMaterial = SubResource("StandardMaterial3D_lllv2")
+metadata/_custom_type_script = "uid://b33clvextfukk"
+
 [node name="HexTile" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
 script = ExtResource("1_5idql")
+highlightStates = Dictionary[int, Object]({
+0: SubResource("Resource_wkulw"),
+1: SubResource("Resource_mlnnr"),
+2: SubResource("Resource_1axyw")
+})
 terrainScenes = Dictionary[int, PackedScene]({
 0: ExtResource("2_5idql"),
 1: ExtResource("3_3e4qa"),
@@ -17,8 +47,8 @@ terrainScenes = Dictionary[int, PackedScene]({
 4: ExtResource("6_5idql"),
 5: ExtResource("6_5idql")
 })
-totalAnimationDuration = 0.4
-skippedDuration = 0.37
+totalAnimationDuration = 0.8
+skippedDuration = 0.8
 spawnPoint = NodePath("spawn")
 
 [node name="spawn" type="Node3D" parent="."]
