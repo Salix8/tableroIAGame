@@ -14,7 +14,7 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 		if (playerTroops.Length > 0){
 			TroopManager.TroopInfo randomTroop = playerTroops[GD.RandRange(0, playerTroops.Length - 1)];
 			Vector2I neighborPos = Random.Shared.GetItems(HexGrid.GetNeighborCoords(randomTroop.Position).Where(state.IsValidTroopCoord).ToArray(),1).First();
-			return Task.FromResult<IGameAction>(new MoveTroopAction(randomTroop, neighborPos));
+			return Task.FromResult<IGameAction>(new MoveTroopAction(randomTroop, [neighborPos]));
 		}
 
 		Vector2I[] spawns = state.GetValidPlayerSpawns(player).ToArray();

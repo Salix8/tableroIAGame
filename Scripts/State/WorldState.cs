@@ -103,13 +103,14 @@ public class WorldState
 		troopEvents.Add(coord, events);
 	}
 	public IEnumerable<TroopManager.TroopInfo> GetPlayerTroops(PlayerId id) => troopManager.GetPlayerTroops(id);
-	public async Task<bool> TryMoveTroop(TroopManager.TroopInfo troop, Vector2I to)
+
+	public async Task<(TroopManager.TroopInfo result, bool moved)> TryMoveTroopToCell(TroopManager.TroopInfo troop, Vector2I to)
 	{
 		Vector2I from = troop.Position;
-		if (!IsValidTroopCoord(to)) return false;
-		if (!troopManager.CanMoveTroop(troop, to)) return false;
+		if (!IsValidTroopCoord(to)) return (troop,false);
+		if (!troopManager.CanMoveTroop(troop, to)) return (troop,false);
 
-		var ranges = troopManager.GetTroopRanges();
+		var ranges = troopManager.ComputeTroopRanges();
 
 		var inRange = ranges.GetValueOrDefault(from, []);
 		var newRange = ranges.GetValueOrDefault(to, []);
@@ -121,7 +122,10 @@ public class WorldState
 			troop = attackedTarget;
 		}
 
-		if (!troopManager.TryMoveTroop(troop, to, out TroopManager.TroopInfo movedTroop)) return false;
+		if (!troopManager.TryMoveTroop(troop, to, out TroopManager.TroopInfo movedTroop)){
+
+			return (movedTroop, false);
+		}
 		TroopEvents troopEvent = GetEventWithAssert(from);
 		troopEvents.Remove(from);
 		AddEventWithAssert(to, troopEvent);
@@ -129,9 +133,12 @@ public class WorldState
 
 		await troopEvent.TroopMoved.DispatchSequential((troop, movedTroop));
 
-		return true;
+		return (movedTroop,true);
 
 	}
+
+	public Dictionary<Vector2I, HashSet<TroopManager.TroopInfo>> ComputeTroopRanges() =>
+		troopManager.ComputeTroopRanges();
 	public async Task<bool> TrySpawnTroop(TroopData data, Vector2I coord, PlayerId owner)
 	{
 		if (!IsValidTroopCoord(coord)) return false;
@@ -191,11 +198,6 @@ public class WorldState
 			troopManager.TryRemoveTroop(deadTroop);
 			troopEvents.Remove(deadTroop.Position);
 		}
-	}
-	public bool IsOccupied(Vector2I coord)
-	{
-		return TerrainState.GetTerrainType(coord) == TerrainState.TerrainType.Mountain ||
-		       troopManager.IsOccupied(coord);
 	}
 	public bool IsValidTroopCoord(Vector2I coord)
 	{

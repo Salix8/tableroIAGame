@@ -77,7 +77,7 @@ public class TroopManager
 		return true;
 	}
 
-	public Dictionary<Vector2I, HashSet<TroopInfo>> GetTroopRanges()
+	public Dictionary<Vector2I, HashSet<TroopInfo>> ComputeTroopRanges()
 	{
 		Dictionary<Vector2I, HashSet<TroopInfo>> ranges = new();
 		foreach (TroopInfo troop in troops.Values){

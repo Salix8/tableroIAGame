@@ -13,6 +13,12 @@ public partial class TroopVisualizer : Node3D
 	[Export] Node3D spawnPoint;
 	[Export] float appearDuration;
 	[Export] float moveDuration;
+	[Export] AnimationLibrary troopAnimations;
+	[Export] string spawnAnimationName;
+	[Export] string idleAnimationName;
+	[Export] string movingAnimationName;
+	[Export] string deathAnimationName;
+	[Export] string damagedAnimationName;
 	Node3D spawnedTroop;
 
 
@@ -40,17 +46,11 @@ public partial class TroopVisualizer : Node3D
 		}
 	}
 	MeshInstance3D[] troopMeshes;
-
+	AnimationPlayer animationPlayer;
 	public async Task Kill()
 	{
 		if (spawnedTroop == null) return;
-
-		Tween disappear = GetTree().CreateTween();
-		disappear.TweenMethod(Callable.From((Vector3 scale) => {
-			spawnedTroop.Scale = scale;
-		}), spawnedTroop.Scale, Vector3.Zero, appearDuration).SetEase(Tween.EaseType.Out);
-
-		await ToSignal(disappear, Tween.SignalName.Finished);
+		await PlayTroopAnimation(deathAnimationName);
 	}
 
 	public async Task Attack(Vector3 target)
@@ -62,8 +62,7 @@ public partial class TroopVisualizer : Node3D
 
 	public async Task Damaged(int damage)
 	{
-
-		await ToSignal(GetTree().CreateTimer(0.3f), Timer.SignalName.Timeout);
+		await PlayTroopAnimation(damagedAnimationName);
 	}
 
 	public async Task MoveTo(Vector3 target)
@@ -73,24 +72,42 @@ public partial class TroopVisualizer : Node3D
 		move.TweenMethod(Callable.From((Vector3 newPos) => {
 			GlobalPosition = newPos;
 		}), GlobalPosition, target, moveDuration).SetEase(Tween.EaseType.Out);
-
+		_ = PlayTroopAnimation(movingAnimationName);
 		await ToSignal(move, Tween.SignalName.Finished);
+		_ = PlayTroopAnimation(idleAnimationName);
 	}
 
+	const string LibraryName = "TroopAnimations";
+
+	async Task PlayTroopAnimation(string animationName)
+	{
+		var anim = troopAnimations.GetAnimation(animationName);
+		animationPlayer.Play($"{LibraryName}/{animationName}");
+
+		await ToSignal(GetTree().CreateTimer(anim.GetLength()), Timer.SignalName.Timeout);
+	}
 	public async Task Spawn(Vector3 position, TroopData data)
 	{
 		GlobalPosition =  position;
 		spawnedTroop?.QueueFree();
 		spawnedTroop = data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);
-
+		animationPlayer = spawnedTroop.GetAllChildrenOfType<AnimationPlayer>().FirstOrDefault();
+		Debug.Assert(animationPlayer != null, "Animation player not found under troop scene");
 		troopMeshes = spawnedTroop.GetAllChildrenOfType<MeshInstance3D>().ToArray();
 		Debug.Assert(spawnedTroop != null, "No troop mesh found under troop scene");
-		spawnedTroop.Scale = Vector3.Zero;
-		Tween appear = GetTree().CreateTween();
-		appear.TweenMethod(Callable.From((Vector3 scale) => {
-			spawnedTroop.Scale = scale;
-		}), spawnedTroop.Scale, Vector3.One, appearDuration).SetEase(Tween.EaseType.Out);
 
-		await ToSignal(appear, Tween.SignalName.Finished);
+		spawnedTroop.Scale = Vector3.One*0.01f;
+		Callable.From(() => {
+			spawnedTroop.Scale = Vector3.One;
+		}).CallDeferred();
+		await PlayTroopAnimation(spawnAnimationName);
+
+		_ = PlayTroopAnimation(idleAnimationName);
+		// spawnedTroop.Scale = Vector3.One*0.01f;
+		// Tween appear = GetTree().CreateTween();
+		// appear.TweenMethod(Callable.From((Vector3 scale) => {
+		// 	spawnedTroop.Scale = scale;
+		// }), spawnedTroop.Scale, Vector3.One, appearDuration).SetEase(Tween.EaseType.Out);
+		// await ToSignal(appear, Tween.SignalName.Finished);
 	}
 }

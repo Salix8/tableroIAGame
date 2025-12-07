@@ -1,18 +1,19 @@
 [gd_scene load_steps=3 format=3 uid="uid://d0go4w3w4k0px"]
 
-[ext_resource type="PackedScene" uid="uid://bvms2m6n77oqt" path="res://Assets/KayKit_Adventurers_2.0_FREE/Characters/fbx/Ranger.fbx" id="1_txnr6"]
+[ext_resource type="PackedScene" uid="uid://cwy6lslf6mjlk" path="res://Scenes/Visualizers/Troops/modelos/scout.tscn" id="1_7r16a"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6xrl5"]
-radius = 0.3
-height = 1.0
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7r16a"]
+radius = 0.4428711
+height = 1.6113281
 
 [node name="ranger" type="Node3D"]
 
-[node name="Ranger" parent="." instance=ExtResource("1_txnr6")]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+[node name="Ranger" parent="." instance=ExtResource("1_7r16a")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 
 [node name="TroopClickArea" type="Area3D" parent="."]
+collision_layer = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TroopClickArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-shape = SubResource("CapsuleShape3D_6xrl5")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.70566404, 0)
+shape = SubResource("CapsuleShape3D_7r16a")

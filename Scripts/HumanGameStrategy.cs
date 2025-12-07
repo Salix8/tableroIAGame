@@ -10,6 +10,7 @@ using Game.State;
 using Game.UI;
 using Game.Visualizers;
 using Godot.Collections;
+using Timer = Godot.Timer;
 
 namespace Game;
 
@@ -91,10 +92,14 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		}
 
 		Debug.Assert(visualizer != null, "No visualizer found for troop.");
+		HashSet<Vector2I> reachablePositions = HexGridNavigation.ComputeReachablePositions(troop, state);
 		await Task.WhenAll(
 			HighlightTroops([troop], TroopVisualizer.HighlightType.Selected),
-			HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.Gray)
+			HighlightTiles(state.TerrainState.GetFilledPositions().Where(pos => !reachablePositions.Contains(pos)), HexTileVisualizer.HighlightType.Gray)
+			// HighlightTiles(state.TerrainState.GetFilledPositions().Where(pos => reachablePositions.Contains(pos)), HexTileVisualizer.HighlightType.None)
 		);
+
+
 		// get all reachable targets
 		Vector2I selection = await tileClickHandler.WaitForTileClick(CancellationToken.None);
 
@@ -102,11 +107,41 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 			HighlightTroops([troop], TroopVisualizer.HighlightType.None),
 			HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
 		);
-		if (state.IsValidTroopCoord(selection)){
-			return new MoveTroopAction(troop, selection);
+		if (!reachablePositions.Contains(selection)){
+			return null;
 		}
 
-		return null;
+		if (!state.IsValidTroopCoord(selection)){
+			return null;
+		}
+
+		// await HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None);
+		// var enemyRanges = state.ComputeTroopRanges();
+		// foreach (Vector2I position in enemyRanges.Keys){
+		// 	var enemies = enemyRanges[position].Where(coveringTroop => coveringTroop.Owner != troop.Owner).ToHashSet();
+		// 	if (enemies.Count == 0){
+		// 		enemyRanges.Remove(position);
+		// 		continue;
+		// 	}
+		//
+		// 	enemyRanges[position] = enemies;
+		// }
+		//
+		// await HighlightTiles(enemyRanges.Keys, HexTileVisualizer.HighlightType.Gray);
+		// foreach (var ( open, current) in HexGridNavigation.Test(troop,selection,state)){
+		// 	foreach (HexGridNavigation.Move move in open){
+		// 		DebugDraw3D.DrawArrow(grid.HexToWorld(move.From) + Vector3.Up*1,grid.HexToWorld(move.To) + Vector3.Up*1,Colors.Red, 0.4f, duration:0.5f);
+		// 	}
+		//
+		// 	DebugDraw3D.DrawArrow(grid.HexToWorld(current.From) + Vector3.Up*1,grid.HexToWorld(current.To) + Vector3.Up*1,Colors.SpringGreen, 0.4f, duration:0.5f);
+		//
+		// 	await ToSignal(GetTree().CreateTimer(0.2f), Timer.SignalName.Timeout);
+		// }
+		// await ToSignal(GetTree().CreateTimer(1f), Timer.SignalName.Timeout);
+		IList<Vector2I>? path = HexGridNavigation.ComputeOptimalPath(troop, selection, state);
+		if (path == null) return null;
+
+		return new MoveTroopAction(troop, path.ToArray());
 	}
 
 	Task HighlightTroops(IEnumerable<TroopManager.TroopInfo> troops, TroopVisualizer.HighlightType type)

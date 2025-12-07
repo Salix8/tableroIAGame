@@ -1,6 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://cal78vmms1mpb"]
 
 [ext_resource type="Script" uid="uid://ciddeviryl38y" path="res://Scripts/Visualizers/TroopVisualizer.cs" id="1_anh3s"]
+[ext_resource type="AnimationLibrary" uid="uid://bdq31qj8kt4nb" path="res://TroopAnimations.res" id="2_8pif0"]
 [ext_resource type="Script" uid="uid://b33clvextfukk" path="res://Scripts/Visualizers/ModelHighlightState.cs" id="2_a3ldm"]
 [ext_resource type="Material" uid="uid://cdwmg75yludo3" path="res://VFX/RimOverlay.tres" id="3_8pif0"]
 
@@ -25,15 +26,17 @@ script = ExtResource("2_a3ldm")
 overrideMaterial = SubResource("StandardMaterial3D_jjh4i")
 metadata/_custom_type_script = "uid://b33clvextfukk"
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yvtm8"]
-radius = 0.32373047
-height = 1.4354248
-
 [node name="TroopVisualizer" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
 script = ExtResource("1_anh3s")
 spawnPoint = NodePath("spawn")
 appearDuration = 0.3
 moveDuration = 0.3
+troopAnimations = ExtResource("2_8pif0")
+spawnAnimationName = "spawnB"
+idleAnimationName = "idleA"
+movingAnimationName = "runningA"
+deathAnimationName = "deathA"
+damagedAnimationName = "hitB"
 highlightStates = Dictionary[int, Object]({
 0: SubResource("Resource_fot3o"),
 1: SubResource("Resource_aabm5"),
@@ -43,9 +46,3 @@ metadata/_custom_type_script = "uid://ciddeviryl38y"
 
 [node name="spawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45052063, 0)
-
-[node name="Area3D" type="Area3D" parent="."]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7177124, 0)
-shape = SubResource("CapsuleShape3D_yvtm8")
