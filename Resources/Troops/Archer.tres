@@ -9,4 +9,5 @@ ModelScene = ExtResource("1_0jv21")
 Name = "Arquero"
 Cost = 6
 Damage = 3
+AttackRange = 3
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

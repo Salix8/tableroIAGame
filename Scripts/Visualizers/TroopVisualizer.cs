@@ -19,6 +19,7 @@ public partial class TroopVisualizer : Node3D
 	[Export] string movingAnimationName;
 	[Export] string deathAnimationName;
 	[Export] string damagedAnimationName;
+	[Export] string attackAnimationName;
 	Node3D spawnedTroop;
 
 
@@ -55,7 +56,9 @@ public partial class TroopVisualizer : Node3D
 
 	public async Task Attack(Vector3 target)
 	{
-		LookAt(target,Vector3.Up);
+		Vector3 delta = target - GlobalPosition;
+		LookAt( GlobalPosition - delta,Vector3.Up); // idk why but this works correctly only when reversed
+		await PlayTroopAnimation(attackAnimationName, 0.7f);
 		DebugDraw3D.DrawArrow(GlobalPosition + Vector3.Up*1f, target + Vector3.Up*1f, Colors.Red,arrow_size:0.1f,  duration:0.3f);
 		await ToSignal(GetTree().CreateTimer(0.3f), Timer.SignalName.Timeout);
 	}
@@ -67,7 +70,8 @@ public partial class TroopVisualizer : Node3D
 
 	public async Task MoveTo(Vector3 target)
 	{
-		LookAt(target,Vector3.Up);
+		Vector3 delta = target - GlobalPosition;
+		LookAt( GlobalPosition - delta,Vector3.Up); // idk why but this works correctly only when reversed
 		Tween move = GetTree().CreateTween();
 		move.TweenMethod(Callable.From((Vector3 newPos) => {
 			GlobalPosition = newPos;
@@ -79,12 +83,12 @@ public partial class TroopVisualizer : Node3D
 
 	const string LibraryName = "TroopAnimations";
 
-	async Task PlayTroopAnimation(string animationName)
+	async Task PlayTroopAnimation(string animationName, float endSkip = 0)
 	{
 		var anim = troopAnimations.GetAnimation(animationName);
 		animationPlayer.Play($"{LibraryName}/{animationName}");
 
-		await ToSignal(GetTree().CreateTimer(anim.GetLength()), Timer.SignalName.Timeout);
+		await ToSignal(GetTree().CreateTimer(anim.GetLength()-endSkip), Timer.SignalName.Timeout);
 	}
 	public async Task Spawn(Vector3 position, TroopData data)
 	{

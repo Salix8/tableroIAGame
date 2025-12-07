@@ -37,6 +37,7 @@ idleAnimationName = "idleA"
 movingAnimationName = "runningA"
 deathAnimationName = "deathA"
 damagedAnimationName = "hitB"
+attackAnimationName = "throw"
 highlightStates = Dictionary[int, Object]({
 0: SubResource("Resource_fot3o"),
 1: SubResource("Resource_aabm5"),
@@ -45,4 +46,4 @@ highlightStates = Dictionary[int, Object]({
 metadata/_custom_type_script = "uid://ciddeviryl38y"
 
 [node name="spawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45052063, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31975365, 0)
