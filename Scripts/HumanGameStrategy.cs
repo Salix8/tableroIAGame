@@ -45,7 +45,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 	async Task<IGameAction?> TryCreateAction(Vector2I selection, WorldState state, PlayerId player, CancellationToken token)
 	{
-		if (state.TryGetTroop(selection, out TroopManager.TroopInfo? troop)){
+		if (state.TryGetTroop(selection, out TroopManager.IReadonlyTroopInfo? troop)){
 			if (troop.Owner == player){
 				return await TroopAction(troop, state, player, token);
 			}
@@ -142,7 +142,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 
 
-	async Task<IGameAction?> TroopAction(TroopManager.TroopInfo troop, WorldState state, PlayerId player, CancellationToken token)
+	async Task<IGameAction?> TroopAction(TroopManager.IReadonlyTroopInfo troop, WorldState state, PlayerId player, CancellationToken token)
 	{
 
 		troopVisualizerManager.TryGetVisualizer(troop.Position, out TroopVisualizer? visualizer);
@@ -211,7 +211,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 	}
 
-	Task HighlightTroops(IEnumerable<TroopManager.TroopInfo> troops, TroopVisualizer.HighlightType type)
+	Task HighlightTroops(IEnumerable<TroopManager.IReadonlyTroopInfo> troops, TroopVisualizer.HighlightType type)
 	{
 		return Task.WhenAll(troops.Select(troop => {
 			if (troopVisualizerManager.TryGetVisualizer(troop.Position, out TroopVisualizer? visualizer)){

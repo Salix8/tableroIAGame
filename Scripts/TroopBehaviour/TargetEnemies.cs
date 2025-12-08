@@ -13,12 +13,12 @@ public partial class TargetEnemies : BehaviourNode
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
 		while (true){
-			HashSet<TroopManager.TroopInfo> enemies = context.State.ComputeTroopRanges()
+			HashSet<TroopManager.IReadonlyTroopInfo> enemies = context.State.ComputeTroopRanges()
 				.GetValueOrDefault(context.Goal.Target, []);
 			if (enemies.Count == 0){
 				yield break;
 			}
-			TroopManager.TroopInfo strongestEnemy = enemies
+			TroopManager.IReadonlyTroopInfo strongestEnemy = enemies
 				.Where(enemy => enemy.Owner != context.Troop.Owner)
 				.MaxBy(enemy => TroopDataDangerHeuristic(enemy.Data));
 			foreach (var evaluation in BehaviourNodeUtils.EvaluateNode(targetedNodeFactory.Build(strongestEnemy.Position),context, onFailure)){

@@ -11,94 +11,109 @@ namespace Game.State;
 
 public class TroopManager
 {
+	readonly Dictionary<Vector2I, TroopInfo> troops = new();
+	public IReadOnlyDictionary<Vector2I, IReadonlyTroopInfo> GetTroops() => troops.ToDictionary(kvp => kvp.Key, IReadonlyTroopInfo (kvp) => kvp.Value);
+	// public IReadOnlyDictionary<Vector2I, IReadonlyTroopInfo> Troops => troops.ToDictionary(kvp => kvp.Key, IReadonlyTroopInfo (kvp) => kvp.Value);
 
-	public readonly record struct TroopId(int Value)
+	public IEnumerable<IReadonlyTroopInfo> DeadTroops => troops.Values.Where(troop=>troop.CurrentHealth <= 0);
+
+	public interface IReadonlyTroopInfo
 	{
-		public readonly int Value = Value;
 
-		public override string ToString()
+		public  Vector2I Position { get; }
+		public PlayerId Owner { get; }
+		public TroopData Data { get; }
+		public int CurrentHealth { get; }
+
+		public TroopSnapshot CreateSnapshot()
 		{
-			return $"Troop {Value}";
+			return new TroopSnapshot(){
+				Position = Position,
+				Owner = Owner,
+				Data = Data,
+				CurrentHealth = CurrentHealth
+			};
 		}
 	}
 
-	int lastTroopId = 0;
-
-	TroopId RegisterTroopId()
+	public record struct TroopSnapshot
 	{
-		return new TroopId(lastTroopId++);
+		public Vector2I Position;
+		public PlayerId Owner;
+		public TroopData Data;
+		public int CurrentHealth;
 	}
-	Dictionary<TroopId, Vector2I> troopIds = new();
-	readonly Dictionary<Vector2I, TroopInfo> troops = new();
-	public IReadOnlyDictionary<Vector2I, TroopInfo> Troops => troops;
-
-	public IEnumerable<TroopInfo> DeadTroops => Troops.Values.Where(troop=>troop.CurrentHealth <= 0);
-
-	public record TroopInfo(TroopId id)
+	class TroopInfo : IReadonlyTroopInfo
 	{
-		public readonly TroopId Id = id;
-		public Vector2I Position { get; init; }
-		public PlayerId Owner { get; init; }
-		public TroopData Data { get; init; }
-		public int CurrentHealth { get; init; }
+		public Vector2I Position { get;set; }
+		public PlayerId Owner { get; set; }
+		public TroopData Data { get; set; }
+		public int CurrentHealth { get; set; }
+
 	}
 
-	public IEnumerable<TroopInfo> GetPlayerTroops(PlayerId id) => troops.Values.Where(troop => troop.Owner == id);
+	public IEnumerable<IReadonlyTroopInfo> GetPlayerTroops(PlayerId id) => troops.Values.Where(troop => troop.Owner == id);
 
-	public bool TryGetTroop(Vector2I coord, [NotNullWhen(true)] out TroopInfo? troop)
+	public bool TryGetTroop(Vector2I coord, [NotNullWhen(true)] out IReadonlyTroopInfo? troop)
 	{
-		return troops.TryGetValue(coord, out troop);
+		var contained = troops.TryGetValue(coord, out TroopInfo? troopInfo);
+		troop = troopInfo;
+		return contained;
 	}
 
-	public bool TryDamageTroop(TroopInfo troop, int damage, out TroopInfo damagedTroop)
+	TroopInfo ConvertToWriteable(IReadonlyTroopInfo troop)
 	{
-		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
-		troop = troop with{ CurrentHealth = Mathf.Max(troop.CurrentHealth - damage,0) };
-		troops[troop.Position] = troop;
-		damagedTroop = troop;
+		Debug.Assert(troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
+		return troops[troop.Position];
+	}
+	public bool TryDamageTroop(IReadonlyTroopInfo troop, int damage)
+	{
+		Debug.Assert(troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
+		var troopInfo = ConvertToWriteable(troop);
+		troopInfo.CurrentHealth = Mathf.Max(troopInfo.CurrentHealth - damage, 0);
 		return true;
 	}
 
-	public bool TryRemoveTroop(TroopInfo troopToRemove)
+	public bool TryRemoveTroop(IReadonlyTroopInfo troopToRemove)
 	{
 
-		Debug.Assert(Troops.Values.Contains(troopToRemove),"Troop manager doesn't contain provided troop");
+		Debug.Assert(troops.Values.Contains(troopToRemove),"Troop manager doesn't contain provided troop");
 		return troops.Remove(troopToRemove.Position);
 	}
 
 	public bool IsOccupied(Vector2I coord) => troops.ContainsKey(coord);
 
-	public bool CanMoveTroop(TroopInfo troop, Vector2I to)
+	public bool CanMoveTroop(IReadonlyTroopInfo troop, Vector2I to)
 	{
-		Debug.Assert(Troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
+		Debug.Assert(troops.Values.Contains(troop),"Troop manager doesn't contain provided troop");
 		return !IsOccupied(to) && troops.ContainsKey(troop.Position);
 	}
-	public bool TryMoveTroop(TroopInfo toMove, Vector2I to, out TroopInfo movedTroop)
+	public bool TryMoveTroop(IReadonlyTroopInfo toMove, Vector2I to)
 	{
-		Debug.Assert(Troops.Values.Contains(toMove), "Troop manager doesn't contain provided troop");
-		movedTroop = toMove;
+		TroopInfo troop = ConvertToWriteable(toMove);
 		if (IsOccupied(to)) return false;
-		if (!troops.Remove(toMove.Position, out TroopInfo? troop)) return false;
-		movedTroop = troop with{ Position = to };
-		troops[to] = movedTroop;
+		if (!troops.Remove(troop.Position)) return false;
+		troop.Position = to;
+		troops[to] = troop;
 		return true;
 	}
 
-	public bool TryCreateTroop(TroopData data, PlayerId owner, Vector2I coord, [NotNullWhen(true)] out TroopInfo? troop)
+	public bool TryCreateTroop(TroopData data, PlayerId owner, Vector2I coord, [NotNullWhen(true)] out IReadonlyTroopInfo? troop)
 	{
 		if (IsOccupied(coord)){
 			troop = null;
 			return false;
 		}
 
-		troop = new TroopInfo(RegisterTroopId()){ CurrentHealth = data.Health, Data = data, Owner = owner, Position = coord  };
-		troops.Add(coord,troop);
+		var troopInfo = new TroopInfo{ CurrentHealth = data.Health, Data = data, Owner = owner, Position = coord  };
+		troop = troopInfo;
+		troops.Add(coord,troopInfo);
 		return true;
 	}
 
-	public Dictionary<Vector2I, HashSet<TroopInfo>> ComputeTroopRanges()
+	public Dictionary<Vector2I, HashSet<IReadonlyTroopInfo>> ComputeTroopRanges()
 	{
-		Dictionary<Vector2I, HashSet<TroopInfo>> ranges = new();
+		Dictionary<Vector2I, HashSet<IReadonlyTroopInfo>> ranges = new();
 		foreach (TroopInfo troop in troops.Values){
 			foreach (Vector2I coord in HexGrid.GetNeighbourSpiralCoords(troop.Position, troop.Data.AttackRange)){
 				if (!ranges.ContainsKey(coord)){

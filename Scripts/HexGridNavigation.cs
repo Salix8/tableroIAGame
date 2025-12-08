@@ -108,7 +108,7 @@ public static class HexGridNavigation
 	}
 
 	public static IEnumerable<(ISet<Move> targets, Move current)> Test(
-		TroopManager.TroopInfo troop, Vector2I targetCoords, WorldState state)
+		TroopManager.IReadonlyTroopInfo troop, Vector2I targetCoords, WorldState state)
 	{
 		var enemyRanges = state.ComputeTroopRanges();
 		foreach (Vector2I position in enemyRanges.Keys){
@@ -176,15 +176,15 @@ public static class HexGridNavigation
 
 		int GetDamageForMove(Vector2I from, Vector2I to)
 		{
-			HashSet<TroopManager.TroopInfo> inRange = enemyRanges.GetValueOrDefault(from, []);
-			HashSet<TroopManager.TroopInfo> newRange = enemyRanges.GetValueOrDefault(to, []);
+			HashSet<TroopManager.IReadonlyTroopInfo> inRange = enemyRanges.GetValueOrDefault(from, []);
+			HashSet<TroopManager.IReadonlyTroopInfo> newRange = enemyRanges.GetValueOrDefault(to, []);
 
-			IEnumerable<TroopManager.TroopInfo> lostRange = inRange.Where(elem => !newRange.Contains(elem));
+			IEnumerable<TroopManager.IReadonlyTroopInfo> lostRange = inRange.Where(elem => !newRange.Contains(elem));
 			return lostRange.Select(enemy => enemy.Data.Damage).Sum();
 		}
 	}
 
-	public static HashSet<Vector2I> ComputeReachablePositions(TroopManager.TroopInfo troop, WorldState state)
+	public static HashSet<Vector2I> ComputeReachablePositions(TroopManager.IReadonlyTroopInfo troop, WorldState state)
 	{
 		int maxMovement = troop.Data.MovementRange;
 		var openSet = new PriorityQueue<Vector2I, int>();
@@ -215,11 +215,11 @@ public static class HexGridNavigation
 		}
 	}
 
-	public static Vector2I[]? ComputeOptimalPath(TroopManager.TroopInfo troop, Vector2I target, WorldState state)
+	public static Vector2I[]? ComputeOptimalPath(TroopManager.IReadonlyTroopInfo troop, Vector2I target, WorldState state)
 	{
 		return ComputeOptimalPath(troop, [target], state);
 	}
-	public static Vector2I[]? ComputeOptimalPath(TroopManager.TroopInfo troop, HashSet<Vector2I> targets,
+	public static Vector2I[]? ComputeOptimalPath(TroopManager.IReadonlyTroopInfo troop, HashSet<Vector2I> targets,
 		WorldState state)
 	{
 		var enemyRanges = state.ComputeTroopRanges();
@@ -285,10 +285,10 @@ public static class HexGridNavigation
 
 		int GetDamageForMove(Vector2I from, Vector2I to)
 		{
-			HashSet<TroopManager.TroopInfo> inRange = enemyRanges.GetValueOrDefault(from, []);
-			HashSet<TroopManager.TroopInfo> newRange = enemyRanges.GetValueOrDefault(to, []);
+			HashSet<TroopManager.IReadonlyTroopInfo> inRange = enemyRanges.GetValueOrDefault(from, []);
+			HashSet<TroopManager.IReadonlyTroopInfo> newRange = enemyRanges.GetValueOrDefault(to, []);
 
-			IEnumerable<TroopManager.TroopInfo> lostRange = inRange.Where(elem => !newRange.Contains(elem));
+			IEnumerable<TroopManager.IReadonlyTroopInfo> lostRange = inRange.Where(elem => !newRange.Contains(elem));
 			return lostRange.Select(enemy => enemy.Data.Damage).Sum();
 		}
 

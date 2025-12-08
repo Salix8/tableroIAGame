@@ -11,9 +11,9 @@ public interface IBehaviourNode
 	public IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context);
 }
 
-public readonly struct NodeContext(TroopManager.TroopInfo troop, Goal goal, WorldState state)
+public readonly struct NodeContext(TroopManager.IReadonlyTroopInfo troop, Goal goal, WorldState state)
 {
-	public TroopManager.TroopInfo Troop { get; } = troop;
+	public TroopManager.IReadonlyTroopInfo Troop { get; } = troop;
 	public Goal Goal { get; } = goal;
 	public WorldState State { get; } = state;
 }

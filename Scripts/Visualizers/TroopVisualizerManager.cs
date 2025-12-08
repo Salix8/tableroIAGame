@@ -32,51 +32,51 @@ public partial class TroopVisualizerManager : Node3D
 		return false;
 	}
 
-	async Task TroopAttacking((TroopManager.TroopInfo, Vector2I) args)
+	async Task TroopAttacking((TroopManager.IReadonlyTroopInfo, Vector2I) args)
 	{
-		(TroopManager.TroopInfo troop, Vector2I targetCoord) = args;
-		TroopVisualizer visualizer = GetTroopVisualizer(troop);
+		(TroopManager.IReadonlyTroopInfo troop, Vector2I targetCoord) = args;
+		TroopVisualizer visualizer = GetTroopVisualizer(troop.Position);
 		Vector3 target = grid.HexToWorld(targetCoord);
 		await visualizer.Attack(target);
 	}
 
-	async Task TroopDamaged((TroopManager.TroopInfo, TroopManager.TroopInfo) args)
+	async Task TroopDamaged((TroopManager.TroopSnapshot, TroopManager.IReadonlyTroopInfo) args)
 	{
-		(TroopManager.TroopInfo before, TroopManager.TroopInfo after) = args;
-		TroopVisualizer visualizer = GetTroopVisualizer(before);
+		(TroopManager.TroopSnapshot before, TroopManager.IReadonlyTroopInfo after) = args;
+		TroopVisualizer visualizer = GetTroopVisualizer(before.Position);
 		await visualizer.Damaged(after.CurrentHealth - before.CurrentHealth);
 	}
 
-	async Task TroopKilled(TroopManager.TroopInfo troop)
+	async Task TroopKilled(TroopManager.IReadonlyTroopInfo troop)
 	{
-		TroopVisualizer visualizer = GetTroopVisualizer(troop);
+		TroopVisualizer visualizer = GetTroopVisualizer(troop.Position);
 		await visualizer.Kill();
 		visualizers.Remove(troop.Position);
 		visualizer.QueueFree();
 	}
 
-	async Task TroopMoved((TroopManager.TroopInfo, TroopManager.TroopInfo) args)
+	async Task TroopMoved((TroopManager.TroopSnapshot, TroopManager.IReadonlyTroopInfo) args)
 	{
-		(TroopManager.TroopInfo before, TroopManager.TroopInfo after) = args;
-		TroopVisualizer visualizer = GetTroopVisualizer(before);
-		Vector3 target = grid.HexToWorld(after.Position);
+		(TroopManager.TroopSnapshot before, TroopManager.IReadonlyTroopInfo current) = args;
+		TroopVisualizer visualizer = GetTroopVisualizer(before.Position);
+		Vector3 target = grid.HexToWorld(current.Position);
 		await visualizer.MoveTo(target);
 		visualizers.Remove(before.Position);
-		Debug.Assert(!visualizers.ContainsKey(after.Position),
-			$"Can't move visualizer to {after.Position}. Position occupied by another visualizer");
-		visualizers.Add(after.Position, visualizer);
+		Debug.Assert(!visualizers.ContainsKey(current.Position),
+			$"Can't move visualizer to {current.Position}. Position occupied by another visualizer");
+		visualizers.Add(current.Position, visualizer);
 	}
 
-	TroopVisualizer GetTroopVisualizer(TroopManager.TroopInfo relatedTroop)
+	TroopVisualizer GetTroopVisualizer(Vector2I position)
 	{
-		Debug.Assert(visualizers.ContainsKey(relatedTroop.Position),
-			$"Visualizer doesn't exist for related troop at {relatedTroop.Position}");
-		return visualizers[relatedTroop.Position];
+		Debug.Assert(visualizers.ContainsKey(position),
+			$"Visualizer doesn't exist at {position}");
+		return visualizers[position];
 	}
 
-	async Task SpawnVisualizer((ITroopEventsHandler, TroopManager.TroopInfo) args)
+	async Task SpawnVisualizer((ITroopEventsHandler, TroopManager.IReadonlyTroopInfo) args)
 	{
-		(ITroopEventsHandler troopEventsHandler, TroopManager.TroopInfo troop) = args;
+		(ITroopEventsHandler troopEventsHandler, TroopManager.IReadonlyTroopInfo troop) = args;
 		troopEventsHandler.GetTroopMovedHandler().Subscribe(TroopMoved);
 		troopEventsHandler.GetTroopKilledHandler().Subscribe(TroopKilled);
 		troopEventsHandler.GetTroopAttackingHandler().Subscribe(TroopAttacking);
