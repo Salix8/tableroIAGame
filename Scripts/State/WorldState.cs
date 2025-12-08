@@ -210,7 +210,7 @@ public class WorldState
 	}
 
 	readonly Dictionary<Vector2I, PlayerId> playerManaClaims = new();
-
+	public IReadOnlyDictionary<Vector2I, PlayerId> PlayerManaClaims => playerManaClaims;
 	public async Task<bool> TryClaimManaPool(PlayerId playerId, Vector2I coord)
 	{
 		if (!IsValidPlayerId(playerId)) return false;

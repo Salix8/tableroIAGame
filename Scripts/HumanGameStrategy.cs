@@ -43,7 +43,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 	{
 		if (state.TryGetTroop(selection, out TroopManager.TroopInfo? troop)){
 			if (troop.Owner == player){
-				return await TryMoveTroop(troop, state, player, token);
+				return await TroopAction(troop, state, player, token);
 			}
 		}
 
@@ -97,7 +97,46 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		return gameInterface.GetTroopSpawnSelection(resources, token);
 	}
 
-	async Task<IGameAction?> TryMoveTroop(TroopManager.TroopInfo troop, WorldState state, PlayerId player, CancellationToken token)
+	static Task WaitButtonClick(Button btn, CancellationToken token)
+	{
+		var tcs = new TaskCompletionSource(
+			TaskCreationOptions.RunContinuationsAsynchronously);
+
+		CancellationTokenRegistration registration = default;
+
+		void Cleanup()
+		{
+			registration.Dispose();
+
+			Callable.From(() =>
+			{
+				btn.ButtonUp -= ButtonUp;
+			}).CallDeferred();
+		}
+
+		void ButtonUp()
+		{
+			if (tcs.TrySetResult()){
+				Cleanup();
+			}
+		}
+
+		void Cancel()
+		{
+			if (tcs.TrySetCanceled(token)){
+				Cleanup();
+			}
+		}
+
+		registration = token.Register(Cancel);
+		btn.ButtonUp += ButtonUp;
+
+		return tcs.Task;
+	}
+
+
+
+	async Task<IGameAction?> TroopAction(TroopManager.TroopInfo troop, WorldState state, PlayerId player, CancellationToken token)
 	{
 
 		troopVisualizerManager.TryGetVisualizer(troop.Position, out TroopVisualizer? visualizer);
@@ -110,7 +149,46 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		);
 
 		try{
-			Vector2I selection = await tileClickHandler.WaitForTileClick(token);
+			using var raceCancel = new CancellationTokenSource();
+			using var linkedCancel = CancellationTokenSource.CreateLinkedTokenSource(raceCancel.Token, token);
+			List<Task<IGameAction?>> gameActionTasks =[
+				TryMoveTroop(tileClickHandler.WaitForTileClick(linkedCancel.Token), linkedCancel.Token)
+
+			];
+			if (state.TerrainState.GetTerrainType(troop.Position) == TerrainState.TerrainType.ManaPool){
+				if (state.PlayerManaClaims.TryGetValue(troop.Position, out PlayerId id)){
+					if (id != player){
+						await gameInterface.ToggleClaimButton(true);
+						gameActionTasks.Add(TryClaimCell(WaitButtonClick(gameInterface.ClaimButton, linkedCancel.Token), linkedCancel.Token));
+					}
+				}
+				else{
+					await gameInterface.ToggleClaimButton(true);
+					gameActionTasks.Add(TryClaimCell(WaitButtonClick(gameInterface.ClaimButton, linkedCancel.Token), linkedCancel.Token));
+				}
+			}
+			Task<IGameAction?> finished = await Task.WhenAny(gameActionTasks.ToArray());
+			raceCancel.Cancel();
+			return await finished;
+		}
+		finally{
+
+			await Task.WhenAll(
+				gameInterface.ToggleClaimButton(false),
+				HighlightTroops([troop], TroopVisualizer.HighlightType.None),
+				HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
+			);
+		}
+
+		async Task<IGameAction?> TryClaimCell(Task btnTask, CancellationToken token)
+		{
+			await btnTask;
+
+			return new ClaimManaAction(troop.Position, player);
+		}
+		async Task<IGameAction?> TryMoveTroop(Task<Vector2I> coordSelectTask,  CancellationToken token)
+		{
+			Vector2I selection = await coordSelectTask;
 			if (!reachablePositions.Contains(selection)){
 				return null;
 			}
@@ -124,40 +202,6 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 			return new MoveTroopAction(troop, path.ToArray());
 		}
-		finally{
-
-			await Task.WhenAll(
-				HighlightTroops([troop], TroopVisualizer.HighlightType.None),
-				HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
-			);
-		}
-
-		// get all reachable targets
-
-
-		// await HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None);
-		// var enemyRanges = state.ComputeTroopRanges();
-		// foreach (Vector2I position in enemyRanges.Keys){
-		// 	var enemies = enemyRanges[position].Where(coveringTroop => coveringTroop.Owner != troop.Owner).ToHashSet();
-		// 	if (enemies.Count == 0){
-		// 		enemyRanges.Remove(position);
-		// 		continue;
-		// 	}
-		//
-		// 	enemyRanges[position] = enemies;
-		// }
-		//
-		// await HighlightTiles(enemyRanges.Keys, HexTileVisualizer.HighlightType.Gray);
-		// foreach (var ( open, current) in HexGridNavigation.Test(troop,selection,state)){
-		// 	foreach (HexGridNavigation.Move move in open){
-		// 		DebugDraw3D.DrawArrow(grid.HexToWorld(move.From) + Vector3.Up*1,grid.HexToWorld(move.To) + Vector3.Up*1,Colors.Red, 0.4f, duration:0.5f);
-		// 	}
-		//
-		// 	DebugDraw3D.DrawArrow(grid.HexToWorld(current.From) + Vector3.Up*1,grid.HexToWorld(current.To) + Vector3.Up*1,Colors.SpringGreen, 0.4f, duration:0.5f);
-		//
-		// 	await ToSignal(GetTree().CreateTimer(0.2f), Timer.SignalName.Timeout);
-		// }
-		// await ToSignal(GetTree().CreateTimer(1f), Timer.SignalName.Timeout);
 
 	}
 

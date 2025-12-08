@@ -12,9 +12,17 @@ namespace Game.UI;
 public partial class GameUI : CanvasLayer
 {
 	[Export] PlayerStatsUI playerStatsUI;
-	[Export] Button nextTurnButton;
+	[Export] Button skipTurnButton;
+	public Button SkipTurnButton => skipTurnButton;
 	[Export] Label turnInfoLabel;
 	[Export] TroopSelectionMenu troopSelectionMenu;
+	[Export] Button claimButton;
+	public Button ClaimButton => claimButton;
+
+	public async Task ToggleClaimButton(bool toggle)
+	{
+		claimButton.Visible = toggle;
+	}
 
 	public override void _Ready()
 	{
@@ -48,5 +56,10 @@ public partial class GameUI : CanvasLayer
 		finally{
 			await troopSelectionMenu.HideMenu();
 		}
+	}
+
+	public async Task ToggleTurnControls(bool toggle)
+	{
+		skipTurnButton.Visible = toggle;
 	}
 }

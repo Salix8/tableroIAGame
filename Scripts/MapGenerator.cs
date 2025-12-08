@@ -119,7 +119,7 @@ public partial class MapGenerator : Node3D
 
 			if (GD.Randf() < WizardTowerDensity)
 			{
-				finalMap[entry.Key] = TerrainState.TerrainType.WizardTower;
+				finalMap[entry.Key] = TerrainState.TerrainType.ManaPool;
 				// worldState.State.ManaWells.Add(entry.Key, new ManaWellState { OwnerIndex = null });
 			}
 		}

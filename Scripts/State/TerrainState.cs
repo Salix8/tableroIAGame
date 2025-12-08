@@ -12,7 +12,6 @@ public class TerrainState()
 		Forest,
 		Mountain,
 		Water,
-		WizardTower,
 		ManaPool,
 	}
 

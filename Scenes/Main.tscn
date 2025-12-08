@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=20 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://ho0am3pm8f0w" path="res://Scripts/Visualizers/MapVisualizer.cs" id="2_grg3l"]
@@ -9,7 +9,6 @@
 [ext_resource type="Resource" uid="uid://cluvypf4r7vcj" path="res://Resources/Troops/Scout.tres" id="4_v1gob"]
 [ext_resource type="Resource" uid="uid://c8tw1oe0vy5hg" path="res://Resources/Troops/Warrior.tres" id="5_jw32o"]
 [ext_resource type="Resource" uid="uid://dwryn3llrislp" path="res://Resources/Troops/Archer.tres" id="6_50glp"]
-[ext_resource type="Script" uid="uid://vhdq4vv602yp" path="res://Scripts/HexGridNavigation.cs" id="8_50glp"]
 [ext_resource type="Resource" uid="uid://cl02jkthhwtlr" path="res://Resources/Troops/Barbarian.tres" id="10_2w5on"]
 [ext_resource type="Script" uid="uid://dv71us8ote7gl" path="res://Scripts/HexGrid3D.cs" id="10_4kpch"]
 [ext_resource type="Script" uid="uid://bfnuy8u42wosp" path="res://Scripts/PlayableMatch.cs" id="12_2w5on"]
@@ -74,9 +73,6 @@ scoutData = ExtResource("4_v1gob")
 warriorData = ExtResource("5_jw32o")
 archerData = ExtResource("6_50glp")
 barbarianData = ExtResource("10_2w5on")
-
-[node name="GridNavigation" type="Node" parent="."]
-script = ExtResource("8_50glp")
 
 [node name="PlayableMatch" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human", "gameInterface")]
 script = ExtResource("12_2w5on")
