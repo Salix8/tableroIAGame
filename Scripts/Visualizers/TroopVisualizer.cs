@@ -34,17 +34,16 @@ public partial class TroopVisualizer : Node3D
 
 	public Task Highlight(HighlightType type)
 	{
-		return highlightStates[type].Transition(spawnedTroop, troopMeshes);
+		return highlightStates[type].Transition(spawnedTroop, matManager);
 	}
 
-	public void SetBaseColor(Color color)
+	void SetBaseColor(Color color)
 	{
-		foreach (MeshInstance3D troopMesh in troopMeshes){
-			int count = troopMesh.Mesh.GetSurfaceCount();
-			for (int i = 0; i < count; i++){
-				if (troopMesh.Mesh.SurfaceGetMaterial(i) is StandardMaterial3D mat) mat.AlbedoColor = color;
-			}
-		}
+		var mat = new StandardMaterial3D();
+		mat.AlbedoColor = color;
+		mat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+		mat.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+		matManager.SetOverlay(mat,ModelMaterialManager.MaterialLevel.Base);
 	}
 	MeshInstance3D[] troopMeshes;
 	AnimationPlayer animationPlayer;
@@ -90,16 +89,19 @@ public partial class TroopVisualizer : Node3D
 
 		await ToSignal(GetTree().CreateTimer(anim.GetLength()-endSkip), Timer.SignalName.Timeout);
 	}
-	public async Task Spawn(Vector3 position, TroopData data)
+
+	[Export] ModelMaterialManager matManager;
+	public async Task Spawn(Vector3 position, TroopData data, Color troopColor)
 	{
 		GlobalPosition =  position;
 		spawnedTroop?.QueueFree();
 		spawnedTroop = data.ModelScene.InstantiateUnderAs<Node3D>(spawnPoint);
+		matManager.Manage(spawnedTroop);
 		animationPlayer = spawnedTroop.GetAllChildrenOfType<AnimationPlayer>().FirstOrDefault();
 		Debug.Assert(animationPlayer != null, "Animation player not found under troop scene");
-		troopMeshes = spawnedTroop.GetAllChildrenOfType<MeshInstance3D>().ToArray();
-		Debug.Assert(spawnedTroop != null, "No troop mesh found under troop scene");
 
+
+		SetBaseColor(troopColor);
 		spawnedTroop.Scale = Vector3.One*0.01f;
 		Callable.From(() => {
 			spawnedTroop.Scale = Vector3.One;

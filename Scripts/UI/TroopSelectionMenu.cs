@@ -41,24 +41,24 @@ namespace Game.UI
 
 		public async Task<TroopData?> GetSelection(CancellationToken cancellationToken)
 		{
-			using CancellationTokenSource buttonCancelSource = new();
-			using CancellationTokenSource linkedSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, buttonCancelSource.Token);
-			Task<TroopData>[] selectionTasks = troopButtons
-				// .Where(btn => !btn.Disabled) // commented out cuz this honestly makes more sense without relying on disabled
-				.Select(btn => btn.WaitForSelection(linkedSource.Token))
-				.ToArray();
-			if (selectionTasks.Length == 0){
-				await buttonCancelSource.CancelAsync();
-				return null;
-			}
-			Task<TroopData> resultTask = await Task.WhenAny(selectionTasks);
-			await buttonCancelSource.CancelAsync();
-			if (resultTask.IsCanceled || resultTask.IsFaulted){
-				return null;
-			}
+			using CancellationTokenSource btnCancel = new();
+			using CancellationTokenSource linkedSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, btnCancel.Token);
+			try{
+				Task<TroopData>[] selectionTasks = troopButtons
+					// .Where(btn => !btn.Disabled) // commented out cuz this honestly makes more sense without relying on disabled
+					.Select(btn => btn.WaitForSelection(linkedSource.Token))
+					.ToArray();
+				if (selectionTasks.Length == 0){
+					return null;
+				}
 
-			return await resultTask;
+				Task<TroopData> resultTask = await Task.WhenAny(selectionTasks);
 
+				return await resultTask;
+			}
+			finally{
+				await btnCancel.CancelAsync();
+			}
 		}
 
 		public async Task HideMenu()

@@ -17,21 +17,19 @@ public partial class HexTileVisualizer : Node3D
 		Selected,
 		Gray,
 	}
-
 	[Export] Dictionary<HighlightType, ModelHighlightState> highlightStates;
 	public Task Highlight(HighlightType type)
 	{
-		return highlightStates[type].Transition(currentTerrain, terrainMeshes);
+		return highlightStates[type].Transition(currentTerrain, matManager);
 	}
 
-	public void SetBaseColor(Color color)
+	public async Task SetBaseColor(Color color)
 	{
-		foreach (MeshInstance3D troopMesh in terrainMeshes){
-			int count = troopMesh.Mesh.GetSurfaceCount();
-			for (int i = 0; i < count; i++){
-				if (troopMesh.Mesh.SurfaceGetMaterial(i) is StandardMaterial3D mat) mat.AlbedoColor = color;
-			}
-		}
+		var mat = new StandardMaterial3D();
+		mat.AlbedoColor = color;
+		mat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+		mat.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+		matManager.SetOverlay(mat,ModelMaterialManager.MaterialLevel.Base);
 	}
 	[Export] Dictionary<TerrainState.TerrainType, PackedScene> terrainScenes;
 
@@ -40,7 +38,7 @@ public partial class HexTileVisualizer : Node3D
 	[Export] float skippedDuration = 0.2f;
 	Node3D currentTerrain;
 	[Export] Node3D spawnPoint;
-	MeshInstance3D[] terrainMeshes;
+	[Export] ModelMaterialManager matManager;
 	public Vector2I HexCoord { get; set; } // Added property for the hex coordinate
 
 
@@ -56,8 +54,7 @@ public partial class HexTileVisualizer : Node3D
 
 		}
 		currentTerrain = terrainScenes[terrain].InstantiateUnderAs<Node3D>(spawnPoint);
-		terrainMeshes = currentTerrain.GetAllChildrenOfType<MeshInstance3D>().ToArray();
-		Debug.Assert(terrainMeshes != null, "No terrain mesh found under terrain scene");
+		matManager.Manage(currentTerrain);
 		currentTerrain.Scale = Vector3.One;
 		Tween scaleUpTween = GetTree().CreateTween();
 		scaleUpTween.TweenMethod(Callable.From((Vector3 scale) => {

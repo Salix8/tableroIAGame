@@ -20,6 +20,11 @@ public partial class GameUI : CanvasLayer
 	{
 	}
 
+	public async Task ShowTurnText(string text)
+	{
+		turnInfoLabel.Text = text;
+	}
+
 	//todo work all the ui interaction methods in here as async methods
 	public async Task UpdatePlayerResources((PlayerResources, PlayerResources ) args)
 	{
@@ -36,9 +41,12 @@ public partial class GameUI : CanvasLayer
 	{
 		troopSelectionMenu.SetEnabledTroops(troopData => troopData.Cost <= availableResources.Mana);
 		await troopSelectionMenu.ShowMenu();
-		TroopData? troop;
-		troop = await troopSelectionMenu.GetSelection(token);
-		await troopSelectionMenu.HideMenu();
-		return troop;
+		try{
+			TroopData? troop = await troopSelectionMenu.GetSelection(token);
+			return troop;
+		}
+		finally{
+			await troopSelectionMenu.HideMenu();
+		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Game.State;
 using Godot;
@@ -22,25 +23,34 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 		return player;
 	}
 
-	public async Task NextTurn()
+	public async Task NextTurn(CancellationToken token)
 	{
-		int skip = 0;
+		await Turn(playerOrder[currentTurn], token);
+		currentTurn = GetAdvancedTurn(1);
+
+	}
+
+	public async Task RunCurrentTurn(CancellationToken token)
+	{
+		await Turn(playerOrder[currentTurn], token);
+	}
+
+	public bool TryAdvanceCurrentTurn()
+	{
+		int skip = 1;
 		while (true){
 			if (skip == playerOrder.Count){
 				//stalemate
-				return;
+				return false;
 			}
 			int turn = GetAdvancedTurn(skip);
 			if (!HasLost(playerOrder[turn])){
+				currentTurn = turn;
 				//valid player
-				break;
+				return true;
 			}
 			skip++;
 		}
-		currentTurn = GetAdvancedTurn(skip);
-		await Turn(playerOrder[currentTurn]);
-
-		currentTurn = GetAdvancedTurn(1);
 	}
 
 	public PlayerId CurrentPlayer => playerOrder[currentTurn];
@@ -54,19 +64,23 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 	{
 		return !State.GetPlayerClaimedManaPools(player).Any();
 	}
-
-	async Task Turn(PlayerId player)
+	async Task Turn(PlayerId player, CancellationToken token)
 	{
-		var claimedMana = State.GetPlayerClaimedManaPools(player).Count();
+		var claimedMana = State.GetPlayerClaimedManaPools(player).Count()*2;
 		await State.MutatePlayerResources(player, resources => new PlayerResources{ Mana = resources.Mana + claimedMana });
 		IGameStrategy strategy = players[player];
-		for (int i = 0; i < actionsPerTurn; i++){
-			IGameAction action = await strategy.GetNextAction(State, player);
-			await action.TryApply(State); // should kill dead troops after each step?
+		try{
+			for (int i = 0; i < actionsPerTurn; i++){
+				IGameAction action = await strategy.GetNextAction(State, player, token);
+				await action.TryApply(State);
+			}
+
+		}
+		finally{
+			//run attacks for all troops
+			//kill all dead troops
+			await State.KillDeadTroops();
 		}
 
-		//run attacks for all troops
-		//kill all dead troops
-		await State.KillDeadTroops();
 	}
 }

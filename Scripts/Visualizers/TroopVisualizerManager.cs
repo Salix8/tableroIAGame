@@ -12,12 +12,13 @@ namespace Game.Visualizers;
 public partial class TroopVisualizerManager : Node3D
 {
 	[Export] PackedScene troopVisualizerScene;
-	[Export] PlayableWorldState state;
+	[Export] PlayableMatch game;
 	[Export] HexGrid3D grid;
 	Dictionary<Vector2I, TroopVisualizer> visualizers = new();
+
 	public override void _Ready()
 	{
-		state.State.TroopSpawned.Subscribe(SpawnVisualizer);
+		game.State.TroopSpawned.Subscribe(SpawnVisualizer);
 	}
 
 	public bool TryGetVisualizer(Vector2I coord, [NotNullWhen(true)] out TroopVisualizer? visualizer)
@@ -29,10 +30,9 @@ public partial class TroopVisualizerManager : Node3D
 
 		visualizer = null;
 		return false;
-
 	}
 
-	async Task TroopAttacking((TroopManager.TroopInfo,Vector2I) args)
+	async Task TroopAttacking((TroopManager.TroopInfo, Vector2I) args)
 	{
 		(TroopManager.TroopInfo troop, Vector2I targetCoord) = args;
 		TroopVisualizer visualizer = GetTroopVisualizer(troop);
@@ -53,7 +53,6 @@ public partial class TroopVisualizerManager : Node3D
 		await visualizer.Kill();
 		visualizers.Remove(troop.Position);
 		visualizer.QueueFree();
-
 	}
 
 	async Task TroopMoved((TroopManager.TroopInfo, TroopManager.TroopInfo) args)
@@ -63,13 +62,15 @@ public partial class TroopVisualizerManager : Node3D
 		Vector3 target = grid.HexToWorld(after.Position);
 		await visualizer.MoveTo(target);
 		visualizers.Remove(before.Position);
-		Debug.Assert(!visualizers.ContainsKey(after.Position), $"Can't move visualizer to {after.Position}. Position occupied by another visualizer");
+		Debug.Assert(!visualizers.ContainsKey(after.Position),
+			$"Can't move visualizer to {after.Position}. Position occupied by another visualizer");
 		visualizers.Add(after.Position, visualizer);
 	}
 
 	TroopVisualizer GetTroopVisualizer(TroopManager.TroopInfo relatedTroop)
 	{
-		Debug.Assert(visualizers.ContainsKey(relatedTroop.Position), $"Visualizer doesn't exist for related troop at {relatedTroop.Position}");
+		Debug.Assert(visualizers.ContainsKey(relatedTroop.Position),
+			$"Visualizer doesn't exist for related troop at {relatedTroop.Position}");
 		return visualizers[relatedTroop.Position];
 	}
 
@@ -81,10 +82,12 @@ public partial class TroopVisualizerManager : Node3D
 		troopEventsHandler.GetTroopAttackingHandler().Subscribe(TroopAttacking);
 		troopEventsHandler.GetTroopDamagedHandler().Subscribe(TroopDamaged);
 		TroopVisualizer visualizer = troopVisualizerScene.InstantiateUnderAs<TroopVisualizer>(this);
+		game.Players.TryGetValue(troop.Owner, out PlayerInfo? info);
+		Debug.Assert(info != null, "Spawned troop does not belong to a valid player");
 		Vector3 position = grid.HexToWorld(troop.Position);
-		Debug.Assert(!visualizers.ContainsKey(troop.Position), $"A visualizer already exists at coordinate {troop.Position}");
+		Debug.Assert(!visualizers.ContainsKey(troop.Position),
+			$"A visualizer already exists at coordinate {troop.Position}");
 		visualizers.Add(troop.Position, visualizer);
-		//todo add base material for
-		await visualizer.Spawn(position,troop.Data);
+		await visualizer.Spawn(position, troop.Data, info.TroopColor);
 	}
 }

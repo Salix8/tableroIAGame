@@ -13,7 +13,7 @@ public partial class TileClickHandler : Node
 {
 	[Export] HexGrid3D grid;
 
-	[Export] PlayableWorldState playableWorldState;
+	[Export] PlayableMatch playableMatch;
 
 	[Export(PropertyHint.Layers3DPhysics)] uint collisionMask = 6; // Default to layers 2 (Ground) and 3 (Interactables)
 	[Export(PropertyHint.Layers3DPhysics)] uint troopLayers = 2;
@@ -24,23 +24,29 @@ public partial class TileClickHandler : Node
 	public Task<Vector2I> WaitForTileClick(CancellationToken cancelToken)
 	{
 		TaskCompletionSource<Vector2I> source = new();
-		cancelToken.Register(() => {
+
+		CancellationTokenRegistration registration = default;
+
+		registration = cancelToken.Register(() => {
 			TileClicked -= OnTileClicked;
+			source.TrySetCanceled();
 		});
 		TileClicked += OnTileClicked;
 		return source.Task;
+
 
 		void OnTileClicked(Vector2I tile)
 		{
 			TileClicked -= OnTileClicked;
 			source.SetResult(tile);
+			registration.Dispose();
 		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		Debug.Assert(grid != null, "grid is null!");
-		Debug.Assert(playableWorldState != null, "playableWorldState is null!");
+		Debug.Assert(playableMatch != null, "playableWorldState is null!");
 		Debug.Assert(camera != null, "camera is null!");
 		if (@event is not InputEventMouseButton mouseButton || !mouseButton.IsPressed() ||
 		    mouseButton.ButtonIndex != MouseButton.Left) return;

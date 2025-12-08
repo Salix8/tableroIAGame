@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Game.State;
 using Godot;
@@ -8,8 +9,9 @@ namespace Game;
 
 public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 {
-	public Task<IGameAction> GetNextAction(WorldState state, PlayerId player)
+	public Task<IGameAction> GetNextAction(WorldState state, PlayerId player, CancellationToken token)
 	{
+		token.ThrowIfCancellationRequested();
 		TroopManager.TroopInfo[] playerTroops = state.GetPlayerTroops(player).ToArray();
 		if (playerTroops.Length > 0){
 			TroopManager.TroopInfo randomTroop = playerTroops[GD.RandRange(0, playerTroops.Length - 1)];

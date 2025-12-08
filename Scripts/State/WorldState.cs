@@ -168,6 +168,7 @@ public class WorldState
 		int damage = attacker.Data.Damage;
 		damage = ModifiedDamage(type.Value, damage);
 		if (!troopManager.TryDamageTroop(target, damage, out TroopManager.TroopInfo damagedTarget)) return  Task.FromResult(false);
+		GD.Print($"Damaged to {damagedTarget.CurrentHealth}");
 		attackedTarget = damagedTarget;
 		TroopEvents attackerEvents = GetEventWithAssert(from);
 		TroopEvents targetEvents = GetEventWithAssert(to);
@@ -210,14 +211,18 @@ public class WorldState
 
 	readonly Dictionary<Vector2I, PlayerId> playerManaClaims = new();
 
-	public bool TryClaimManaPool(PlayerId playerId, Vector2I coord)
+	public async Task<bool> TryClaimManaPool(PlayerId playerId, Vector2I coord)
 	{
 		if (!IsValidPlayerId(playerId)) return false;
 		TerrainState.TerrainType? terrain = TerrainState.GetTerrainType(coord);
 		if (terrain is not TerrainState.TerrainType.ManaPool) return false;
 		playerManaClaims[coord] = playerId;
+		await manaPoolClaimed.DispatchSequential((playerId,coord));
 		return true;
 	}
+
+	AsyncEvent<(PlayerId player, Vector2I coord)> manaPoolClaimed = new();
+	public IAsyncHandlerCollection<(PlayerId player, Vector2I coord)> ManaPoolClaimed => manaPoolClaimed;
 
 	public IEnumerable<Vector2I> GetPlayerClaimedManaPools(PlayerId playerId)
 	{

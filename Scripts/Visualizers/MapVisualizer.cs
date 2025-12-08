@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Game.State;
@@ -10,12 +11,13 @@ namespace Game.Visualizers;
 [GlobalClass]
 public partial class MapVisualizer : Node3D
 {
-	[Export] PlayableWorldState state;
+	[Export] PlayableMatch game;
 	[Export] HexGrid3D grid;
 	[Export] PackedScene hexTileVisualizerScene;
 	public override void _EnterTree()
 	{
-		state.State.TerrainState.CellAdded.Subscribe(SpawnCell);
+		game.State.TerrainState.CellAdded.Subscribe(SpawnCell);
+		game.State.ManaPoolClaimed.Subscribe(ClaimVisualizer);
 	}
 
 	Dictionary<Vector2I, HexTileVisualizer> visualizers = new();
@@ -33,6 +35,16 @@ public partial class MapVisualizer : Node3D
 		newViz.GlobalPosition = position;
 		visualizers.Add(coord, newViz);
 		return newViz;
+	}
+
+	async Task ClaimVisualizer((PlayerId, Vector2I) args)
+	{
+		(PlayerId owner, Vector2I coord) = args;
+		visualizers.TryGetValue(coord, out HexTileVisualizer? visualizer);
+		Debug.Assert(visualizer != null, "No visualizer found for claimed mana pool");
+		game.Players.TryGetValue(owner, out PlayerInfo? info);
+		Debug.Assert(info != null, "Claimed visualizer does not belong to a valid player");
+		await visualizer.SetBaseColor(info.TerrainColor);
 	}
 
 	public bool TryGetVisualizer(Vector2I coord, [NotNullWhen(true)] out HexTileVisualizer? visualizer)

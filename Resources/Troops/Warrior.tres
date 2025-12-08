@@ -1,11 +1,19 @@
-[gd_resource type="Resource" script_class="TroopData" load_steps=3 format=3 uid="uid://c8tw1oe0vy5hg"]
+[gd_resource type="Resource" script_class="TroopData" load_steps=5 format=3 uid="uid://c8tw1oe0vy5hg"]
 
-[ext_resource type="PackedScene" uid="uid://im52skll4w43" path="res://Scenes/Visualizers/Troops/Warrior.tscn" id="1_450tq"]
+[ext_resource type="Texture2D" uid="uid://dybhfnjhcv5el" path="res://Assets/KayKit_Adventurers_2.0_FREE/Textures/knight_texture.png" id="1_8stmm"]
+[ext_resource type="PackedScene" uid="uid://im52skll4w43" path="res://Scenes/Visualizers/Troops/warrior.tscn" id="1_450tq"]
 [ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="1_jrcrt"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kcljp"]
+resource_name = "rogue"
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_8stmm")
+emission_enabled = true
 
 [resource]
 script = ExtResource("1_jrcrt")
 ModelScene = ExtResource("1_450tq")
+ModelMaterial = SubResource("StandardMaterial3D_kcljp")
 Name = "Guerrero"
 Health = 6
 VisionRange = 4

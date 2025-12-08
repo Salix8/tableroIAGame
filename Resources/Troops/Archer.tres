@@ -1,11 +1,19 @@
-[gd_resource type="Resource" script_class="TroopData" load_steps=3 format=3 uid="uid://dwryn3llrislp"]
+[gd_resource type="Resource" script_class="TroopData" load_steps=5 format=3 uid="uid://dwryn3llrislp"]
 
 [ext_resource type="PackedScene" uid="uid://d0go4w3w4k0px" path="res://Scenes/Visualizers/Troops/Archer.tscn" id="1_0jv21"]
+[ext_resource type="Texture2D" uid="uid://cgakp13n7xuw4" path="res://Assets/KayKit_Adventurers_2.0_FREE/Textures/ranger_texture.png" id="1_7jv3o"]
 [ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="1_8yq5r"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pjbvl"]
+resource_name = "rogue"
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_7jv3o")
+emission_enabled = true
 
 [resource]
 script = ExtResource("1_8yq5r")
 ModelScene = ExtResource("1_0jv21")
+ModelMaterial = SubResource("StandardMaterial3D_pjbvl")
 Name = "Arquero"
 Cost = 6
 Damage = 3

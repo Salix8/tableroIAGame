@@ -26,71 +26,81 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 	//
 	// Dictionary<(SelectionType, SelectionType), >
-	public async Task<IGameAction> GetNextAction(WorldState state, PlayerId player)
+	public async Task<IGameAction> GetNextAction(WorldState state, PlayerId player, CancellationToken token)
 	{
+		token.ThrowIfCancellationRequested();
 		IGameAction? action = null;
 		while (action == null){
-			Vector2I click = await tileClickHandler.WaitForTileClick(CancellationToken.None);
-			action = await TryCreateAction(click, state, player);
+			Vector2I click = await tileClickHandler.WaitForTileClick(token);
+			action = await TryCreateAction(click, state, player, token);
+
 		}
 
 		return action;
 	}
 
-	async Task<IGameAction?> TryCreateAction(Vector2I selection, WorldState state, PlayerId player)
+	async Task<IGameAction?> TryCreateAction(Vector2I selection, WorldState state, PlayerId player, CancellationToken token)
 	{
 		if (state.TryGetTroop(selection, out TroopManager.TroopInfo? troop)){
 			if (troop.Owner == player){
-				return await TryMoveTroop(troop, state, player);
+				return await TryMoveTroop(troop, state, player, token);
 			}
 		}
 
 		if (!state.IsValidSpawn(player, selection)) return null;
 
-		return await TrySpawnTroop(selection, state, player);
+		return await TrySpawnTroop(selection, state, player, token);
 	}
 
-	async Task<IGameAction?> TrySpawnTroop(Vector2I spawnPosition, WorldState state, PlayerId player)
+	async Task<IGameAction?> TrySpawnTroop(Vector2I spawnPosition, WorldState state, PlayerId player, CancellationToken token)
 	{
-
+		token.ThrowIfCancellationRequested();
 		await Task.WhenAll(
 			HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.Gray),
 			HighlightTiles([spawnPosition], HexTileVisualizer.HighlightType.Selected),
 			HighlightTiles(state.TerrainState.GetFilledPositions().Where(pos => pos != spawnPosition), HexTileVisualizer.HighlightType.Gray)
 		);
 
-		CancellationTokenSource tokenSource = new();
-		Task<TroopData?> spawnTask = GetSpawnSelection(state, player, tokenSource.Token);
-		Task<Vector2I> cancelTask = tileClickHandler.WaitForTileClick(tokenSource.Token);
-		await Task.WhenAny([spawnTask, cancelTask]);
-		await tokenSource.CancelAsync();
-		await Task.WhenAll(
-			HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.None),
-			HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
-		);
-		if (cancelTask.IsCompleted) return null;
-		if (spawnTask.Result == null) return null;
-		TroopData troopToSpawn = spawnTask.Result;
+		using var spawnCts  = CancellationTokenSource.CreateLinkedTokenSource(token);
+		using var clickCts  = CancellationTokenSource.CreateLinkedTokenSource(token);
 
+		try{
+			Task<TroopData?> spawnTask = GetSpawnSelection(state, player, spawnCts.Token);
+			Task<Vector2I> cancelTask = tileClickHandler.WaitForTileClick(clickCts.Token);
+			Task finished = await Task.WhenAny(spawnTask, cancelTask);
+			if (finished == cancelTask){
+				await spawnCts.CancelAsync();
+				return null;
+			}
+			await clickCts.CancelAsync();
 
+			TroopData? troop = await spawnTask;
 
-		return new CreateTroopAction(troopToSpawn, spawnPosition, player);
+			if (troop == null)
+				return null;
+
+			return new CreateTroopAction(troop, spawnPosition, player);
+		}
+		finally{
+			await Task.WhenAll(
+				HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.None),
+				HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
+			);
+
+		}
 	}
 
-	Task<TroopData?> GetSpawnSelection(WorldState state, PlayerId player, CancellationToken cancellationToken)
+	Task<TroopData?> GetSpawnSelection(WorldState state, PlayerId player, CancellationToken token)
 	{
 		PlayerResources? resources = state.GetPlayerResources(player);
 		Debug.Assert(resources != null, $"Player resources for player {player} not found in world state");
-		return gameInterface.GetTroopSpawnSelection(resources, cancellationToken);
+		return gameInterface.GetTroopSpawnSelection(resources, token);
 	}
 
-	async Task<IGameAction?> TryMoveTroop(TroopManager.TroopInfo troop, WorldState state, PlayerId player)
+	async Task<IGameAction?> TryMoveTroop(TroopManager.TroopInfo troop, WorldState state, PlayerId player, CancellationToken token)
 	{
-		troopVisualizerManager.TryGetVisualizer(troop.Position, out TroopVisualizer? visualizer);
-		foreach (Vector2I filledPosition in state.TerrainState.GetFilledPositions()){
-			// var tileVisualizer
-		}
 
+		troopVisualizerManager.TryGetVisualizer(troop.Position, out TroopVisualizer? visualizer);
 		Debug.Assert(visualizer != null, "No visualizer found for troop.");
 		HashSet<Vector2I> reachablePositions = HexGridNavigation.ComputeReachablePositions(troop, state);
 		await Task.WhenAll(
@@ -99,21 +109,31 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 			// HighlightTiles(state.TerrainState.GetFilledPositions().Where(pos => reachablePositions.Contains(pos)), HexTileVisualizer.HighlightType.None)
 		);
 
+		try{
+			Vector2I selection = await tileClickHandler.WaitForTileClick(token);
+			if (!reachablePositions.Contains(selection)){
+				return null;
+			}
+
+			if (!state.IsValidTroopCoord(selection)){
+				return null;
+			}
+
+			IList<Vector2I>? path = HexGridNavigation.ComputeOptimalPath(troop, selection, state);
+			if (path == null) return null;
+
+			return new MoveTroopAction(troop, path.ToArray());
+		}
+		finally{
+
+			await Task.WhenAll(
+				HighlightTroops([troop], TroopVisualizer.HighlightType.None),
+				HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
+			);
+		}
 
 		// get all reachable targets
-		Vector2I selection = await tileClickHandler.WaitForTileClick(CancellationToken.None);
 
-		await Task.WhenAll(
-			HighlightTroops([troop], TroopVisualizer.HighlightType.None),
-			HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
-		);
-		if (!reachablePositions.Contains(selection)){
-			return null;
-		}
-
-		if (!state.IsValidTroopCoord(selection)){
-			return null;
-		}
 
 		// await HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None);
 		// var enemyRanges = state.ComputeTroopRanges();
@@ -138,10 +158,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		// 	await ToSignal(GetTree().CreateTimer(0.2f), Timer.SignalName.Timeout);
 		// }
 		// await ToSignal(GetTree().CreateTimer(1f), Timer.SignalName.Timeout);
-		IList<Vector2I>? path = HexGridNavigation.ComputeOptimalPath(troop, selection, state);
-		if (path == null) return null;
 
-		return new MoveTroopAction(troop, path.ToArray());
 	}
 
 	Task HighlightTroops(IEnumerable<TroopManager.TroopInfo> troops, TroopVisualizer.HighlightType type)

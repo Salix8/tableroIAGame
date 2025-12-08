@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://cal78vmms1mpb"]
+[gd_scene load_steps=10 format=3 uid="uid://cal78vmms1mpb"]
 
 [ext_resource type="Script" uid="uid://ciddeviryl38y" path="res://Scripts/Visualizers/TroopVisualizer.cs" id="1_anh3s"]
 [ext_resource type="AnimationLibrary" uid="uid://bdq31qj8kt4nb" path="res://TroopAnimations.res" id="2_8pif0"]
 [ext_resource type="Script" uid="uid://b33clvextfukk" path="res://Scripts/Visualizers/ModelHighlightState.cs" id="2_a3ldm"]
 [ext_resource type="Material" uid="uid://cdwmg75yludo3" path="res://VFX/RimOverlay.tres" id="3_8pif0"]
+[ext_resource type="Script" uid="uid://du856j0stppl5" path="res://Scripts/ModelMaterialManager.cs" id="5_fot3o"]
 
 [sub_resource type="Resource" id="Resource_fot3o"]
 script = ExtResource("2_a3ldm")
@@ -26,7 +27,7 @@ script = ExtResource("2_a3ldm")
 overrideMaterial = SubResource("StandardMaterial3D_jjh4i")
 metadata/_custom_type_script = "uid://b33clvextfukk"
 
-[node name="TroopVisualizer" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
+[node name="TroopVisualizer" type="Node3D" node_paths=PackedStringArray("spawnPoint", "matManager")]
 script = ExtResource("1_anh3s")
 spawnPoint = NodePath("spawn")
 appearDuration = 0.3
@@ -43,7 +44,12 @@ highlightStates = Dictionary[int, Object]({
 1: SubResource("Resource_aabm5"),
 2: SubResource("Resource_ps6mu")
 })
+matManager = NodePath("ModelMaterialManager")
 metadata/_custom_type_script = "uid://ciddeviryl38y"
 
 [node name="spawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31975365, 0)
+
+[node name="ModelMaterialManager" type="Node3D" parent="."]
+script = ExtResource("5_fot3o")
+metadata/_custom_type_script = "uid://du856j0stppl5"

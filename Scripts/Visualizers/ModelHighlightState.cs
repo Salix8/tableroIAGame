@@ -13,14 +13,10 @@ public partial class ModelHighlightState : Resource
 	[Export] float duration = 0.3f;
 	[Export] Tween.EaseType easeType = Tween.EaseType.InOut;
 	[Export] Tween.TransitionType transitionType = Tween.TransitionType.Quad;
-	public async Task Transition(Node3D modelParent, MeshInstance3D[] meshes)
+	public async Task Transition(Node3D modelParent, ModelMaterialManager materialManager)
 	{
-		foreach (MeshInstance3D mesh in meshes){
-			mesh.MaterialOverride = overrideMaterial;
-		}
-		foreach (MeshInstance3D mesh in meshes){
-			mesh.MaterialOverlay = overlayMaterial;
-		}
+		materialManager.SetOverlay(overlayMaterial, ModelMaterialManager.MaterialLevel.Extra);
+		materialManager.SetOverride(overrideMaterial);
 
 		SceneTree tree = GodotExtensions.TryGetSceneTree();
 		if (tree == null) return;
