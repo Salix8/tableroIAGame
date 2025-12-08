@@ -5,16 +5,16 @@ using Godot;
 
 namespace Game.TroopBehaviour;
 
-public partial class SequencerNode : BehaviourNode
+[GlobalClass]
+public partial class Sequencer : BehaviourNode
 {
 	[Export] BehaviourNode[] sequence;
-	[Export] BehaviourNodeUtils.ActionOnFailure actionOnFailure;
-
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
-
 		foreach (BehaviourNode node in sequence){
-			foreach (NodeEvaluation evaluation in BehaviourNodeUtils.EvaluateNode(node,context, actionOnFailure)) yield return evaluation;
+			foreach (NodeEvaluation evaluation in node.EvaluateActions(context)){
+				yield return evaluation;
+			}
 		}
 	}
 }

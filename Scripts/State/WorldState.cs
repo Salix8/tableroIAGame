@@ -228,10 +228,6 @@ public class WorldState
 		return playerManaClaims.Where(pair => pair.Value == playerId).Select(pair => pair.Key);
 	}
 
-	public int GetTotalManaPools()
-	{
-		return playerManaClaims.Count;
-	}
 
 	public IEnumerable<Vector2I> GetValidPlayerSpawns(PlayerId playerId)
 	{

@@ -6,10 +6,10 @@ using Godot;
 
 namespace Game.TroopBehaviour;
 
-public partial class TargetEnemies : BehaviourNode
+[GlobalClass]
+public partial class TargetEnemiesAtGoal : BehaviourNode
 {
-	[Export] TargetedNodeFactory targetedNodeFactory;
-	[Export] BehaviourNodeUtils.ActionOnFailure onFailure;
+	[Export] TroopTargetedNodeFactory troopTargetedNodeFactory;
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
 		while (true){
@@ -21,7 +21,7 @@ public partial class TargetEnemies : BehaviourNode
 			TroopManager.IReadonlyTroopInfo strongestEnemy = enemies
 				.Where(enemy => enemy.Owner != context.Troop.Owner)
 				.MaxBy(enemy => TroopDataDangerHeuristic(enemy.Data));
-			foreach (var evaluation in BehaviourNodeUtils.EvaluateNode(targetedNodeFactory.Build(strongestEnemy.Position),context, onFailure)){
+			foreach (var evaluation in troopTargetedNodeFactory.Build(strongestEnemy).EvaluateActions(context)){
 				yield return evaluation;
 			}
 		}

@@ -96,13 +96,24 @@ public static class HexGridNavigation
 		public int Damage;
 		public int HCost;
 
-		public class Comparer : IComparer<Cost>
+		public class DamageMinimizedComparer : IComparer<Cost>
 		{
 			public int Compare(Cost x, Cost y)
 			{
 				int damageComparison = x.Damage.CompareTo(y.Damage);
 				if (damageComparison != 0) return damageComparison;
 				return (x.GCost + x.HCost) - (y.GCost + y.HCost);
+			}
+		}
+		public class WeighedComparer(int damageWeight, int movementWeight) : IComparer<Cost>
+		{
+			public int Compare(Cost x, Cost y)
+			{
+				int relativeDamage = x.Damage - y.Damage;
+				relativeDamage *= damageWeight;
+				int relativeCost = (x.GCost + x.HCost) - (y.GCost + y.HCost);
+				relativeCost *= movementWeight;
+				return relativeDamage + relativeCost;
 			}
 		}
 	}
@@ -124,7 +135,7 @@ public static class HexGridNavigation
 		// if (startCell == null || targetCell == null) return [];
 		Vector2I startCoords = troop.Position;
 
-		var openSet = new PriorityQueue<Node, Cost>(new Cost.Comparer());
+		var openSet = new PriorityQueue<Node, Cost>(new Cost.DamageMinimizedComparer());
 		var closedSet = new HashSet<Node>();
 		var gCost = new Dictionary<Node, int>();
 		var parent = new Dictionary<Node, Node>();
@@ -215,23 +226,24 @@ public static class HexGridNavigation
 		}
 	}
 
-	public static Vector2I[]? ComputeOptimalPath(TroopManager.IReadonlyTroopInfo troop, Vector2I target, WorldState state)
+	public static Vector2I[]? ComputeOptimalPath(TroopManager.IReadonlyTroopInfo troop, Vector2I target, WorldState state, IComparer<Cost>? customCostComparer = null, bool uncappedMovement = false)
 	{
-		return ComputeOptimalPath(troop, [target], state);
+		return ComputeOptimalPath(troop, [target], state, customCostComparer,uncappedMovement);
 	}
 	public static Vector2I[]? ComputeOptimalPath(TroopManager.IReadonlyTroopInfo troop, HashSet<Vector2I> targets,
-		WorldState state)
+		WorldState state, IComparer<Cost>? customCostComparer = null, bool uncappedMovement = false)
 	{
+		customCostComparer ??= new Cost.DamageMinimizedComparer();
 		var enemyRanges = state.ComputeTroopRanges();
 		foreach (Vector2I position in enemyRanges.Keys){
 			enemyRanges[position] = enemyRanges[position].Where(coveringTroop => coveringTroop.Owner != troop.Owner)
 				.ToHashSet();
 		}
 
-		int maxMovement = troop.Data.MovementRange;
+		int maxMovement = uncappedMovement ? 99999 : troop.Data.MovementRange;
 		Vector2I startCoords = troop.Position;
 
-		var openSet = new PriorityQueue<Node, Cost>(new Cost.Comparer());
+		var openSet = new PriorityQueue<Node, Cost>(customCostComparer);
 		var closedSet = new HashSet<Node>();
 		var gCost = new Dictionary<Node, int>();
 		var parent = new Dictionary<Node, Node>();

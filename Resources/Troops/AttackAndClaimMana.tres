@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="Sequencer" load_steps=15 format=3 uid="uid://jwdagyjqa1s"]
+
+[ext_resource type="Script" uid="uid://chyd6way3ulnt" path="res://Scripts/TroopBehaviour/Sequencer.cs" id="1_5vowi"]
+[ext_resource type="Script" uid="uid://cycfkgfx778jb" path="res://Scripts/TroopBehaviour/TargetEnemiesAtGoal.cs" id="2_nvs14"]
+[ext_resource type="Script" uid="uid://dwu8lt1g2vioa" path="res://Scripts/TroopBehaviour/Targeted/MoveToTarget.cs" id="3_m4igx"]
+[ext_resource type="Script" uid="uid://dqchix17ftcy0" path="res://Scripts/TroopBehaviour/Targeted/AttackTargetTroop.cs" id="4_nvs14"]
+[ext_resource type="Script" uid="uid://bkobbkkb1oh1l" path="res://Scripts/TroopBehaviour/RepeatUntilEmpty.cs" id="5_7wsse"]
+[ext_resource type="Script" uid="uid://rjhyonth4651" path="res://Scripts/TroopBehaviour/MoveToGoal.cs" id="6_g5xay"]
+[ext_resource type="Script" uid="uid://dxvh3j35k8gak" path="res://Scripts/TroopBehaviour/ClaimManaAtGoal.cs" id="7_b2vk4"]
+
+[sub_resource type="Resource" id="Resource_m4igx"]
+script = ExtResource("3_m4igx")
+metadata/_custom_type_script = "uid://dwu8lt1g2vioa"
+
+[sub_resource type="Resource" id="Resource_32rm4"]
+script = ExtResource("4_nvs14")
+move = SubResource("Resource_m4igx")
+metadata/_custom_type_script = "uid://dqchix17ftcy0"
+
+[sub_resource type="Resource" id="Resource_evscc"]
+script = ExtResource("2_nvs14")
+troopTargetedNodeFactory = SubResource("Resource_32rm4")
+metadata/_custom_type_script = "uid://cycfkgfx778jb"
+
+[sub_resource type="Resource" id="Resource_1tusn"]
+script = ExtResource("5_7wsse")
+child = SubResource("Resource_evscc")
+metadata/_custom_type_script = "uid://bkobbkkb1oh1l"
+
+[sub_resource type="Resource" id="Resource_7wsse"]
+script = ExtResource("3_m4igx")
+metadata/_custom_type_script = "uid://dwu8lt1g2vioa"
+
+[sub_resource type="Resource" id="Resource_t6sex"]
+script = ExtResource("6_g5xay")
+moveToTarget = SubResource("Resource_7wsse")
+metadata/_custom_type_script = "uid://rjhyonth4651"
+
+[sub_resource type="Resource" id="Resource_n3p0e"]
+script = ExtResource("7_b2vk4")
+metadata/_custom_type_script = "uid://dxvh3j35k8gak"
+
+[resource]
+script = ExtResource("1_5vowi")
+sequence = Array[Object]([SubResource("Resource_1tusn"), SubResource("Resource_t6sex"), SubResource("Resource_n3p0e")])
+metadata/_custom_type_script = "uid://chyd6way3ulnt"

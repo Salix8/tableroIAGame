@@ -18,48 +18,59 @@ public readonly struct NodeContext(TroopManager.IReadonlyTroopInfo troop, Goal g
 	public WorldState State { get; } = state;
 }
 
-public readonly struct NodeEvaluation(NodeEvaluation.ResultType type, IGameAction? result)
+public class NodeEvaluation
 {
+	NodeEvaluation(ResultType type, IGameAction? action)
+	{
+		Type = type;
+		Result = action;
+	}
 	public enum ResultType
 	{
-		Success,
+		Ongoing,
+		Idle,
 		Failure,
 	}
-	public ResultType Type { get; } = type;
-	public IGameAction? Result { get; } = result;
-}
+	public ResultType Type { get; }
+	public IGameAction? Result { get; }
 
-public static class BehaviourNodeUtils{
-
-	public enum ActionOnFailure
+	public static NodeEvaluation Fail()
 	{
-		Retry,
-		Skip,
-		Fail
+		return new NodeEvaluation(ResultType.Failure, null);
 	}
-	public static IEnumerable<NodeEvaluation> EvaluateNode(IBehaviourNode node, NodeContext context, ActionOnFailure onFail)
+
+	public static NodeEvaluation Idle()
 	{
-		foreach (NodeEvaluation evaluation in node.EvaluateActions(context)){
-			if (evaluation.Type == NodeEvaluation.ResultType.Failure){
-				switch (onFail){
-					case ActionOnFailure.Retry:
-						continue;
-					case ActionOnFailure.Skip:
-						yield break;
-					case ActionOnFailure.Fail:
-						yield return evaluation;
-						break;
-					default:
-						throw new ArgumentOutOfRangeException();
-				}
-			}
-			yield return evaluation;
+		return new NodeEvaluation(ResultType.Idle, null);
+	}
 
-
-		}
+	public static NodeEvaluation FromAction(IGameAction action)
+	{
+		return new NodeEvaluation(ResultType.Ongoing, action);
 	}
 }
 
+// public static class BehaviourNodeUtils{
+//
+// 	public enum ActionOnFailure
+// 	{
+// 		Retry,
+// 		Skip,
+// 		Fail
+// 	}
+// 	public static IEnumerable<NodeEvaluation> SkipNullEvaluations(IBehaviourNode node, NodeContext context)
+// 	{
+// 		foreach (NodeEvaluation evaluation in node.EvaluateActions(context)){
+// 			if (evaluation.Result != null){
+// 				yield return evaluation;
+// 			}
+//
+//
+// 		}
+// 	}
+// }
+
+[GlobalClass]
 public abstract partial class BehaviourNode : Resource, IBehaviourNode
 {
 
