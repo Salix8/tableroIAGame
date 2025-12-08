@@ -70,10 +70,16 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 		await State.MutatePlayerResources(player, resources => new PlayerResources{ Mana = resources.Mana + claimedMana });
 		IGameStrategy strategy = players[player];
 		try{
-			for (int i = 0; i < actionsPerTurn; i++){
-				IGameAction action = await strategy.GetNextAction(State, player, token);
+
+			var generator = strategy.GetActionGenerator(State, player, actionsPerTurn, token);
+			await foreach (var action in generator){
 				await action.TryApply(State);
+				//todo stop the generator when hit max actions
 			}
+			// for (int i = 0; i < actionsPerTurn; i++){
+			// 	IGameAction action = generator;
+			// 	await action.TryApply(State);
+			// }
 
 		}
 		finally{

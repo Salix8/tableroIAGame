@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot; // Added for Vector2I
@@ -26,17 +27,20 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 
 	//
 	// Dictionary<(SelectionType, SelectionType), >
-	public async Task<IGameAction> GetNextAction(WorldState state, PlayerId player, CancellationToken token)
+	//todo put turn skips in here instead of match
+	public async IAsyncEnumerable<IGameAction> GetActionGenerator(WorldState state, PlayerId player, int desiredActions, [EnumeratorCancellation] CancellationToken token)
 	{
 		token.ThrowIfCancellationRequested();
-		IGameAction? action = null;
-		while (action == null){
-			Vector2I click = await tileClickHandler.WaitForTileClick(token);
-			action = await TryCreateAction(click, state, player, token);
+		for (int i = 0; i < desiredActions; i++){
+			IGameAction? action = null;
+			while (action == null){
+				Vector2I click = await tileClickHandler.WaitForTileClick(token);
+				action = await TryCreateAction(click, state, player, token);
 
+			}
+			yield return action;
 		}
 
-		return action;
 	}
 
 	async Task<IGameAction?> TryCreateAction(Vector2I selection, WorldState state, PlayerId player, CancellationToken token)
@@ -47,9 +51,11 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 			}
 		}
 
-		if (!state.IsValidSpawn(player, selection)) return null;
+		if (state.IsValidSpawn(player, selection)){
+			return await TrySpawnTroop(selection, state, player, token);
+		}
 
-		return await TrySpawnTroop(selection, state, player, token);
+		return null;
 	}
 
 	async Task<IGameAction?> TrySpawnTroop(Vector2I spawnPosition, WorldState state, PlayerId player, CancellationToken token)

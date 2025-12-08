@@ -245,6 +245,9 @@ public class WorldState
 
 	public bool IsValidSpawn(PlayerId playerId, Vector2I coord)
 	{
+		if (!IsValidTroopCoord(coord)){
+			return false;
+		}
 		return HexGrid.GetNeighbourSpiralCoords(coord, 1).Where(IsValidTroopCoord).Any(neighbour => {
 			if (!playerManaClaims.TryGetValue(neighbour, out PlayerId id)){
 				return false;

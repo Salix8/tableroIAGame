@@ -215,7 +215,11 @@ public static class HexGridNavigation
 		}
 	}
 
-	public static Vector2I[]? ComputeOptimalPath(TroopManager.TroopInfo troop, Vector2I targetCoords,
+	public static Vector2I[]? ComputeOptimalPath(TroopManager.TroopInfo troop, Vector2I target, WorldState state)
+	{
+		return ComputeOptimalPath(troop, [target], state);
+	}
+	public static Vector2I[]? ComputeOptimalPath(TroopManager.TroopInfo troop, HashSet<Vector2I> targets,
 		WorldState state)
 	{
 		var enemyRanges = state.ComputeTroopRanges();
@@ -240,7 +244,7 @@ public static class HexGridNavigation
 		EnqueueNeighbours(startingNode);
 
 		while (openSet.TryDequeue(out Node currentNode, out _)){
-			if (currentNode.Position == targetCoords){
+			if (targets.Contains(currentNode.Position)){
 				return Backtrack(startingNode, currentNode);
 			}
 
@@ -270,7 +274,7 @@ public static class HexGridNavigation
 				Debug.Assert(movementCost != null, "Valid troop coord doesn't have terrain.");
 
 				int tentativeG = gCost[origin] + movementCost.Value;
-				int h = HexGrid.GetHexDistance(neighbor.Position, targetCoords);
+				int h = targets.Select(target => HexGrid.GetHexDistance(neighbor.Position, target)).Min();
 				if (tentativeG + h > maxMovement) continue; // if above movement limit skip
 				if (tentativeG >= gCost.GetValueOrDefault(neighbor, int.MaxValue)) continue;
 				parent[neighbor] = origin;

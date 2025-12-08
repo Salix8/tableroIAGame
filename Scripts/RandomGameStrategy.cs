@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Game.State;
@@ -9,22 +11,27 @@ namespace Game;
 
 public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 {
-	public Task<IGameAction> GetNextAction(WorldState state, PlayerId player, CancellationToken token)
+
+	public async IAsyncEnumerable<IGameAction> GetActionGenerator(WorldState state, PlayerId player, int desiredActions, [EnumeratorCancellation] CancellationToken token)
 	{
 		token.ThrowIfCancellationRequested();
-		TroopManager.TroopInfo[] playerTroops = state.GetPlayerTroops(player).ToArray();
-		if (playerTroops.Length > 0){
-			TroopManager.TroopInfo randomTroop = playerTroops[GD.RandRange(0, playerTroops.Length - 1)];
-			Vector2I neighborPos = Random.Shared.GetItems(HexGrid.GetNeighborCoords(randomTroop.Position).Where(state.IsValidTroopCoord).ToArray(),1).First();
-			return Task.FromResult<IGameAction>(new MoveTroopAction(randomTroop, [neighborPos]));
-		}
+		for (int i = 0; i < desiredActions; i++){
+			TroopManager.TroopInfo[] playerTroops = state.GetPlayerTroops(player).ToArray();
+			if (playerTroops.Length > 0){
+				TroopManager.TroopInfo randomTroop = playerTroops[GD.RandRange(0, playerTroops.Length - 1)];
+				Vector2I neighborPos = Random.Shared.GetItems(HexGrid.GetNeighborCoords(randomTroop.Position).Where(state.IsValidTroopCoord).ToArray(),1).First();
+				yield return new MoveTroopAction(randomTroop, [neighborPos]);
+				continue;
+			}
 
-		Vector2I[] spawns = state.GetValidPlayerSpawns(player).ToArray();
-		if (spawns.Length == 0){
-			return Task.FromResult<IGameAction>(new EmptyAction());
+			Vector2I[] spawns = state.GetValidPlayerSpawns(player).ToArray();
+			if (spawns.Length == 0){
+				yield return new EmptyAction();
+				continue;
+			}
+			Vector2I spawnPos = Random.Shared.GetItems(spawns,1).First();
+			yield return new CreateTroopAction(troopToSpawn, spawnPos, player);
+			continue;
 		}
-		Vector2I spawnPos = Random.Shared.GetItems(spawns,1).First();
-		return Task.FromResult<IGameAction>(new CreateTroopAction(troopToSpawn, spawnPos, player));
-
 	}
 }

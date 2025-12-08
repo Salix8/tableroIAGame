@@ -1,10 +1,11 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Game.State;
 
 public interface IGameStrategy
 {
-	public Task<IGameAction> GetNextAction(WorldState state, PlayerId player, CancellationToken token);
+	public IAsyncEnumerable<IGameAction> GetActionGenerator(WorldState state, PlayerId player, int desiredActions, CancellationToken token);
 
 }

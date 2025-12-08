@@ -11,13 +11,32 @@ namespace Game.State;
 
 public class TroopManager
 {
+
+	public readonly record struct TroopId(int Value)
+	{
+		public readonly int Value = Value;
+
+		public override string ToString()
+		{
+			return $"Troop {Value}";
+		}
+	}
+
+	int lastTroopId = 0;
+
+	TroopId RegisterTroopId()
+	{
+		return new TroopId(lastTroopId++);
+	}
+	Dictionary<TroopId, Vector2I> troopIds = new();
 	readonly Dictionary<Vector2I, TroopInfo> troops = new();
 	public IReadOnlyDictionary<Vector2I, TroopInfo> Troops => troops;
 
 	public IEnumerable<TroopInfo> DeadTroops => Troops.Values.Where(troop=>troop.CurrentHealth <= 0);
 
-	public record TroopInfo
+	public record TroopInfo(TroopId id)
 	{
+		public readonly TroopId Id = id;
 		public Vector2I Position { get; init; }
 		public PlayerId Owner { get; init; }
 		public TroopData Data { get; init; }
@@ -72,7 +91,7 @@ public class TroopManager
 			return false;
 		}
 
-		troop = new TroopInfo{ CurrentHealth = data.Health, Data = data, Owner = owner, Position = coord };
+		troop = new TroopInfo(RegisterTroopId()){ CurrentHealth = data.Health, Data = data, Owner = owner, Position = coord  };
 		troops.Add(coord,troop);
 		return true;
 	}
