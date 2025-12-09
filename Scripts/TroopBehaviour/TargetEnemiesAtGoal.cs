@@ -15,12 +15,12 @@ public partial class TargetEnemiesAtGoal : BehaviourNode
 		while (true){
 			HashSet<TroopManager.IReadonlyTroopInfo> enemies = context.State.ComputeTroopRanges()
 				.GetValueOrDefault(context.Goal.Target, []);
-			if (enemies.Count == 0){
-				yield break;
-			}
 			TroopManager.IReadonlyTroopInfo strongestEnemy = enemies
 				.Where(enemy => enemy.Owner != context.Troop.Owner)
 				.MaxBy(enemy => TroopDataDangerHeuristic(enemy.Data));
+			if (strongestEnemy == null){
+				yield break;
+			}
 			foreach (var evaluation in targetTroop.Build(strongestEnemy).EvaluateActions(context)){
 				yield return evaluation;
 			}

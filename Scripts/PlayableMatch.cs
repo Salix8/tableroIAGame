@@ -91,7 +91,7 @@ public partial class PlayableMatch : Node
 				catch (OperationCanceledException){}
 
 				await gameInterface.ToggleTurnControls(false);
-
+				await match.RunTroopAttackPhase();
 				if (!match.TryAdvanceCurrentTurn()){
 					//stalemate
 					break;

@@ -18,7 +18,8 @@ public partial class TroopData : Resource
 	[Export(PropertyHint.Range, positiveHint)] public int MovementRange { get; private set; } = 3;
 	[Export(PropertyHint.Range, positiveHint)] public int VisionRange { get; private set; } = 5;
 	[Export(PropertyHint.Range, positiveHint)] public int Armor { get; private set; } = 0;
-	[Export] BehaviourNode troopMoveTree;
+	[Export] public BehaviourNode troopBehaviour { get; private set; }
+
 
 
 	const string positiveHint = "0, 1, or_greater, hide_slider";
