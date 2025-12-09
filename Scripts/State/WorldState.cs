@@ -115,6 +115,7 @@ public class WorldState
 		troopEvents.Add(coord, events);
 	}
 	public IEnumerable<TroopManager.IReadonlyTroopInfo> GetPlayerTroops(PlayerId id) => troopManager.GetPlayerTroops(id);
+	public IEnumerable<TroopManager.IReadonlyTroopInfo> GetAllTroops() => troopManager.GetAllTroops();
 
 	public async Task<bool> TryMoveTroopToCell(TroopManager.IReadonlyTroopInfo troop, Vector2I to)
 	{

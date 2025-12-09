@@ -15,6 +15,10 @@ public partial class TargetEnemiesAtGoal : BehaviourNode
 		while (true){
 			HashSet<TroopManager.IReadonlyTroopInfo> enemies = context.State.ComputeTroopRanges()
 				.GetValueOrDefault(context.Goal.Target, []);
+			if (context.State.TryGetTroop(context.Goal.Target, out TroopManager.IReadonlyTroopInfo info)){
+				enemies.Add(info);
+
+			}
 			TroopManager.IReadonlyTroopInfo strongestEnemy = enemies
 				.Where(enemy => enemy.Owner != context.Troop.Owner)
 				.Where(enemy => context.State.CalculateDamage(context.Troop, enemy) > 0)

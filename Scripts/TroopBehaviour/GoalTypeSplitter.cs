@@ -10,6 +10,7 @@ public partial class GoalTypeSplitter : BehaviourNode
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
 		if (!children.TryGetValue(context.Goal.Type, out BehaviourNode child)){
+
 			yield return NodeEvaluation.Fail();
 			yield break;
 		}

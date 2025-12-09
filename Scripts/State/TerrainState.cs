@@ -15,6 +15,9 @@ public class TerrainState()
 		ManaPool,
 	}
 
+	HashSet<Vector2I> manaPools = new();
+	public IReadOnlySet<Vector2I> ManaPools => manaPools;
+	public int TotalManaPools => manaPools.Count;
 	readonly Dictionary<Vector2I, TerrainType> terrainMap = new();
 
 	static int GetTerrainCost(TerrainType terrain)
@@ -29,7 +32,15 @@ public class TerrainState()
 
 	public Task AddCellAt(Vector2I position, TerrainType type)
 	{
+		if (terrainMap.TryGetValue(position, out TerrainType value)){
+			if (value == TerrainType.ManaPool){
+				manaPools.Remove(position);
+			}
+		}
 		terrainMap[position] = type;
+		if (type == TerrainType.ManaPool){
+			manaPools.Add(position);
+		}
 		return cellAdded.DispatchSequential((position, type));
 	}
 

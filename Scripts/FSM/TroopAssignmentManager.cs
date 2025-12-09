@@ -1,19 +1,12 @@
-#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Game.State;
 using Game.TroopBehaviour;
-using Godot;
 
-namespace Game;
+namespace Game.FSM;
 
-public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
-{
-	public class TroopAssignmentManager
+public class TroopAssignmentManager
 	{
 		public class Assignment(
 			TroopManager.IReadonlyTroopInfo troop,
@@ -42,19 +35,24 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 			assignments.Add(troop, newAssignment);
 		}
 
-		public IEnumerable<IGameAction> GetAssignmentActions(int maxActions, WorldState state)
+		public IEnumerable<IGameAction> GetAssignmentActions(int maxActions, WorldState state, Func<Assignment, float> assignmentPriority = null)
 		{
+
 			if (maxActions <= 0 || assignments.Count == 0)
 				yield break;
+			Assignment[] sortedAssignments = assignments.Values.ToArray();
+			if (assignmentPriority != null){
+				sortedAssignments = sortedAssignments.OrderByDescending(assignmentPriority).ToArray();
+			}
+			else{
+				Random.Shared.Shuffle(sortedAssignments);
 
-			var keys = assignments.Keys.ToArray();
-			Random.Shared.Shuffle(keys);
+			}
 
-			foreach (var troop in keys){
+			foreach (var assignment in sortedAssignments){
 				if (maxActions <= 0)
 					break;
-
-				var assignment = assignments[troop];
+				var troop = assignment.Troop;
 				var evaluator = assignment.Evaluator;
 				if (state.LockedTroops.Contains(troop)){
 					continue;
@@ -112,6 +110,11 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 			return assignments.ContainsKey(troop);
 		}
 
+		public Goal? GetGoal(TroopManager.IReadonlyTroopInfo troop)
+		{
+			return assignments.GetValueOrDefault(troop, null)?.AssignedGoal;
+		}
+
 		public void ClearAll()
 		{
 			foreach (Assignment a in assignments.Values)
@@ -120,57 +123,3 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 			assignments.Clear();
 		}
 	}
-
-	TroopAssignmentManager assignmentManager = new();
-	// Dictionary<TroopManager.IReadonlyTroopInfo, IEnumerator<NodeEvaluation>> troopActions = new();
-
-	public async IAsyncEnumerable<IGameAction> GetActionGenerator(WorldState state, PlayerId player, int desiredActions,
-		[EnumeratorCancellation] CancellationToken token)
-	{
-		token.ThrowIfCancellationRequested();
-
-		for (int actionsRan = 0; actionsRan < desiredActions; actionsRan++){
-			TroopManager.IReadonlyTroopInfo[] playerTroops = state.GetPlayerTroops(player).ToArray();
-			if (playerTroops.Length >= desiredActions){
-				while(TryAssignTask(state, player)){}
-				foreach (IGameAction gameAction in assignmentManager.GetAssignmentActions(1, state)){
-					yield return gameAction;
-				}
-
-
-				continue;
-			}
-
-			Vector2I[] spawns = state.GetValidPlayerSpawns(player).ToArray();
-			if (spawns.Length == 0){
-				yield return new EmptyAction();
-				continue;
-			}
-
-			Vector2I spawnPos = Random.Shared.GetItems(spawns, 1).First();
-			yield return new CreateTroopAction(troopToSpawn, spawnPos, player);
-		}
-	}
-
-	bool TryAssignTask(WorldState state, PlayerId player)
-	{
-		TroopManager.IReadonlyTroopInfo[] playerTroops = state.GetPlayerTroops(player).ToArray();
-		PlayerId enemy = state.PlayerIds.First(id => id != player);
-		var enemyManaPolls = state.GetPlayerClaimedManaPools(enemy).ToArray();
-		if (enemyManaPolls.Length == 0){
-			return false;
-		}
-
-		var randomManaPool = Random.Shared.GetItems(enemyManaPolls, 1).First();
-		var unassignedTroops = playerTroops.Where(troop => !assignmentManager.HasAssignment(troop)).ToArray();
-		if (unassignedTroops.Length == 0){
-			return false;
-		}
-
-		TroopManager.IReadonlyTroopInfo
-			randomTroop = unassignedTroops[GD.RandRange(0, unassignedTroops.Length - 1)];
-		assignmentManager.AddAssignment(new NodeContext(randomTroop, new Goal(randomManaPool, Goal.GoalType.Attack), state));
-		return true;
-	}
-
-}

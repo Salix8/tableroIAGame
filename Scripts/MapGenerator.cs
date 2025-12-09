@@ -28,7 +28,7 @@ public partial class MapGenerator : Node3D
 
 	public (Dictionary<Vector2I, TerrainState.TerrainType> map, Vector2I mana1Pos, Vector2I mana2Pos) GenerateMap()
 	{
-
+		GD.Seed(2323);
 		// Calculate terrain probability thresholds from weights
 		float totalWeight = PlainsWeight + ForestWeight + WaterWeight;
 		float plainsThreshold = (totalWeight > 0) ? PlainsWeight / totalWeight : 1.0f;
@@ -91,7 +91,6 @@ public partial class MapGenerator : Node3D
 				.ToList();
 		}
 
-		GD.Randomize();
 
 		// Select first Mana Well for Player 0
 		int randomIndex1 = (int)(GD.Randi() % availablePlains.Count);

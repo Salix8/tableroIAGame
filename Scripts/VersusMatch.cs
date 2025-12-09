@@ -68,7 +68,7 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 
 	async Task Turn(PlayerId player, CancellationToken token)
 	{
-		var claimedMana = State.GetPlayerClaimedManaPools(player).Count() * 2;
+		var claimedMana = State.GetPlayerClaimedManaPools(player).Count() * 1;
 		await State.MutatePlayerResources(player,
 			resources => new PlayerResources{ Mana = resources.Mana + claimedMana });
 		IGameStrategy strategy = players[player];

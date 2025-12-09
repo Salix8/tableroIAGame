@@ -127,4 +127,6 @@ public class TroopManager
 
 		return ranges;
 	}
+
+	public IEnumerable<IReadonlyTroopInfo> GetAllTroops() => troops.Values;
 }

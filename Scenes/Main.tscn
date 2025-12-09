@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=28 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://ho0am3pm8f0w" path="res://Scripts/Visualizers/MapVisualizer.cs" id="2_grg3l"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://t7gock5q4pfd" path="res://Scripts/HumanGameStrategy.cs" id="16_erwvk"]
 [ext_resource type="Script" uid="uid://dano1t1lxmm7n" path="res://Scripts/CameraRig.cs" id="18_346fj"]
 [ext_resource type="Texture2D" uid="uid://wbxjppkl7wye" path="res://Assets/noon_grass_4k.hdr" id="19_0sclb"]
+[ext_resource type="Script" uid="uid://dis6ojlvc6gb4" path="res://Scripts/FSM/HierarchicalAi.cs" id="21_fq0cl"]
 
 [sub_resource type="Resource" id="Resource_0sclb"]
 script = ExtResource("14_346fj")
@@ -34,6 +35,9 @@ troopColor = Color(1, 0.4862745, 0.15294118, 0.2509804)
 terrainColor = Color(1, 0.4862745, 0.15294118, 0.2509804)
 name = "Jugador IA"
 metadata/_custom_type_script = "uid://bcir2pufptnum"
+
+[sub_resource type="Gradient" id="Gradient_sxkr1"]
+colors = PackedColorArray(1, 0, 0, 1, 0, 1, 0, 1)
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_sxkr1"]
 panorama = ExtResource("19_0sclb")
@@ -85,7 +89,7 @@ warriorData = ExtResource("5_jw32o")
 archerData = ExtResource("6_50glp")
 barbarianData = ExtResource("10_2w5on")
 
-[node name="PlayableMatch" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human", "gameInterface", "influenceMapManagerNode")]
+[node name="PlayableMatch" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human", "gameInterface", "influenceMapManagerNode", "enemyAi", "enemyAi2")]
 script = ExtResource("12_2w5on")
 grid = NodePath("../Enviroment/HexGrid3D")
 generator = NodePath("../Enviroment/MapGenerator")
@@ -95,6 +99,8 @@ gameInterface = NodePath("../GameUI")
 humanPlayerInfo = SubResource("Resource_0sclb")
 aiPlayerInfo = SubResource("Resource_sxkr1")
 influenceMapManagerNode = NodePath("InfluenceManager")
+enemyAi = NodePath("../HierarchicalAi")
+enemyAi2 = NodePath("../HierarchicalAi2")
 metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="InfluenceManager" type="Node" parent="PlayableMatch"]
@@ -105,6 +111,7 @@ visible = false
 script = ExtResource("15_sxkr1")
 MapManager = NodePath("../InfluenceManager")
 Grid = NodePath("../../Enviroment/HexGrid3D")
+territoryGradient = SubResource("Gradient_sxkr1")
 
 [node name="GameUI" parent="." instance=ExtResource("12_grg3l")]
 
@@ -134,3 +141,19 @@ transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.70710
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_sxkr1")
+
+[node name="HierarchicalAi2" type="Node" parent="." node_paths=PackedStringArray("influenceMapManager")]
+script = ExtResource("21_fq0cl")
+influenceMapManager = NodePath("../PlayableMatch/InfluenceManager")
+scoutTroop = ExtResource("4_v1gob")
+knightTroop = ExtResource("5_jw32o")
+archerTroop = ExtResource("6_50glp")
+metadata/_custom_type_script = "uid://dis6ojlvc6gb4"
+
+[node name="HierarchicalAi" type="Node" parent="." node_paths=PackedStringArray("influenceMapManager")]
+script = ExtResource("21_fq0cl")
+influenceMapManager = NodePath("../PlayableMatch/InfluenceManager")
+scoutTroop = ExtResource("4_v1gob")
+knightTroop = ExtResource("5_jw32o")
+archerTroop = ExtResource("6_50glp")
+metadata/_custom_type_script = "uid://dis6ojlvc6gb4"

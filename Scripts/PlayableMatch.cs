@@ -6,6 +6,7 @@ using Game.UI;
 using Godot;
 using System.Threading.Tasks;
 using Game.AI;
+using Game.FSM;
 
 namespace Game;
 
@@ -22,6 +23,8 @@ public partial class PlayableMatch : Node
 	[Export] PlayerInfo humanPlayerInfo;
 	[Export] PlayerInfo aiPlayerInfo;
 	[Export] InfluenceMapManager influenceMapManagerNode;
+	[Export] HierarchicalAi enemyAi;
+	[Export] HierarchicalAi enemyAi2;
 	Dictionary<PlayerId, PlayerInfo> players = new();
 	public IReadOnlyDictionary<PlayerId, PlayerInfo> Players => players;
 
@@ -49,7 +52,9 @@ public partial class PlayableMatch : Node
 		}
 
 		PlayerId humanPlayer = match.AddPlayer(human);
-		PlayerId aiPlayer = match.AddPlayer(new RandomGameStrategy(testTroop));
+		PlayerId aiPlayer = match.AddPlayer(enemyAi);
+		enemyAi.Initialize(State,aiPlayer);
+		// enemyAi2.Initialize(State,humanPlayer);
 		players = new Dictionary<PlayerId, PlayerInfo>{
 			{ humanPlayer, humanPlayerInfo },
 			{ aiPlayer, aiPlayerInfo }
@@ -80,17 +85,20 @@ public partial class PlayableMatch : Node
 					await gameInterface.ToggleTurnControls(true);
 				}
 				if (match.HasLost(humanPlayer)){
+					await gameInterface.ShowTurnText($"Ganador - {players[aiPlayer].Name}");
 					//ai wins
 					break;
 				}
 				if (match.HasLost(aiPlayer)){
+
+					await gameInterface.ShowTurnText($"Ganador - {players[humanPlayer].Name}");
 					//human wins
 					break;
 				}
 
 				if(match.CurrentPlayer == aiPlayer){
 					var allCoords = State.TerrainState.GetFilledPositions();
-					influenceMapManagerNode.UpdateMaps(State, aiPlayer, allCoords);
+					// influenceMapManagerNode.UpdateMaps(State, aiPlayer);
 				}
 
 				try{
@@ -101,6 +109,7 @@ public partial class PlayableMatch : Node
 				await gameInterface.ToggleTurnControls(false);
 				await match.RunTroopAttackPhase();
 				if (!match.TryAdvanceCurrentTurn()){
+					await gameInterface.ShowTurnText($"Game Over");
 					//stalemate
 					break;
 				}
