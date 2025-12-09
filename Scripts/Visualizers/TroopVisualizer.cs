@@ -87,7 +87,7 @@ public partial class TroopVisualizer : Node3D
 		var anim = troopAnimations.GetAnimation(animationName);
 		animationPlayer.Play($"{LibraryName}/{animationName}");
 
-		await ToSignal(GetTree().CreateTimer(anim.GetLength()-endSkip), Timer.SignalName.Timeout);
+		await ToSignal(GetTree().CreateTimer((anim.GetLength()-endSkip)/animationPlayer.SpeedScale), Timer.SignalName.Timeout);
 	}
 
 	[Export] ModelMaterialManager matManager;

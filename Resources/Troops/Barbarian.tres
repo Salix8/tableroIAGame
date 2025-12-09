@@ -12,5 +12,5 @@ Cost = 5
 Health = 4
 VisionRange = 4
 Armor = 1
-troopMoveTree = ExtResource("3_37xan")
+troopBehaviour = ExtResource("3_37xan")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

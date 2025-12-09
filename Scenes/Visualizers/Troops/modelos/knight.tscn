@@ -74,3 +74,4 @@ bones/22/scale = Vector3(1, 0.9999997, 1.0000018)
 libraries = {
 &"TroopAnimations": ExtResource("2_042jo")
 }
+speed_scale = 3.0

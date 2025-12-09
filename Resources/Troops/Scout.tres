@@ -10,5 +10,5 @@ ModelScene = ExtResource("1_a6awx")
 Name = "Explorador"
 Cost = 2
 MovementRange = 10
-troopMoveTree = ExtResource("3_6rbe8")
+troopBehaviour = ExtResource("3_6rbe8")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

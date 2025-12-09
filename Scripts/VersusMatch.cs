@@ -18,7 +18,7 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 	public PlayerId AddPlayer(IGameStrategy strategy)
 	{
 		PlayerId player = State.RegisterNewPlayer();
-		players.Add(player,strategy);
+		players.Add(player, strategy);
 		playerOrder.Add(player);
 		return player;
 	}
@@ -27,7 +27,6 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 	{
 		await Turn(playerOrder[currentTurn], token);
 		currentTurn = GetAdvancedTurn(1);
-
 	}
 
 	public async Task RunCurrentTurn(CancellationToken token)
@@ -43,12 +42,14 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 				//stalemate
 				return false;
 			}
+
 			int turn = GetAdvancedTurn(skip);
 			if (!HasLost(playerOrder[turn])){
 				currentTurn = turn;
 				//valid player
 				return true;
 			}
+
 			skip++;
 		}
 	}
@@ -64,13 +65,14 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 	{
 		return !State.GetPlayerClaimedManaPools(player).Any();
 	}
+
 	async Task Turn(PlayerId player, CancellationToken token)
 	{
-		var claimedMana = State.GetPlayerClaimedManaPools(player).Count()*2;
-		await State.MutatePlayerResources(player, resources => new PlayerResources{ Mana = resources.Mana + claimedMana });
+		var claimedMana = State.GetPlayerClaimedManaPools(player).Count() * 2;
+		await State.MutatePlayerResources(player,
+			resources => new PlayerResources{ Mana = resources.Mana + claimedMana });
 		IGameStrategy strategy = players[player];
 		try{
-
 			var generator = strategy.GetActionGenerator(State, player, actionsPerTurn, token);
 			await foreach (var action in generator){
 				await action.TryApply(State);
@@ -80,13 +82,43 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 			// 	IGameAction action = generator;
 			// 	await action.TryApply(State);
 			// }
-
 		}
 		finally{
 			//run attacks for all troops
 			//kill all dead troops
 			await State.KillDeadTroops();
 		}
+	}
 
+	public async Task RunTroopAttackPhase()
+	{
+		var gameTroops = State.GetTroops();
+		var attackingTroops = gameTroops.Values.ToArray();
+		foreach (TroopManager.IReadonlyTroopInfo attackingTroop in attackingTroops){
+			int attacks = attackingTroop.Data.AttackCount;
+			var rangeCells = HexGrid.GetNeighbourSpiralCoords(attackingTroop.Position, attackingTroop.Data.AttackRange).ToArray();
+			var enemiesInRange = rangeCells.Select(pos => gameTroops.GetValueOrDefault(pos, null))
+				.Where(troop => troop != null && troop.Owner != attackingTroop.Owner).ToArray();
+			if (enemiesInRange.Length == 0){
+				continue;
+			}
+			for (int atck = 0; atck < attacks; atck++){
+				var bestTarget = enemiesInRange.MaxBy(AttackHeuristic);
+				if (bestTarget != null){
+					await State.TryExecuteAttack(attackingTroop, bestTarget);
+				}
+
+			}
+		}
+
+		await State.KillDeadTroops();
+	}
+
+	static float AttackHeuristic(TroopManager.IReadonlyTroopInfo troop)
+	{
+		if (troop.CurrentHealth == 0){
+			return -9999;
+		}
+		return troop.Data.Damage * troop.Data.AttackCount - troop.CurrentHealth;
 	}
 }

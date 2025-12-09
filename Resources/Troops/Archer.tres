@@ -11,5 +11,5 @@ Name = "Arquero"
 Cost = 6
 Damage = 3
 AttackRange = 3
-troopMoveTree = ExtResource("3_7jv3o")
+troopBehaviour = ExtResource("3_7jv3o")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

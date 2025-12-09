@@ -10,5 +10,5 @@ ModelScene = ExtResource("1_450tq")
 Name = "Guerrero"
 Health = 6
 VisionRange = 4
-troopMoveTree = ExtResource("3_8stmm")
+troopBehaviour = ExtResource("3_8stmm")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

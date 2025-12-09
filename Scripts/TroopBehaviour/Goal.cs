@@ -2,7 +2,7 @@
 
 namespace Game.TroopBehaviour;
 
-public record struct Goal
+public record struct Goal(Vector2I target, Goal.GoalType type)
 {
 	public enum GoalType
 	{
@@ -10,6 +10,6 @@ public record struct Goal
 		Defend,
 	}
 
-	public Vector2I Target;
-	public GoalType Type;
+	public Vector2I Target = target;
+	public GoalType Type = type;
 }

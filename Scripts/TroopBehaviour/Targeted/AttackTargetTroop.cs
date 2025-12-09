@@ -23,9 +23,16 @@ public class AttackTroop(TroopManager.IReadonlyTroopInfo target, MoveToTarget mo
 		while (target.CurrentHealth > 0){
 			int reach = context.Troop.Data.AttackRange;
 			HashSet<Vector2I> targets = HexGrid.GetNeighbourSpiralCoords(target.Position, reach).ToHashSet();
+			bool ran = false;
 			foreach (var evaluation in mover.Build(targets).EvaluateActions(context)){
+				ran = true;
 				yield return evaluation;
 			}
+
+			if (!ran){
+				yield return NodeEvaluation.Idle();
+			}
+
 		}
 	}
 }
