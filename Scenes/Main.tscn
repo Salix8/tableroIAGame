@@ -43,6 +43,7 @@ sky_material = SubResource("PanoramaSkyMaterial_sxkr1")
 [sub_resource type="Environment" id="Environment_sxkr1"]
 background_mode = 2
 sky = SubResource("Sky_0sclb")
+ambient_light_sky_contribution = 0.2
 
 [node name="Main" type="Node3D"]
 
@@ -115,10 +116,13 @@ mapVisualizer = NodePath("../Enviroment/MapVisualizer")
 metadata/_custom_type_script = "uid://t7gock5q4pfd"
 
 [node name="SoporteCamara" type="Node3D" parent="."]
-transform = Transform3D(0.8660254, -0.3213938, 0.38302222, 0, 0.76604444, 0.6427876, -0.5, -0.55667037, 0.66341394, 7.9204974, 11.731785, 9.719067)
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("18_346fj")
+RotationStep = 0.12
+RotationCooldown = 0.0
 
 [node name="Camera3D" type="Camera3D" parent="SoporteCamara"]
+transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 9, 9)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_sxkr1")

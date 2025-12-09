@@ -63,7 +63,7 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 
 	public bool HasLost(PlayerId player)
 	{
-		return !State.GetPlayerClaimedManaPools(player).Any();
+		return !State.GetPlayerClaimedManaPools(player).Any();// && !State.GetPlayerTroops(player).Any();
 	}
 
 	async Task Turn(PlayerId player, CancellationToken token)

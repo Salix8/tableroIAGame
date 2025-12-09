@@ -34,19 +34,12 @@ public partial class CameraRig : Node3D
 
         HandleMovement(fDelta);
 
-        // 1. Movimiento (Igual que antes)
         GlobalPosition = GlobalPosition.Lerp(_targetPosition, SmoothSpeed * fDelta);
 
-        // 2. Rotación: Aquí está el truco para evitar el efecto zootropo
-        // Si la cámara ya está muy cerca del objetivo, reseteamos el objetivo a la posición actual
-        // Esto evita que se acumulen vueltas si dejas de girar la rueda
-        if (Mathf.Abs(RotationDegrees.Y - _targetRotationY) < 0.1f)
-        {
-             _targetRotationY = RotationDegrees.Y;
-        }
 
         Vector3 currentRot = RotationDegrees;
-        currentRot.Y = Mathf.Lerp(currentRot.Y, _targetRotationY, RotationSmoothing * fDelta);
+        currentRot.Y = Mathf.RadToDeg(Mathf.LerpAngle(Mathf.DegToRad(currentRot.Y), _targetRotationY, RotationSmoothing * fDelta));
+        // GD.Print(_targetRotationY);
         RotationDegrees = currentRot;
     }
 
@@ -79,7 +72,7 @@ public partial class CameraRig : Node3D
                 // En lugar de sumar siempre, forzamos que el objetivo sea relativo a donde
                 // estamos visualmente AHORA, no donde "deberíamos estar".
                 // Esto corta la cola de rotaciones pendientes.
-                _targetRotationY = RotationDegrees.Y + RotationStep;
+                _targetRotationY += RotationStep;
                 _lastRotationTime = timeNow;
             }
         }
@@ -87,7 +80,7 @@ public partial class CameraRig : Node3D
         {
             if (timeNow - _lastRotationTime > RotationCooldown)
             {
-                _targetRotationY = RotationDegrees.Y - RotationStep;
+                _targetRotationY -= RotationStep;
                 _lastRotationTime = timeNow;
             }
         }
