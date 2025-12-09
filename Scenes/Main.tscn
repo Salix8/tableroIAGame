@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cj4rxubggvnkc"]
+[gd_scene load_steps=26 format=3 uid="uid://cj4rxubggvnkc"]
 
 [ext_resource type="Script" uid="uid://mwnpkamlfepd" path="res://Scripts/MapGenerator.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://ho0am3pm8f0w" path="res://Scripts/Visualizers/MapVisualizer.cs" id="2_grg3l"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" uid="uid://bvpyoe423bqe" path="res://Scripts/InfluenceMapManager.cs" id="13_h1m7h"]
 [ext_resource type="Script" uid="uid://bcir2pufptnum" path="res://Scripts/PlayerInfo.cs" id="14_346fj"]
 [ext_resource type="Script" uid="uid://ceolt7t8o253r" path="res://Scripts/Visualizers/TileClickHandler.cs" id="14_erwvk"]
+[ext_resource type="Script" uid="uid://djh3htu1kn35d" path="res://Scripts/InfluenceDebugger.cs" id="15_sxkr1"]
 [ext_resource type="Script" uid="uid://t7gock5q4pfd" path="res://Scripts/HumanGameStrategy.cs" id="16_erwvk"]
 [ext_resource type="Script" uid="uid://dano1t1lxmm7n" path="res://Scripts/CameraRig.cs" id="18_346fj"]
 [ext_resource type="Texture2D" uid="uid://wbxjppkl7wye" path="res://Assets/noon_grass_4k.hdr" id="19_0sclb"]
@@ -84,7 +85,7 @@ warriorData = ExtResource("5_jw32o")
 archerData = ExtResource("6_50glp")
 barbarianData = ExtResource("10_2w5on")
 
-[node name="PlayableMatch" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human", "gameInterface")]
+[node name="PlayableMatch" type="Node" parent="." node_paths=PackedStringArray("grid", "generator", "human", "gameInterface", "influenceMapManagerNode")]
 script = ExtResource("12_2w5on")
 grid = NodePath("../Enviroment/HexGrid3D")
 generator = NodePath("../Enviroment/MapGenerator")
@@ -93,10 +94,17 @@ human = NodePath("../HumanGameStrategy")
 gameInterface = NodePath("../GameUI")
 humanPlayerInfo = SubResource("Resource_0sclb")
 aiPlayerInfo = SubResource("Resource_sxkr1")
+influenceMapManagerNode = NodePath("InfluenceManager")
 metadata/_custom_type_script = "uid://bfnuy8u42wosp"
 
 [node name="InfluenceManager" type="Node" parent="PlayableMatch"]
 script = ExtResource("13_h1m7h")
+
+[node name="InfluenceDebugger" type="Node3D" parent="PlayableMatch" node_paths=PackedStringArray("MapManager", "Grid")]
+visible = false
+script = ExtResource("15_sxkr1")
+MapManager = NodePath("../InfluenceManager")
+Grid = NodePath("../../Enviroment/HexGrid3D")
 
 [node name="GameUI" parent="." instance=ExtResource("12_grg3l")]
 

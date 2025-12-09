@@ -5,6 +5,7 @@ using Game.State;
 using Game.UI;
 using Godot;
 using System.Threading.Tasks;
+using Game.AI;
 
 namespace Game;
 
@@ -20,6 +21,7 @@ public partial class PlayableMatch : Node
 	[Export] GameUI gameInterface;
 	[Export] PlayerInfo humanPlayerInfo;
 	[Export] PlayerInfo aiPlayerInfo;
+	[Export] InfluenceMapManager influenceMapManagerNode;
 	Dictionary<PlayerId, PlayerInfo> players = new();
 	public IReadOnlyDictionary<PlayerId, PlayerInfo> Players => players;
 
@@ -69,6 +71,7 @@ public partial class PlayableMatch : Node
 			int curTurn = 0;
 			while (true){
 
+
 				PlayerInfo currentPlayerInfo = players[match.CurrentPlayer];
 				await gameInterface.ShowTurnText($"Turno - {currentPlayerInfo.Name}");
 				CancellationToken turnCancellation = CancellationToken.None;
@@ -83,6 +86,11 @@ public partial class PlayableMatch : Node
 				if (match.HasLost(aiPlayer)){
 					//human wins
 					break;
+				}
+
+				if(match.CurrentPlayer == aiPlayer){
+					var allCoords = State.TerrainState.GetFilledPositions();
+					influenceMapManagerNode.UpdateMaps(State, aiPlayer, allCoords);
 				}
 
 				try{
