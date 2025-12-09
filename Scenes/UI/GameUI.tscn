@@ -188,6 +188,7 @@ script = ExtResource("5_ikj5o")
 troopToSpawn = ExtResource("8_s5b58")
 
 [node name="BtnBarbarian" type="Button" parent="MenuTroopSelection/HBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
