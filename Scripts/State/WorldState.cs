@@ -48,6 +48,18 @@ public class TroopEvents : ITroopEventsHandler
 
 public class WorldState
 {
+	HashSet<TroopManager.IReadonlyTroopInfo> lockedTroops = [];
+	public IReadOnlySet<TroopManager.IReadonlyTroopInfo> LockedTroops => lockedTroops;
+
+	public void LockTroop(TroopManager.IReadonlyTroopInfo troop)
+	{
+		lockedTroops.Add(troop);
+	}
+
+	public void ClearLockedTroops()
+	{
+		lockedTroops.Clear();
+	}
 	public PlayerId RegisterNewPlayer()
 	{
 		int playerCount = PlayerIds.Count();
@@ -191,6 +203,7 @@ public class WorldState
 			await events.TroopKilled.DispatchSequential(deadTroop);
 			troopManager.TryRemoveTroop(deadTroop);
 			troopEvents.Remove(deadTroop.Position);
+			lockedTroops.Remove(deadTroop);
 		}
 	}
 	public bool IsValidTroopCoord(Vector2I coord)
@@ -237,7 +250,7 @@ public class WorldState
 		if (!IsValidTroopCoord(coord)){
 			return false;
 		}
-		return HexGrid.GetNeighbourSpiralCoords(coord, 1).Where(IsValidTroopCoord).Any(neighbour => {
+		return HexGrid.GetNeighbourSpiralCoords(coord, 1).Any(neighbour => {
 			if (!playerManaClaims.TryGetValue(neighbour, out PlayerId id)){
 				return false;
 			}

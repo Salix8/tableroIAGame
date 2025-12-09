@@ -76,17 +76,13 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 			var generator = strategy.GetActionGenerator(State, player, actionsPerTurn, token);
 			await foreach (var action in generator){
 				await action.TryApply(State);
-				//todo stop the generator when hit max actions
 			}
-			// for (int i = 0; i < actionsPerTurn; i++){
-			// 	IGameAction action = generator;
-			// 	await action.TryApply(State);
-			// }
 		}
 		finally{
 			//run attacks for all troops
 			//kill all dead troops
 			await State.KillDeadTroops();
+			State.ClearLockedTroops();
 		}
 	}
 

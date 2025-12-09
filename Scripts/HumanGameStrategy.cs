@@ -31,15 +31,27 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 	public async IAsyncEnumerable<IGameAction> GetActionGenerator(WorldState state, PlayerId player, int desiredActions, [EnumeratorCancellation] CancellationToken token)
 	{
 		token.ThrowIfCancellationRequested();
-		for (int i = 0; i < desiredActions; i++){
-			IGameAction? action = null;
-			while (action == null){
-				Vector2I click = await tileClickHandler.WaitForTileClick(token);
-				action = await TryCreateAction(click, state, player, token);
+		try{
+			for (int i = 0; i < desiredActions; i++){
+				await HighlightTroops(state.LockedTroops.Where(troop => troop.Owner == player),
+					TroopVisualizer.HighlightType.Gray);
+				IGameAction? action = null;
+				while (action == null){
+					Vector2I click = await tileClickHandler.WaitForTileClick(token);
+					action = await TryCreateAction(click, state, player, token);
 
+				}
+
+				yield return action;
 			}
-			yield return action;
+
 		}
+		finally{
+
+			await HighlightTroops(state.GetPlayerTroops(player).Where(troop => troop.Owner == player),
+				TroopVisualizer.HighlightType.None);
+		}
+
 
 	}
 
@@ -47,7 +59,10 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 	{
 		if (state.TryGetTroop(selection, out TroopManager.IReadonlyTroopInfo? troop)){
 			if (troop.Owner == player){
-				return await TroopAction(troop, state, player, token);
+				if (!state.LockedTroops.Contains(troop)){
+					return await TroopAction(troop, state, player, token);
+
+				}
 			}
 		}
 
@@ -62,7 +77,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 	{
 		token.ThrowIfCancellationRequested();
 		await Task.WhenAll(
-			HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.Gray),
+			// HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.Gray),
 			HighlightTiles([spawnPosition], HexTileVisualizer.HighlightType.Selected),
 			HighlightTiles(state.TerrainState.GetFilledPositions().Where(pos => pos != spawnPosition), HexTileVisualizer.HighlightType.Gray)
 		);
@@ -89,7 +104,7 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 		}
 		finally{
 			await Task.WhenAll(
-				HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.None),
+				// HighlightTroops(state.GetTroops().Values, TroopVisualizer.HighlightType.None),
 				HighlightTiles(state.TerrainState.GetFilledPositions(), HexTileVisualizer.HighlightType.None)
 			);
 
@@ -158,19 +173,19 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 			using var raceCancel = new CancellationTokenSource();
 			using var linkedCancel = CancellationTokenSource.CreateLinkedTokenSource(raceCancel.Token, token);
 			List<Task<IGameAction?>> gameActionTasks =[
-				TryMoveTroop(tileClickHandler.WaitForTileClick(linkedCancel.Token), linkedCancel.Token)
+				TryMoveTroop(tileClickHandler.WaitForTileClick(linkedCancel.Token))
 
 			];
 			if (state.TerrainState.GetTerrainType(troop.Position) == TerrainState.TerrainType.ManaPool){
 				if (state.PlayerManaClaims.TryGetValue(troop.Position, out PlayerId id)){
 					if (id != player){
 						await gameInterface.ToggleClaimButton(true);
-						gameActionTasks.Add(TryClaimCell(WaitButtonClick(gameInterface.ClaimButton, linkedCancel.Token), linkedCancel.Token));
+						gameActionTasks.Add(TryClaimCell(WaitButtonClick(gameInterface.ClaimButton, linkedCancel.Token)));
 					}
 				}
 				else{
 					await gameInterface.ToggleClaimButton(true);
-					gameActionTasks.Add(TryClaimCell(WaitButtonClick(gameInterface.ClaimButton, linkedCancel.Token), linkedCancel.Token));
+					gameActionTasks.Add(TryClaimCell(WaitButtonClick(gameInterface.ClaimButton, linkedCancel.Token)));
 				}
 			}
 			Task<IGameAction?> finished = await Task.WhenAny(gameActionTasks.ToArray());
@@ -186,13 +201,13 @@ public partial class HumanGameStrategy : Node, IGameStrategy
 			);
 		}
 
-		async Task<IGameAction?> TryClaimCell(Task btnTask, CancellationToken token)
+		async Task<IGameAction?> TryClaimCell(Task btnTask)
 		{
 			await btnTask;
 
-			return new ClaimManaAction(troop.Position, player);
+			return new ClaimManaAction(troop, player);
 		}
-		async Task<IGameAction?> TryMoveTroop(Task<Vector2I> coordSelectTask,  CancellationToken token)
+		async Task<IGameAction?> TryMoveTroop(Task<Vector2I> coordSelectTask)
 		{
 			Vector2I selection = await coordSelectTask;
 			if (!reachablePositions.Contains(selection)){

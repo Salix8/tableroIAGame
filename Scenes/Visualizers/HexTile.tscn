@@ -49,7 +49,7 @@ terrainScenes = Dictionary[int, PackedScene]({
 5: ExtResource("6_wizard_tower")
 })
 totalAnimationDuration = 0.4
-skippedDuration = 0.37
+skippedDuration = 0.4
 spawnPoint = NodePath("spawn")
 matManager = NodePath("ModelMaterialManager")
 

@@ -6,11 +6,11 @@ using Godot;
 namespace Game.TroopBehaviour;
 
 [GlobalClass]
-public partial class ClaimManaAtGoal : BehaviourNode
+public partial class ClaimMana : BehaviourNode
 {
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
-		yield return NodeEvaluation.FromAction(new ClaimManaAction(context.Goal.Target, context.Troop.Owner));
+		yield return NodeEvaluation.FromAction(new ClaimManaAction(context.Troop, context.Troop.Owner));
 
 	}
 }

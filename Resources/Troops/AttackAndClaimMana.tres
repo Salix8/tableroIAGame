@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dqchix17ftcy0" path="res://Scripts/TroopBehaviour/Targeted/AttackTargetTroop.cs" id="4_nvs14"]
 [ext_resource type="Script" uid="uid://bkobbkkb1oh1l" path="res://Scripts/TroopBehaviour/RepeatUntilEmpty.cs" id="5_7wsse"]
 [ext_resource type="Script" uid="uid://rjhyonth4651" path="res://Scripts/TroopBehaviour/TargetGoal.cs" id="6_nvs14"]
-[ext_resource type="Script" uid="uid://dxvh3j35k8gak" path="res://Scripts/TroopBehaviour/ClaimManaAtGoal.cs" id="7_b2vk4"]
+[ext_resource type="Script" uid="uid://dxvh3j35k8gak" path="res://Scripts/TroopBehaviour/ClaimMana.cs" id="7_nvs14"]
 
 [sub_resource type="Resource" id="Resource_m4igx"]
 script = ExtResource("3_m4igx")
@@ -36,11 +36,11 @@ script = ExtResource("6_nvs14")
 positionTarget = SubResource("Resource_7wsse")
 metadata/_custom_type_script = "uid://rjhyonth4651"
 
-[sub_resource type="Resource" id="Resource_n3p0e"]
-script = ExtResource("7_b2vk4")
+[sub_resource type="Resource" id="Resource_b2vk4"]
+script = ExtResource("7_nvs14")
 metadata/_custom_type_script = "uid://dxvh3j35k8gak"
 
 [resource]
 script = ExtResource("1_5vowi")
-sequence = Array[Object]([SubResource("Resource_1tusn"), SubResource("Resource_g5xay"), SubResource("Resource_n3p0e")])
+sequence = Array[Object]([SubResource("Resource_1tusn"), SubResource("Resource_g5xay"), SubResource("Resource_b2vk4")])
 metadata/_custom_type_script = "uid://chyd6way3ulnt"

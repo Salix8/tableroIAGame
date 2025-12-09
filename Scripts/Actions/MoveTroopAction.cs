@@ -8,6 +8,7 @@ public readonly struct MoveTroopAction(TroopManager.IReadonlyTroopInfo target, V
 {
 	public async Task<bool> TryApply(WorldState worldState)
 	{
+		worldState.LockTroop(target);
 		var movingTroop = target;
 		if (!worldState.GetTroops().Values.Contains(movingTroop)){
 			GD.Print("AAA");

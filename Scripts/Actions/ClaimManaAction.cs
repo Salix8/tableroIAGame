@@ -4,10 +4,12 @@ using Godot;
 
 namespace Game.State;
 
-public readonly struct ClaimManaAction(Vector2I cell, PlayerId player) : IGameAction
+public readonly struct ClaimManaAction(TroopManager.IReadonlyTroopInfo troop, PlayerId player) : IGameAction
 {
 	public async Task<bool> TryApply(WorldState worldState)
 	{
-		return await worldState.TryClaimManaPool(player, cell);
+
+		worldState.LockTroop(troop);
+		return await worldState.TryClaimManaPool(player, troop.Position);
 	}
 }

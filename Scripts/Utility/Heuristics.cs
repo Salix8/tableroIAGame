@@ -2,7 +2,7 @@
 
 namespace Game;
 
-public class Heuristics
+public static class Heuristics
 {
 
 	public static float AttackHeuristic(TroopManager.IReadonlyTroopInfo attacker, TroopManager.IReadonlyTroopInfo attacked,WorldState worldState)
