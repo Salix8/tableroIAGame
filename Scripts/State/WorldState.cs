@@ -155,33 +155,28 @@ public class WorldState
 
 		return true;
 	}
-	public Task<bool> TryExecuteAttack(TroopManager.IReadonlyTroopInfo attacker,TroopManager.IReadonlyTroopInfo target)
+	public async  Task<bool> TryExecuteAttack(TroopManager.IReadonlyTroopInfo attacker,TroopManager.IReadonlyTroopInfo target)
 	{
 		Vector2I from = attacker.Position;
 		Vector2I to = target.Position;
 		TerrainState.TerrainType? type = TerrainState.GetTerrainType(to);
 		if (type == null){
-			return Task.FromResult(false);
+			return false;
 		}
 
 		int damage = attacker.Data.Damage;
 		damage = ModifiedDamage(type.Value, damage);
 		var beforeDamage = target.CreateSnapshot();
-		if (!troopManager.TryDamageTroop(target, damage)) return  Task.FromResult(false);
+		if (!troopManager.TryDamageTroop(target, damage)) return  false;
 		GD.Print($"Damaged to {target.CurrentHealth}");
 		TroopEvents attackerEvents = GetEventWithAssert(from);
 		TroopEvents targetEvents = GetEventWithAssert(to);
 
-		TaskCompletionSource<bool> source = new();
-		RunEvents();
-		return source.Task;
-
-		async void RunEvents()
-		{
-			await attackerEvents.TroopAttacking.DispatchSequential((attacker, target.Position));
+		await attackerEvents.TroopAttacking.DispatchSequential((attacker, target.Position));
+		if (beforeDamage.CurrentHealth != target.CurrentHealth){
 			await targetEvents.TroopDamaged.DispatchSequential((beforeDamage, target));
-			source.SetResult(true);
 		}
+		return true;
 	}
 	public bool TryGetTroop(Vector2I coord, [NotNullWhen(true)] out TroopManager.IReadonlyTroopInfo? troop) => troopManager.TryGetTroop(coord, out troop);
 	public IReadOnlyDictionary<Vector2I, TroopManager.IReadonlyTroopInfo> GetTroops() => troopManager.GetTroops();

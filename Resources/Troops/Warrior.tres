@@ -9,6 +9,7 @@ script = ExtResource("1_jrcrt")
 ModelScene = ExtResource("1_450tq")
 Name = "Guerrero"
 Health = 6
+AttackCount = 3
 VisionRange = 4
 troopBehaviour = ExtResource("3_8stmm")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

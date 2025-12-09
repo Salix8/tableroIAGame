@@ -252,6 +252,7 @@ public static class HexGridNavigation
 			Damage = 0
 		};
 		gCost[startingNode] = 0;
+		var minGCost = new Dictionary<Vector2, int>();
 
 		EnqueueNeighbours(startingNode);
 
@@ -287,10 +288,17 @@ public static class HexGridNavigation
 
 				int tentativeG = gCost[origin] + movementCost.Value;
 				int h = targets.Select(target => HexGrid.GetHexDistance(neighbor.Position, target)).Min();
+				if (minGCost.TryGetValue(neighbor.Position,out int cost)){
+					if (cost < tentativeG){
+						continue;
+					}
+				}
+
 				if (tentativeG + h > maxMovement) continue; // if above movement limit skip
 				if (tentativeG >= gCost.GetValueOrDefault(neighbor, int.MaxValue)) continue;
 				parent[neighbor] = origin;
 				gCost[neighbor] = tentativeG;
+				minGCost[neighbor.Position] = tentativeG;
 				openSet.Enqueue(neighbor, new Cost(){ GCost = tentativeG, Damage = neighbor.Damage, HCost = h });
 			}
 		}
