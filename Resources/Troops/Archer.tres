@@ -1,13 +1,8 @@
-[gd_resource type="Resource" script_class="TroopData" load_steps=5 format=3 uid="uid://dwryn3llrislp"]
+[gd_resource type="Resource" script_class="TroopData" load_steps=4 format=3 uid="uid://dwryn3llrislp"]
 
 [ext_resource type="PackedScene" uid="uid://d0go4w3w4k0px" path="res://Scenes/Visualizers/Troops/Archer.tscn" id="1_0jv21"]
 [ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="1_8yq5r"]
-[ext_resource type="Script" path="res://Scripts/TroopBehaviour/GoalTypeSplitterNode.cs" id="4_j8cn4"]
-
-[sub_resource type="Resource" id="Resource_7jv3o"]
-script = ExtResource("4_j8cn4")
-children = null
-metadata/_custom_type_script = "uid://b640844imdcrc"
+[ext_resource type="Resource" uid="uid://c3q87cw7l7un5" path="res://Resources/Troops/GenericBehaviour.tres" id="3_7jv3o"]
 
 [resource]
 script = ExtResource("1_8yq5r")
@@ -16,5 +11,5 @@ Name = "Arquero"
 Cost = 6
 Damage = 3
 AttackRange = 3
-troopMoveTree = SubResource("Resource_7jv3o")
+troopMoveTree = ExtResource("3_7jv3o")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

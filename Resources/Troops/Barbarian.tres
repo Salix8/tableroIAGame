@@ -1,22 +1,16 @@
-[gd_resource type="Resource" script_class="TroopData" load_steps=5 format=3 uid="uid://cl02jkthhwtlr"]
+[gd_resource type="Resource" script_class="TroopData" load_steps=4 format=3 uid="uid://cl02jkthhwtlr"]
 
-[ext_resource type="Texture2D" uid="uid://euyehbbklau8" path="res://Assets/KayKit_Adventurers_2.0_FREE/Textures/barbarian_texture.png" id="1_37xan"]
 [ext_resource type="PackedScene" uid="uid://cyx4hymdxeh3" path="res://Scenes/Visualizers/Troops/Barbarian.tscn" id="1_jsa1c"]
 [ext_resource type="Script" uid="uid://cbpnwk4hpv8vt" path="res://Scripts/TroopData.cs" id="2_37xan"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yhpuc"]
-resource_name = "rogue"
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("1_37xan")
-emission_enabled = true
+[ext_resource type="Resource" uid="uid://c3q87cw7l7un5" path="res://Resources/Troops/GenericBehaviour.tres" id="3_37xan"]
 
 [resource]
 script = ExtResource("2_37xan")
 ModelScene = ExtResource("1_jsa1c")
-ModelMaterial = SubResource("StandardMaterial3D_yhpuc")
 Name = "Barbarian"
 Cost = 5
 Health = 4
 VisionRange = 4
 Armor = 1
+troopMoveTree = ExtResource("3_37xan")
 metadata/_custom_type_script = "uid://cbpnwk4hpv8vt"

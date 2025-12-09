@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="GoalTypeSplitter" load_steps=13 format=3 uid="uid://c3q87cw7l7un5"]
+
+[ext_resource type="Resource" uid="uid://jwdagyjqa1s" path="res://Resources/Troops/AttackAndClaimMana.tres" id="1_h2prr"]
+[ext_resource type="Script" uid="uid://chyd6way3ulnt" path="res://Scripts/TroopBehaviour/Sequencer.cs" id="2_mqit5"]
+[ext_resource type="Script" uid="uid://cycfkgfx778jb" path="res://Scripts/TroopBehaviour/TargetEnemiesAtGoal.cs" id="3_q5i18"]
+[ext_resource type="Script" uid="uid://dwu8lt1g2vioa" path="res://Scripts/TroopBehaviour/Targeted/MoveToTarget.cs" id="4_y876f"]
+[ext_resource type="Script" uid="uid://dqchix17ftcy0" path="res://Scripts/TroopBehaviour/Targeted/AttackTargetTroop.cs" id="5_8dwpm"]
+[ext_resource type="Script" uid="uid://bkobbkkb1oh1l" path="res://Scripts/TroopBehaviour/RepeatUntilEmpty.cs" id="6_unooy"]
+[ext_resource type="Script" uid="uid://b640844imdcrc" path="res://Scripts/TroopBehaviour/GoalTypeSplitter.cs" id="7_gnob7"]
+
+[sub_resource type="Resource" id="Resource_yfkrl"]
+script = ExtResource("4_y876f")
+metadata/_custom_type_script = "uid://dwu8lt1g2vioa"
+
+[sub_resource type="Resource" id="Resource_5320b"]
+script = ExtResource("5_8dwpm")
+move = SubResource("Resource_yfkrl")
+metadata/_custom_type_script = "uid://dqchix17ftcy0"
+
+[sub_resource type="Resource" id="Resource_4rxfv"]
+script = ExtResource("3_q5i18")
+targetTroop = SubResource("Resource_5320b")
+metadata/_custom_type_script = "uid://cycfkgfx778jb"
+
+[sub_resource type="Resource" id="Resource_w1pfo"]
+script = ExtResource("2_mqit5")
+sequence = Array[Object]([SubResource("Resource_4rxfv")])
+metadata/_custom_type_script = "uid://chyd6way3ulnt"
+
+[sub_resource type="Resource" id="Resource_txu0r"]
+script = ExtResource("6_unooy")
+child = SubResource("Resource_w1pfo")
+metadata/_custom_type_script = "uid://bkobbkkb1oh1l"
+
+[resource]
+script = ExtResource("7_gnob7")
+children = Dictionary[int, Object]({
+0: ExtResource("1_h2prr"),
+1: SubResource("Resource_txu0r")
+})
+metadata/_custom_type_script = "uid://b640844imdcrc"

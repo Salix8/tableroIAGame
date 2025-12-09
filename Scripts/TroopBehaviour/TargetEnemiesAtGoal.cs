@@ -9,7 +9,7 @@ namespace Game.TroopBehaviour;
 [GlobalClass]
 public partial class TargetEnemiesAtGoal : BehaviourNode
 {
-	[Export] TroopTargetedNodeFactory troopTargetedNodeFactory;
+	[Export] TroopTargetedNodeFactory targetTroop;
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
 		while (true){
@@ -21,7 +21,7 @@ public partial class TargetEnemiesAtGoal : BehaviourNode
 			TroopManager.IReadonlyTroopInfo strongestEnemy = enemies
 				.Where(enemy => enemy.Owner != context.Troop.Owner)
 				.MaxBy(enemy => TroopDataDangerHeuristic(enemy.Data));
-			foreach (var evaluation in troopTargetedNodeFactory.Build(strongestEnemy).EvaluateActions(context)){
+			foreach (var evaluation in targetTroop.Build(strongestEnemy).EvaluateActions(context)){
 				yield return evaluation;
 			}
 		}

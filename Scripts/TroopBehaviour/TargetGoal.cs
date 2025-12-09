@@ -6,12 +6,12 @@ using Godot;
 namespace Game.TroopBehaviour;
 
 [GlobalClass]
-public partial class MoveToGoal : BehaviourNode
+public partial class TargetGoal : BehaviourNode
 {
-	[Export] PositionTargetedNodeFactory moveToTarget;
+	[Export] PositionTargetedNodeFactory positionTarget;
 	public override IEnumerable<NodeEvaluation> EvaluateActions(NodeContext context)
 	{
-		foreach (NodeEvaluation evaluation in moveToTarget.Build(context.Goal.Target).EvaluateActions(context)){
+		foreach (NodeEvaluation evaluation in positionTarget.Build(context.Goal.Target).EvaluateActions(context)){
 			yield return evaluation;
 			if (evaluation.Type == NodeEvaluation.ResultType.Failure){
 				yield break;
