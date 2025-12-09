@@ -103,7 +103,7 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 				continue;
 			}
 			for (int atck = 0; atck < attacks; atck++){
-				var bestTarget = enemiesInRange.MaxBy(AttackHeuristic);
+				var bestTarget = enemiesInRange.MaxBy(enemy=>Heuristics.AttackHeuristic(attackingTroop,enemy,State));
 				if (bestTarget != null){
 					await State.TryExecuteAttack(attackingTroop, bestTarget);
 				}
@@ -114,11 +114,4 @@ public class VersusMatch(WorldState state, int actionsPerTurn)
 		await State.KillDeadTroops();
 	}
 
-	static float AttackHeuristic(TroopManager.IReadonlyTroopInfo troop)
-	{
-		if (troop.CurrentHealth == 0){
-			return -9999;
-		}
-		return troop.Data.Damage * troop.Data.AttackCount - troop.CurrentHealth;
-	}
 }

@@ -164,8 +164,7 @@ public class WorldState
 			return false;
 		}
 
-		int damage = attacker.Data.Damage;
-		damage = ModifiedDamage(type.Value, damage);
+		int damage = CalculateDamage(attacker, target);
 		var beforeDamage = target.CreateSnapshot();
 		if (!troopManager.TryDamageTroop(target, damage)) return  false;
 		GD.Print($"Damaged to {target.CurrentHealth}");
@@ -252,6 +251,14 @@ public class WorldState
 
 	public TerrainState TerrainState { get; } = new();
 
+	public int CalculateDamage(TroopManager.IReadonlyTroopInfo attacker, TroopManager.IReadonlyTroopInfo attacked)
+	{
+		TerrainState.TerrainType? terrain = TerrainState.GetTerrainType(attacked.Position);
+		Debug.Assert(terrain != null, "Attacked troop is not standing on any terrain");
+		int damage = attacker.Data.Damage;
+		damage -= attacked.Data.Armor;
+		return ModifiedDamage(terrain.Value, damage);
+	}
 
 	public static int ModifiedDamage(TerrainState.TerrainType type, int damage)
 	{

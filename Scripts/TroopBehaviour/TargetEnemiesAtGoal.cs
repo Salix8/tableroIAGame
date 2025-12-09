@@ -17,7 +17,8 @@ public partial class TargetEnemiesAtGoal : BehaviourNode
 				.GetValueOrDefault(context.Goal.Target, []);
 			TroopManager.IReadonlyTroopInfo strongestEnemy = enemies
 				.Where(enemy => enemy.Owner != context.Troop.Owner)
-				.MaxBy(enemy => TroopDataDangerHeuristic(enemy.Data));
+				.Where(enemy => context.State.CalculateDamage(context.Troop, enemy) > 0)
+				.MaxBy(enemy => Heuristics.AttackHeuristic(context.Troop,enemy, context.State));
 			if (strongestEnemy == null){
 				yield break;
 			}

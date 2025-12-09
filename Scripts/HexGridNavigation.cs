@@ -191,7 +191,7 @@ public static class HexGridNavigation
 			HashSet<TroopManager.IReadonlyTroopInfo> newRange = enemyRanges.GetValueOrDefault(to, []);
 
 			IEnumerable<TroopManager.IReadonlyTroopInfo> lostRange = inRange.Where(elem => !newRange.Contains(elem));
-			return lostRange.Select(enemy => enemy.Data.Damage).Sum();
+			return lostRange.Select(enemy => state.CalculateDamage(enemy,troop)).Sum();
 		}
 	}
 
@@ -309,7 +309,7 @@ public static class HexGridNavigation
 			HashSet<TroopManager.IReadonlyTroopInfo> newRange = enemyRanges.GetValueOrDefault(to, []);
 
 			IEnumerable<TroopManager.IReadonlyTroopInfo> lostRange = inRange.Where(elem => !newRange.Contains(elem));
-			return lostRange.Select(enemy => enemy.Data.Damage).Sum();
+			return lostRange.Select(enemy => state.CalculateDamage(enemy,troop)).Sum();
 		}
 
 
