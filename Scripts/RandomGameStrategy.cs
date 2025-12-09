@@ -29,6 +29,7 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 
 
 				TryAssignTasks(state, player);
+				continue;
 			}
 
 			Vector2I[] spawns = state.GetValidPlayerSpawns(player).ToArray();
@@ -73,21 +74,15 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 		int leftoverActions = actionLimit;
 		foreach (var troopWithGoal in troopsWithGoal){
 			var evaluator = troopActions[troopWithGoal];
-			if (troopWithGoal.CurrentHealth <= 0){
-				troopActions.Remove(troopWithGoal);
-				evaluator.Dispose();
-
-			}
-			if (!evaluator.MoveNext()){
-				troopActions.Remove(troopWithGoal);
-				evaluator.Dispose();
+			if (troopWithGoal.CurrentHealth <= 0 || !evaluator.MoveNext()){
+				RemoveTroopTask(troopWithGoal);
+				yield break;
 			}
 
 			var evaluation = evaluator.Current;
 			switch (evaluation.Type){
 				case NodeEvaluation.ResultType.Failure:
-					troopActions.Remove(troopWithGoal);
-					evaluator.Dispose();
+					RemoveTroopTask(troopWithGoal);
 					break;
 				case NodeEvaluation.ResultType.Ongoing:
 					yield return evaluation.Result!;
@@ -103,5 +98,16 @@ public class RandomGameStrategy(TroopData troopToSpawn) : IGameStrategy
 				yield break;
 			}
 		}
+	}
+
+	void RemoveTroopTask(TroopManager.IReadonlyTroopInfo troop)
+	{
+		if (troopActions.Remove(troop, out IEnumerator<NodeEvaluation>? evaluator)){
+			evaluator.Dispose();
+
+		}
+
+
+
 	}
 }

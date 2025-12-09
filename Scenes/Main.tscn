@@ -56,7 +56,7 @@ metadata/_custom_type_script = "uid://dv71us8ote7gl"
 
 [node name="MapGenerator" type="Node3D" parent="Enviroment"]
 script = ExtResource("1_r150o")
-MapRadius = 10
+MapRadius = 8
 
 [node name="MapVisualizer" type="Node3D" parent="Enviroment" node_paths=PackedStringArray("game", "grid")]
 script = ExtResource("2_grg3l")
